@@ -22,9 +22,9 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& la
 	for (unsigned int i = 0; i < elements.size(); ++i)
 	{
 		const auto& element = elements[i];
-		// abilitare un attributo per i vertici nel buffer
+		// enable an attribute for the vertices in the vertex buffer
 		GLCall(glEnableVertexAttribArray(i));
-		// setup dell'unico attributo "position" del buffer attualmente bindato
+		// setup of the attribute "position"
 		GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
 		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
 	}

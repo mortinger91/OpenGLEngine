@@ -6,7 +6,7 @@ class VertexArray;
 class IndexBuffer;
 class Shader;
 
-// il __ fa capire che questa funzione è specifica del compilatore, msvc in questo caso
+// __ means that the function is compiler intrinsic, so it's specific to msvc, other compilers will use different functions
 #define ASSERT(x) if(!(x)) __debugbreak();
 #define GLCall(x) GLClearError();\
 	x;\
