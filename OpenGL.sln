@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL", "OpenGL\OpenGL.vcxproj", "{D6C71528-5A67-4E9C-9E51-D9D9CB60F9EA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rotation example", "Rotation example\Rotation example.vcxproj", "{3AB9C31F-931B-4EC1-BBF3-6C204B311851}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{D6C71528-5A67-4E9C-9E51-D9D9CB60F9EA}.Release|x64.Build.0 = Release|x64
 		{D6C71528-5A67-4E9C-9E51-D9D9CB60F9EA}.Release|x86.ActiveCfg = Release|Win32
 		{D6C71528-5A67-4E9C-9E51-D9D9CB60F9EA}.Release|x86.Build.0 = Release|Win32
+		{3AB9C31F-931B-4EC1-BBF3-6C204B311851}.Debug|x64.ActiveCfg = Debug|x64
+		{3AB9C31F-931B-4EC1-BBF3-6C204B311851}.Debug|x64.Build.0 = Debug|x64
+		{3AB9C31F-931B-4EC1-BBF3-6C204B311851}.Debug|x86.ActiveCfg = Debug|Win32
+		{3AB9C31F-931B-4EC1-BBF3-6C204B311851}.Debug|x86.Build.0 = Debug|Win32
+		{3AB9C31F-931B-4EC1-BBF3-6C204B311851}.Release|x64.ActiveCfg = Release|x64
+		{3AB9C31F-931B-4EC1-BBF3-6C204B311851}.Release|x64.Build.0 = Release|x64
+		{3AB9C31F-931B-4EC1-BBF3-6C204B311851}.Release|x86.ActiveCfg = Release|Win32
+		{3AB9C31F-931B-4EC1-BBF3-6C204B311851}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

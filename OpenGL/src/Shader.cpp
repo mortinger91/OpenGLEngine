@@ -12,10 +12,14 @@ struct ShaderProgramSource
 	std::string FragmentSource;
 };
 
-Shader::Shader(const std::string& filepath)
-	:m_Filepath(filepath), m_RendererID(0)
+//Shader::Shader(const std::string& filepath)
+Shader::Shader(const std::string& filepathVertex, const std::string& filepathFragment)
+	:m_FilepathVertex(filepathVertex), m_FilepathFragment(filepathFragment), m_RendererID(0)
 {
-	ShaderProgramSource source = ParseShader(m_Filepath);
+	ShaderProgramSource source;
+	//source = ParseShader(m_Filepath);
+	source.VertexSource = GetFileContent(m_FilepathVertex);
+	source.FragmentSource = GetFileContent(m_FilepathFragment);
 	m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
 }
 
@@ -57,6 +61,18 @@ ShaderProgramSource Shader::ParseShader(const std::string& filepath)
 	}
 
 	return { ss[0].str(), ss[1].str() };
+}
+
+std::string Shader::GetFileContent(const std::string& filepath)
+{
+	std::ifstream stream(filepath);
+	std::string line;
+	std::stringstream ss;
+	while (getline(stream, line))
+	{
+		ss << line << '\n';
+	}
+	return ss.str();
 }
 
 unsigned int Shader::CompileShader(unsigned int type, const std::string& source)

@@ -18,6 +18,14 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
+#include "tests/TestClearColor.h"
+#include "tests/TestTexture2D.h"
+#include "tests/Test3DCube.h"
+
 // opengl old mode
 void TestFunction()
 {
@@ -61,7 +69,7 @@ int Init(GLFWwindow* &window)
 	}
 
 	GLCall(const unsigned char* version = glGetString(GL_VERSION));
-	std::cout << version << std::endl;
+	std::cout << std::string(reinterpret_cast<const char*>(version)) << std::endl;
 	return 0;
 }
 
@@ -79,85 +87,60 @@ int main(void)
 		return -1;
 	}
 	{
-		float positions[] = 
-		{
-			-0.5f, -0.5f, 0.f, 0.f, //0
-			 0.5f, -0.5f, 1.f, 0.f, //1
-			 0.5f,  0.5f, 1.f, 1.f, //2
-			-0.5f,  0.5f, 0.f, 1.f  //3
-		};
-
-		unsigned int indices[] = 
-		{
-			0, 1, 2,
-			2, 3, 0
-		};
-
 		GLCall(glEnable(GL_BLEND));
 		// setting up a blend function, default would be src=0 dest=1 which means override old pixels with new ones
 		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-		VertexArray va;
-		VertexBuffer vb(positions, 4 * 4 * sizeof(float));
+		//Setup ImGui
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGui::StyleColorsDark();
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		ImGui_ImplOpenGL3_Init((char *)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
 
-		VertexBufferLayout layout;
-		// position of the vertices of the two triangles making up a square
-		layout.Push<float>(2);
-		// coordinates of the texture related to each vertices
-		layout.Push<float>(2);
-		va.AddBuffer(vb, layout);
+		test::Test* currentTest = nullptr;
+		test::TestMenu* testMenu = new test::TestMenu(currentTest);
+		currentTest = testMenu;
 
-		// creating an index buffer
-		IndexBuffer ib(indices, 6);
-
-		// orthographic projection matrix
-		glm::mat4 proj = glm::ortho(-2.f, 2.f, -1.5f, 1.5f, -1.f, 1.f);
-	
-		// defining a shader
-		Shader shader("res/shaders/Basic.shader");
-		shader.Bind();
-		// defining a uniform after having bound a shader
-		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-		shader.SetUniformMat4f("u_MVP", proj);
-
-		Texture texture("res/textures/witcher.png");
-		texture.Bind();
-		shader.SetUniform1i("u_Texture", 0);
-
-		// unbiding all 
-		va.Unbind();
-		vb.Unbind();
-		ib.Unbind();
-		shader.Unbind();
-
-		// state setting function
-		GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
+		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
+		testMenu->RegisterTest<test::TestTexture2D>("Texture");
+		testMenu->RegisterTest<test::Test3DCube>("3D Cube");
 
 		Renderer renderer;
-
-		float r = 0.f;
-		float increment = 0.05f;
 
 		// Game engine loop, do it every frame
 		// Loop until the user closes the window
 		while (!glfwWindowShouldClose(window))
 		{
+			GLCall(glClearColor(0.f, 0.f, 0.f, 1.f));
+			// input processing done by glfw
 			processInput(window);
-
-			// Render here
+			// Clearing last frame
 			renderer.Clear();
 
-			shader.Bind();
-			shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
+			//New Frame ImGui
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
 
-			renderer.Draw(va, ib, shader);
+			if(currentTest)
+			{
+				currentTest->OnUpdate(0.f);
+				currentTest->OnRender();
+				ImGui::Begin("Test");
+				if (currentTest != testMenu && ImGui::Button("<-"))
+				{
+					delete currentTest;
+					currentTest = testMenu;
+				}
+				currentTest->OnImGuiRender();
+				ImGui::End();
+			}
 
-			if (r > 1.f)
-				increment = -0.05f;
-			else if (r < 0.f)
-				increment = 0.05f;
-
-			r += increment;
+			//Render ImGui
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 			// Swap front and back buffers
 			// The glfwSwapBuffers will swap the color buffer (a large 2D buffer that contains color values for each pixel in GLFW's window) that is used to render to during this render iteration and show it as output to the screen.
@@ -167,7 +150,17 @@ int main(void)
 			// The glfwPollEvents function checks if any events are triggered (like keyboard input or mouse movement events), updates the window state, and calls the corresponding functions (which we can register via callback methods)
 			glfwPollEvents();
 		}
+		delete currentTest;
+		if (currentTest != testMenu)
+		{
+			delete testMenu;
+		}
 	}
+	// Shutdown ImGui
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+	// Destroy GLFW
     glfwTerminate();
     return 0;
 }

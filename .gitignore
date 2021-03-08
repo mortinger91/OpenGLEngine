@@ -342,3 +342,5 @@ healthchecksdb
 Libs source/
 OpenGL/res/textures
 OpenGL/src/vendor
+Dependecies/GLUT
+Rotation example/
