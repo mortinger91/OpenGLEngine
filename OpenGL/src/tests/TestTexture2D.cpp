@@ -29,6 +29,10 @@ namespace test
 			2, 3, 0
 		};
 
+		GLCall(glEnable(GL_BLEND));
+		// setting up a blend function, default would be src=0 dest=1 which means override old pixels with new ones
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
 		// initializing vertex array
 		m_VAO = std::make_unique<VertexArray>();
 

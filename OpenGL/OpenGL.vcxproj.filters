@@ -21,6 +21,7 @@
     <ClCompile Include="src\tests\Test.cpp" />
     <ClCompile Include="src\tests\TestTexture2D.cpp" />
     <ClCompile Include="src\tests\Test3DCube.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl" />
@@ -463,5 +464,6 @@
     <ClInclude Include="src\tests\TestClearColor.h" />
     <ClInclude Include="src\tests\TestTexture2D.h" />
     <ClInclude Include="src\tests\Test3DCube.h" />
+    <ClInclude Include="src\Camera.h" />
   </ItemGroup>
 </Project>

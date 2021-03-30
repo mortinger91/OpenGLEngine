@@ -65,7 +65,8 @@ int Init(GLFWwindow* &window)
 	if (GLEW_OK != err)
 	{
 	  /* Problem: glewInit failed, something is seriously wrong. */
-	  fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+	  //fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+	  std::cerr << "Error: " << glewGetString(err) << std::endl; 
 	}
 
 	GLCall(const unsigned char* version = glGetString(GL_VERSION));
@@ -87,10 +88,6 @@ int main(void)
 		return -1;
 	}
 	{
-		GLCall(glEnable(GL_BLEND));
-		// setting up a blend function, default would be src=0 dest=1 which means override old pixels with new ones
-		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
 		//Setup ImGui
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
