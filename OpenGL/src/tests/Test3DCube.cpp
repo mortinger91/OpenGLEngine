@@ -67,15 +67,28 @@ void ConvertToRadians(float &value)
 	value = glm::radians(value);
 }
 
+/* New helper transformation function to transform vector by modelview */ 
+void transformvec (const glm::vec4 input, glm::vec4 output, const glm::mat4& modelview) 
+{
+	glm::vec4 inputvec(input[0], input[1], input[2], input[3]);
+	glm::vec4 outputvec = modelview * inputvec;
+	output[0] = outputvec[0];
+	output[1] = outputvec[1];
+	output[2] = outputvec[2];
+	output[3] = outputvec[3];
+}
+
 namespace test
 {
 	Test3DCube::Test3DCube()
 		: m_TranslationVec(-200.f, -60.f, -700.f),
 		  m_RotationVec(0.f, 0.f, 0.f),
-		  m_Scale(130.f),
+		  m_Scale(100.f),
 		  //m_View(glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 0.f))),
-		  eyeVec(10.f, 10.f, 100.f),
-		  centerVec(0.f, 0.f, 0.f),
+		  //eyeVec(10.f, 10.f, 100.f),
+		  eyeVec(0.f, 0.f, 0.f),
+		  //centerVec(0.f, 0.f, 0.f),
+		  centerVec(-10.f, -10.f, -100.f),
 		  upVec(0.f, 1.f, 0.f),
 		  //m_ProjOrtho(glm::ortho(-480., 480., -270., 270., -1000., 1000.)),
 		  //m_ProjPersp(glm::perspective(90.0f * glm::pi<float>() / 180.0f, (float)960 / (float)540, -1000.f, 1000.f)),
@@ -135,9 +148,9 @@ namespace test
 			20, 21, 23, 22, 21, 23 // back
 		};
 
-		//GLCall(glEnable(GL_BLEND));
-		//// setting up a blend function, default would be src=0 dest=1 which means override old pixels with new ones
-		//GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+		GLCall(glEnable(GL_BLEND));
+		// setting up a blend function, default would be src=0 dest=1 which means override old pixels with new ones
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
 		GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glDepthFunc(GL_LESS));
@@ -167,8 +180,8 @@ namespace test
 		m_Shader->Bind();
 
 		// creating a texture
-		m_Texture = std::make_unique<Texture>("res/textures/witcher.png");
-		m_Shader->SetUniform1i("u_Texture", 0);
+		//m_Texture = std::make_unique<Texture>("res/textures/witcher.png");
+		//m_Shader->SetUniform1i("u_Texture", 0);
 
 		//m_Shader->SetUniform1i("u_UseTexture", 0);
 		//r = 1.0f;
@@ -338,7 +351,7 @@ namespace test
 
 		Renderer renderer;
 
-		m_Texture->Bind();
+		//m_Texture->Bind();
 
 		{
 			glm::mat4 model;
@@ -351,6 +364,23 @@ namespace test
 
 			if (m_UseView)
 				mvp = view * mvp;
+
+			// Set Light and Material properties for the teapot
+			// Lights are transformed by current modelview matrix. 
+			// The shader can't do this globally. 
+			// So we need to do so manually.  
+			transformvec(light_direction, light0, mvp);
+			transformvec(light_position1, light1, mvp);
+
+			m_Shader->SetUniform3fv("light0dirn", light0);
+			m_Shader->SetUniform4fv("light0color", light_specular);
+			m_Shader->SetUniform4fv("light1posn", light1);
+			m_Shader->SetUniform4fv("light1color", light_specular1);
+
+			m_Shader->SetUniform4fv("ambient", small);
+			m_Shader->SetUniform4fv("diffuse", medium);
+			m_Shader->SetUniform4fv("specular", one);
+			m_Shader->SetUniform1fv("shininess", high);
 
 			if(m_UseOrtho)
 			{
