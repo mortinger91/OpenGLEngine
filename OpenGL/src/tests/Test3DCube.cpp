@@ -81,9 +81,9 @@ void transformvec (const glm::vec4 input, glm::vec4 output, const glm::mat4& mod
 namespace test
 {
 	Test3DCube::Test3DCube()
-		: m_TranslationVec(-200.f, -60.f, -700.f),
+		: m_TranslationVec(-25.f, -10.f, -600.f),
 		  m_RotationVec(0.f, 0.f, 0.f),
-		  m_Scale(100.f),
+		  m_Scale(90.f),
 		  //m_View(glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 0.f))),
 		  //eyeVec(10.f, 10.f, 100.f),
 		  eyeVec(0.f, 0.f, 0.f),
@@ -93,49 +93,52 @@ namespace test
 		  //m_ProjOrtho(glm::ortho(-480., 480., -270., 270., -1000., 1000.)),
 		  //m_ProjPersp(glm::perspective(90.0f * glm::pi<float>() / 180.0f, (float)960 / (float)540, -1000.f, 1000.f)),
 		  m_NearPlane(1.f),
-		  m_FarPlane(5000.f),
+		  m_FarPlane(1000.f),
 		  m_UseOrtho(false),
 		  m_UseView(true),
-		  m_Fov(30.0f)
+		  m_Fov(30.0f),
+		  m_IsLight(1)
 
 	{
+		// 3 x position, 3 x color, 3 x normal
 		float positions[] =
 		{
-			  // front
-			  1.0f,   1.0f,   1.0f,   1.f,   0.f,   0.f,  0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //0 //0
-			 -1.0f,   1.0f,   1.0f,   1.f,   0.f,   0.f,  0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //1
-			 -1.0f,  -1.0f,   1.0f,   1.f,   0.f,   0.f,  0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //2
-			  1.0f,  -1.0f,   1.0f,   1.f,   0.f,   0.f,  0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //3
-
-			  // left				 			   
-			  1.0f,   1.0f,   1.0f,   0.f,   1.f,   0.f, -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //0 //4
-			  1.0f,  -1.0f,   1.0f,   0.f,   1.f,   0.f, -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //3
-			  1.0f,  -1.0f,  -1.0f,   0.f,   1.f,   0.f, -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //7
-			  1.0f,   1.0f,  -1.0f,   0.f,   1.f,   0.f, -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //4
-
-			  // right					     	   
-			 -1.0f,   1.0f,   1.0f,   0.f,   0.f,   1.f,  1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //1 //8
-			 -1.0f,  -1.0f,   1.0f,   0.f,   0.f,   1.f,  1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //2
-			 -1.0f,  -1.0f,  -1.0f,   0.f,   0.f,   1.f,  1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //6
-			 -1.0f,   1.0f,  -1.0f,   0.f,   0.f,   1.f,  1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //5
-
-			  // bot					     	   
-			  1.0f,  -1.0f,   1.0f,   1.f,   1.f,   0.f,  0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //3 //12
-			 -1.0f,  -1.0f,   1.0f,   1.f,   1.f,   0.f,  0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //2
-			  1.0f,  -1.0f,  -1.0f,   1.f,   1.f,   0.f,  0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //7
-			 -1.0f,  -1.0f,  -1.0f,   1.f,   1.f,   0.f,  0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //6
-
-			  // top					     	   
-			  1.0f,   1.0f,   1.0f,   1.f,   0.f,   1.f,  0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //0 //16
-			 -1.0f,   1.0f,   1.0f,   1.f,   0.f,   1.f,  0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //1
-			  1.0f,   1.0f,  -1.0f,   1.f,   0.f,   1.f,  0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //4
-			 -1.0f,   1.0f,  -1.0f,   1.f,   0.f,   1.f,  0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //5
-
-			  // back					     	   
-			  1.0f,   1.0f,  -1.0f,   0.f,   1.f,   1.f,  0.0f,  0.0f, -1.0f,  //  0.f,  0.f, //4 //20
-			 -1.0f,   1.0f,  -1.0f,   0.f,   1.f,   1.f,  0.0f,  0.0f, -1.0f,  //  0.f,  0.f, //5
-			 -1.0f,  -1.0f,  -1.0f,   0.f,   1.f,   1.f,  0.0f,  0.0f, -1.0f,  //  0.f,  0.f, //6
-			  1.0f,  -1.0f,  -1.0f,   0.f,   1.f,   1.f,  0.0f,  0.0f, -1.0f   //  0.f,  0.f  //7
+			  // POSITIONS               // COLORS               // NORMALS
+			  // back 
+			  1.0f,   1.0f,   1.0f,      1.f,   0.f,   0.f,      0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //0 //0
+			 -1.0f,   1.0f,   1.0f,      1.f,   0.f,   0.f,      0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //1
+			 -1.0f,  -1.0f,   1.0f,      1.f,   0.f,   0.f,      0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //2
+			  1.0f,  -1.0f,   1.0f,      1.f,   0.f,   0.f,      0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //3
+									    					       
+			  // left				    			   		       
+			  1.0f,   1.0f,   1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //0 //4
+			  1.0f,  -1.0f,   1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //3
+			  1.0f,  -1.0f,  -1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //7
+			  1.0f,   1.0f,  -1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //4
+									    					       
+			  // right				   	     	   		       
+			 -1.0f,   1.0f,   1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //1 //8
+			 -1.0f,  -1.0f,   1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //2
+			 -1.0f,  -1.0f,  -1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //6
+			 -1.0f,   1.0f,  -1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //5
+									    					       
+			  // bot				   	     	   		       
+			  1.0f,  -1.0f,   1.0f,      1.f,   1.f,   0.f,      0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //3 //12
+			 -1.0f,  -1.0f,   1.0f,      1.f,   1.f,   0.f,      0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //2
+			  1.0f,  -1.0f,  -1.0f,      1.f,   1.f,   0.f,      0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //7
+			 -1.0f,  -1.0f,  -1.0f,      1.f,   1.f,   0.f,      0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //6
+									    					       
+			  // top				   	     	   		       
+			  1.0f,   1.0f,   1.0f,      1.f,   0.f,   1.f,      0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //0 //16
+			 -1.0f,   1.0f,   1.0f,      1.f,   0.f,   1.f,      0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //1
+			  1.0f,   1.0f,  -1.0f,      1.f,   0.f,   1.f,      0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //4
+			 -1.0f,   1.0f,  -1.0f,      1.f,   0.f,   1.f,      0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //5
+									    					       
+			  // back				   	     	   		       
+			  1.0f,   1.0f,  -1.0f,      0.f,   1.f,   1.f,      0.0f,  0.0f, -1.0f,  //  0.f,  0.f, //4 //20
+			 -1.0f,   1.0f,  -1.0f,      0.f,   1.f,   1.f,      0.0f,  0.0f, -1.0f,  //  0.f,  0.f, //5
+			 -1.0f,  -1.0f,  -1.0f,      0.f,   1.f,   1.f,      0.0f,  0.0f, -1.0f,  //  0.f,  0.f, //6
+			  1.0f,  -1.0f,  -1.0f,      0.f,   1.f,   1.f,      0.0f,  0.0f, -1.0f   //  0.f,  0.f  //7
 		};
 
 		unsigned int indices[] =
@@ -165,15 +168,13 @@ namespace test
 		// position of the vertices of the two triangles making up a square
 		// layout(location = 0) in vertex shader
 		layout.Push<float>(3);
-		// coordinates of the texture related to each vertices
-		// layout(location = 1) in vertex shader
 		layout.Push<float>(3);
 		layout.Push<float>(3);
 		// adding vertex buffer and layout to vertex array
 		m_VAO->AddBuffer(*m_VertexBuffer, layout);
 
 		// creating an index buffer
-		m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 30);
+		m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 36);
 
 		// defining a shader
 		m_Shader = std::make_unique<Shader>("res/shaders/Basic.vert", "res/shaders/Basic.frag");
@@ -354,60 +355,59 @@ namespace test
 		//m_Texture->Bind();
 
 		{
+			m_Shader->Bind();
+
 			glm::mat4 model;
+			glm::mat4 view;
+			glm::mat4 mv;
+			glm::mat4 mvp;
+
 			CreateModelMatrix(model, m_RotationVec, m_TranslationVec, m_Scale);
 
-			glm::mat4 view;
 			CreateViewMatrix(view, eyeVec, centerVec, upVec);
-
-			glm::mat4 mvp = model;
-
+			
 			if (m_UseView)
-				mvp = view * mvp;
+				mv = view * model;
+			else
+				mv = model;
+
+			m_Shader->SetUniformMat4f("u_MV", mv);
 
 			// Set Light and Material properties for the teapot
 			// Lights are transformed by current modelview matrix. 
 			// The shader can't do this globally. 
 			// So we need to do so manually.  
-			transformvec(light_direction, light0, mvp);
-			transformvec(light_position1, light1, mvp);
-
-			m_Shader->SetUniform3fv("light0dirn", light0);
-			m_Shader->SetUniform4fv("light0color", light_specular);
-			m_Shader->SetUniform4fv("light1posn", light1);
-			m_Shader->SetUniform4fv("light1color", light_specular1);
-
-			m_Shader->SetUniform4fv("ambient", small);
-			m_Shader->SetUniform4fv("diffuse", medium);
-			m_Shader->SetUniform4fv("specular", one);
-			m_Shader->SetUniform1fv("shininess", high);
+			//transformvec(light_direction, light0, mv);
+			light0 = light_direction;
+			//transformvec(light_position1, light1, mvp);
+			light1 = light_position1;
 
 			if(m_UseOrtho)
 			{
 				m_ProjOrtho = CreateOrthoMatrix(-480., 480., -270., 270., m_NearPlane, m_FarPlane);
-				mvp = m_ProjOrtho * mvp; // * position
+				mvp = m_ProjOrtho * mv; // * position
 			}
 			else
 			{
 				//m_ProjPersp = glm::perspective(90.0f * glm::pi<float>() / 180.0f, (float)960 / (float)540, m_NearPlane, m_FarPlane);
 				m_ProjPersp = CreatePerspectiveMatrix(m_Fov * glm::pi<float>() / 180.0f, (float)960 / (float)540, m_NearPlane, m_FarPlane);
-				mvp = m_ProjPersp * mvp; // * position
+				mvp = m_ProjPersp * mv; // * position
 			}
 
-			m_Shader->Bind();
 			m_Shader->SetUniformMat4f("u_MVP", mvp);
 
-			//m_Shader->SetUniform1f("u_ChangingColor", r);
-			//if (r > 1.f)
-			//	increment = -0.05f;
-			//else if (r < 0.f)
-			//	increment = 0.05f;
 
-			//r += increment;
+			m_Shader->SetUniform1i("islight", m_IsLight);
+			m_Shader->SetUniform3fv("light0dirn", light0);
+			m_Shader->SetUniform4fv("light0color", light_specular);
+			m_Shader->SetUniform4fv("light1posn", light1);
+			m_Shader->SetUniform4fv("light1color", light_specular1);
 
-			//glm::vec3 eye(0.f, 0.f, 0.f), center(0.f, 0.f, -1.f), up(0.f, 1.f, 0.f);
-			//0, 0, 0, 0, 0,-1, 0, 1, 0
-			//GLCall(gluLookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z));
+			m_Shader->SetUniform4fv("ambient", { 0.2, 0.2, 0.2, 1 });
+			m_Shader->SetUniform4fv("diffuse", { 0.5, 0.5, 0.5, 1 });
+			m_Shader->SetUniform4fv("specular", { 0.75, 0.75, 0.75, 1 });
+			m_Shader->SetUniform1fv("shininess", 100.f);
+
 
 			// Draw call
 			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
@@ -416,15 +416,15 @@ namespace test
 
 	void Test3DCube::OnImGuiRender()
 	{
-		ImGui::SliderFloat("Translate X", &m_TranslationVec.x, -1000.f, 1000.f);
-		ImGui::SliderFloat("Translate Y", &m_TranslationVec.y, -1000.f, 1000.f);
+		ImGui::SliderFloat("Translate X", &m_TranslationVec.x, -100.f, 100.f);
+		ImGui::SliderFloat("Translate Y", &m_TranslationVec.y, -100.f, 100.f);
 		ImGui::SliderFloat("Translate Z", &m_TranslationVec.z, -1000.f, 1000.f);
 		ImGui::SliderFloat("Rotate horizontal", &m_RotationVec.y, 0.f, 360.f);
 		ImGui::SliderFloat("angleZ", &m_RotationVec.z, 0.f, 360.f);
 		ImGui::SliderFloat("angleX", &m_RotationVec.x, 0.f, 360.f);
-		ImGui::SliderFloat("scale", &m_Scale, 0.f, 500.f);
-		ImGui::SliderFloat("nearPlane", &m_NearPlane, -500.f, 500.f);
-		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 5000.f);
+		ImGui::SliderFloat("scale", &m_Scale, 0.f, 100.f);
+		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
+		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
 		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 360.f);
 		if(ImGui::Button("change proj matrix"))
 		{
@@ -442,6 +442,14 @@ namespace test
 			ImGui::Text("Using View");
 		else
 			ImGui::Text("Not Using View");
+		if(ImGui::Button("enable/disable light"))
+		{
+			m_IsLight = (m_IsLight == 0) ? 1 : 0;
+		}
+		if (m_IsLight == 1)
+			ImGui::Text("Using Light");
+		else
+			ImGui::Text("Not Using Light");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 

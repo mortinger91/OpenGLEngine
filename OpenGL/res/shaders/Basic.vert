@@ -20,6 +20,7 @@ void main()
 	// position of the vertex on the screen in NDC coordinates
 	gl_Position = u_MVP * vec4(position, 1.f);
 	v_Color = color;
-	v_Normal = mat3(transpose(inverse(u_MV))) * v_Normal; 
-    v_Vertex = u_MV * vec4(position, 1.0f); 
+	// TODO: move mat3(transpose(inverse(u_MV))) to a uniform
+	v_Normal = mat3(transpose(inverse(u_MV))) * normal; 
+    v_Vertex = u_MV * vec4(position, 1.f); 
 };
