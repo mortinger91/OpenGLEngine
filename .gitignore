@@ -343,3 +343,4 @@ Libs source/
 OpenGL/res/textures
 Dependecies/GLUT
 Rotation example/
+imgui.ini

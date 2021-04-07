@@ -43,7 +43,7 @@ vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in v
 void main()
 {
 	if(islight == 1)
-		{
+	{
 		// They eye is always at (0,0,0) looking down -z axis 
 		// Also compute current fragment position and direction to eye 
 
@@ -65,11 +65,10 @@ void main()
 	    vec3 half1 = normalize (direction1 + eyedirn);
 	    vec4 col1 = ComputeLight(direction1, light1color, normal, half1, diffuse, specular, shininess);
 	
-		color = vec4(v_Color, 1.0f) * (ambient + col0 + col1);
+		color = (ambient + col0 + col1) * vec4(v_Color, 1.f);
 	}
 	else
 	{
-		color = vec4(v_Color, 1.0f);
+		color = vec4(v_Color, 1.f);
 	}
-//    color = vec4(v_Color[0], v_Color[1], v_Color[2], 1.0f);
 };

@@ -84,61 +84,59 @@ namespace test
 		: m_TranslationVec(-25.f, -10.f, -600.f),
 		  m_RotationVec(0.f, 0.f, 0.f),
 		  m_Scale(90.f),
-		  //m_View(glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 0.f))),
-		  //eyeVec(10.f, 10.f, 100.f),
 		  eyeVec(0.f, 0.f, 0.f),
-		  //centerVec(0.f, 0.f, 0.f),
 		  centerVec(-10.f, -10.f, -100.f),
 		  upVec(0.f, 1.f, 0.f),
-		  //m_ProjOrtho(glm::ortho(-480., 480., -270., 270., -1000., 1000.)),
-		  //m_ProjPersp(glm::perspective(90.0f * glm::pi<float>() / 180.0f, (float)960 / (float)540, -1000.f, 1000.f)),
 		  m_NearPlane(1.f),
 		  m_FarPlane(1000.f),
 		  m_UseOrtho(false),
 		  m_UseView(true),
 		  m_Fov(30.0f),
-		  m_IsLight(1)
-
+		  m_IsLight(1),
+		  m_Shininess(100.f),
+		  m_Specular(0.75f),
+		  m_Diffuse(0.5f),
+		  m_Ambient(0.2f)
 	{
 		// 3 x position, 3 x color, 3 x normal
 		float positions[] =
 		{
 			  // POSITIONS               // COLORS               // NORMALS
 			  // back 
-			  1.0f,   1.0f,   1.0f,      1.f,   0.f,   0.f,      0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //0 //0
-			 -1.0f,   1.0f,   1.0f,      1.f,   0.f,   0.f,      0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //1
-			 -1.0f,  -1.0f,   1.0f,      1.f,   0.f,   0.f,      0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //2
-			  1.0f,  -1.0f,   1.0f,      1.f,   0.f,   0.f,      0.0f,  0.0f,  1.0f,  // 0.f,  0.f, //3
+			  1.0f,   1.0f,   1.0f,      0.5f,  0.3f,  0.1f,      0.0f,  0.0f,  1.0f,  
+			 -1.0f,   1.0f,   1.0f,      0.5f,  0.3f,  0.1f,      0.0f,  0.0f,  1.0f,  
+			 -1.0f,  -1.0f,   1.0f,      0.5f,  0.3f,  0.1f,      0.0f,  0.0f,  1.0f,  
+			  1.0f,  -1.0f,   1.0f,      0.5f,  0.3f,  0.1f,      0.0f,  0.0f,  1.0f,  
 									    					       
-			  // left				    			   		       
-			  1.0f,   1.0f,   1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //0 //4
-			  1.0f,  -1.0f,   1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //3
-			  1.0f,  -1.0f,  -1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //7
-			  1.0f,   1.0f,  -1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //4
+			  // right				    			   		       
+			  1.0f,   1.0f,   1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  
+			  1.0f,  -1.0f,   1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  
+			  1.0f,  -1.0f,  -1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  
+			  1.0f,   1.0f,  -1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  
 									    					       
-			  // right				   	     	   		       
-			 -1.0f,   1.0f,   1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //1 //8
-			 -1.0f,  -1.0f,   1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //2
-			 -1.0f,  -1.0f,  -1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //6
-			 -1.0f,   1.0f,  -1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  // 1.f,  0.f, //5
+			  // left				   	     	   		       
+			 -1.0f,   1.0f,   1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  
+			 -1.0f,  -1.0f,   1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  
+			 -1.0f,  -1.0f,  -1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  
+			 -1.0f,   1.0f,  -1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  
 									    					       
 			  // bot				   	     	   		       
-			  1.0f,  -1.0f,   1.0f,      1.f,   1.f,   0.f,      0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //3 //12
-			 -1.0f,  -1.0f,   1.0f,      1.f,   1.f,   0.f,      0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //2
-			  1.0f,  -1.0f,  -1.0f,      1.f,   1.f,   0.f,      0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //7
-			 -1.0f,  -1.0f,  -1.0f,      1.f,   1.f,   0.f,      0.0f, -1.0f,  0.0f,  //  0.f,  1.f, //6
+			  1.0f,  -1.0f,   1.0f,      1.f,   1.f,   0.01f,     0.0f, -1.0f,  0.0f,  
+			 -1.0f,  -1.0f,   1.0f,      1.f,   1.f,   0.01f,     0.0f, -1.0f,  0.0f,  
+			  1.0f,  -1.0f,  -1.0f,      1.f,   1.f,   0.01f,     0.0f, -1.0f,  0.0f,  
+			 -1.0f,  -1.0f,  -1.0f,      1.f,   1.f,   0.01f,     0.0f, -1.0f,  0.0f,  
 									    					       
 			  // top				   	     	   		       
-			  1.0f,   1.0f,   1.0f,      1.f,   0.f,   1.f,      0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //0 //16
-			 -1.0f,   1.0f,   1.0f,      1.f,   0.f,   1.f,      0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //1
-			  1.0f,   1.0f,  -1.0f,      1.f,   0.f,   1.f,      0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //4
-			 -1.0f,   1.0f,  -1.0f,      1.f,   0.f,   1.f,      0.0f,  1.0f,  0.0f,  //  0.f,  1.f, //5
+			  1.0f,   1.0f,   1.0f,      1.f,   0.01f,   1.f,      0.0f,  1.0f,  0.0f,  
+			 -1.0f,   1.0f,   1.0f,      1.f,   0.01f,   1.f,      0.0f,  1.0f,  0.0f,  
+			  1.0f,   1.0f,  -1.0f,      1.f,   0.01f,   1.f,      0.0f,  1.0f,  0.0f,  
+			 -1.0f,   1.0f,  -1.0f,      1.f,   0.01f,   1.f,      0.0f,  1.0f,  0.0f,  
 									    					       
-			  // back				   	     	   		       
-			  1.0f,   1.0f,  -1.0f,      0.f,   1.f,   1.f,      0.0f,  0.0f, -1.0f,  //  0.f,  0.f, //4 //20
-			 -1.0f,   1.0f,  -1.0f,      0.f,   1.f,   1.f,      0.0f,  0.0f, -1.0f,  //  0.f,  0.f, //5
-			 -1.0f,  -1.0f,  -1.0f,      0.f,   1.f,   1.f,      0.0f,  0.0f, -1.0f,  //  0.f,  0.f, //6
-			  1.0f,  -1.0f,  -1.0f,      0.f,   1.f,   1.f,      0.0f,  0.0f, -1.0f   //  0.f,  0.f  //7
+			  // front				   	     	   		       
+			  1.0f,   1.0f,  -1.0f,      0.01f,  1.f,   1.f,      0.0f,  0.0f, -1.0f,  
+			 -1.0f,   1.0f,  -1.0f,      0.01f,  1.f,   1.f,      0.0f,  0.0f, -1.0f,  
+			 -1.0f,  -1.0f,  -1.0f,      0.01f,  1.f,   1.f,      0.0f,  0.0f, -1.0f,  
+			  1.0f,  -1.0f,  -1.0f,      0.01f,  1.f,   1.f,      0.0f,  0.0f, -1.0f   
 		};
 
 		unsigned int indices[] =
@@ -183,10 +181,6 @@ namespace test
 		// creating a texture
 		//m_Texture = std::make_unique<Texture>("res/textures/witcher.png");
 		//m_Shader->SetUniform1i("u_Texture", 0);
-
-		//m_Shader->SetUniform1i("u_UseTexture", 0);
-		//r = 1.0f;
-		//increment = 0.05f;
 
 	}
 
@@ -403,10 +397,10 @@ namespace test
 			m_Shader->SetUniform4fv("light1posn", light1);
 			m_Shader->SetUniform4fv("light1color", light_specular1);
 
-			m_Shader->SetUniform4fv("ambient", { 0.2, 0.2, 0.2, 1 });
-			m_Shader->SetUniform4fv("diffuse", { 0.5, 0.5, 0.5, 1 });
-			m_Shader->SetUniform4fv("specular", { 0.75, 0.75, 0.75, 1 });
-			m_Shader->SetUniform1fv("shininess", 100.f);
+			m_Shader->SetUniform4fv("ambient", { m_Ambient, m_Ambient, m_Ambient, 1 });
+			m_Shader->SetUniform4fv("diffuse", { m_Diffuse, m_Diffuse, m_Diffuse, 1 });
+			m_Shader->SetUniform4fv("specular", { m_Specular, m_Specular, m_Specular, 1 });
+			m_Shader->SetUniform1fv("shininess", m_Shininess);
 
 
 			// Draw call
@@ -420,12 +414,16 @@ namespace test
 		ImGui::SliderFloat("Translate Y", &m_TranslationVec.y, -100.f, 100.f);
 		ImGui::SliderFloat("Translate Z", &m_TranslationVec.z, -1000.f, 1000.f);
 		ImGui::SliderFloat("Rotate horizontal", &m_RotationVec.y, 0.f, 360.f);
-		ImGui::SliderFloat("angleZ", &m_RotationVec.z, 0.f, 360.f);
-		ImGui::SliderFloat("angleX", &m_RotationVec.x, 0.f, 360.f);
+		ImGui::SliderFloat("Rotate vertical", &m_RotationVec.z, 0.f, 360.f);
+		ImGui::SliderFloat("Rotate on Z", &m_RotationVec.x, 0.f, 360.f);
 		ImGui::SliderFloat("scale", &m_Scale, 0.f, 100.f);
 		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
 		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
 		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 360.f);
+		ImGui::SliderFloat("shininess", &m_Shininess, 0.f, 1000.f); 
+		ImGui::SliderFloat("specular", &m_Specular, 0.f, 1.f); 
+		ImGui::SliderFloat("diffuse", &m_Diffuse, 0.f, 1.f); 
+		ImGui::SliderFloat("ambient", &m_Ambient, 0.f, 1.f); 
 		if(ImGui::Button("change proj matrix"))
 		{
 			m_UseOrtho = !m_UseOrtho;

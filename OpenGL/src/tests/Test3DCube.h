@@ -74,5 +74,8 @@ namespace test
 		GLuint diffuse;
 		GLuint specular;
 		GLuint shininess;
+
+		float m_Shininess, m_Specular;
+		float m_Diffuse, m_Ambient;
 	};
 }
