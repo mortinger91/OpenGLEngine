@@ -6,49 +6,7 @@
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
 #include "Shader.h"
-
-//void glhLookAtf2( float *matrix, float *eyePosition3D,
-//                  float *center3D, float *upVector3D )
-//{
-//   float forward[3], side[3], up[3];
-//   float matrix2[16], resultMatrix[16];
-//   // --------------------
-//   forward[0] = center3D[0] - eyePosition3D[0];
-//   forward[1] = center3D[1] - eyePosition3D[1];
-//   forward[2] = center3D[2] - eyePosition3D[2];
-//   NormalizeVector(forward);
-//   // --------------------
-//   // Side = forward x up
-//   ComputeNormalOfPlane(side, forward, upVector3D);
-//   NormalizeVector(side);
-//   --------------------
-//   // Recompute up as: up = side x forward
-//   ComputeNormalOfPlane(up, side, forward);
-//   // --------------------
-//   matrix2[0] = side[0];
-//   matrix2[4] = side[1];
-//   matrix2[8] = side[2];
-//   matrix2[12] = 0.0;
-//   // --------------------
-//   matrix2[1] = up[0];
-//   matrix2[5] = up[1];
-//   matrix2[9] = up[2];
-//   matrix2[13] = 0.0;
-//   // --------------------
-//   matrix2[2] = -forward[0];
-//   matrix2[6] = -forward[1];
-//   matrix2[10] = -forward[2];
-//   matrix2[14] = 0.0;
-//   // --------------------
-//   matrix2[3] = matrix2[7] = matrix2[11] = 0.0;
-//   matrix2[15] = 1.0;
-//   // --------------------
-//   MultiplyMatrices4by4OpenGL_FLOAT(resultMatrix, matrix, matrix2);
-//   glhTranslatef2(resultMatrix,
-//                  -eyePosition3D[0], -eyePosition3D[1], -eyePosition3D[2]);
-//   // --------------------
-//   memcpy(matrix, resultMatrix, 16*sizeof(float));
-//}
+#include "cube.h"
 
 void NormalizeVector(glm::vec3 &vec)
 {
@@ -96,59 +54,14 @@ namespace test
 		  m_Shininess(100.f),
 		  m_Specular(0.75f),
 		  m_Diffuse(0.5f),
-		  m_Ambient(0.2f)
+		  m_Ambient(0.2f),
+		  m_UseTexture(1),
+		  // creating a mesh
+		  m_Mesh1(Cube::positions, Cube::colors, Cube::normals, Cube::textures, Cube::indices),
+		  m_Mesh2("res/meshes/teapot.obj"),
+		  m_ChooseMesh(true)
 	{
-		// 3 x position, 3 x color, 3 x normal
-		float positions[] =
-		{
-			  // POSITIONS               // COLORS               // NORMALS
-			  // back 
-			  1.0f,   1.0f,   1.0f,      0.5f,  0.3f,  0.1f,      0.0f,  0.0f,  1.0f,  
-			 -1.0f,   1.0f,   1.0f,      0.5f,  0.3f,  0.1f,      0.0f,  0.0f,  1.0f,  
-			 -1.0f,  -1.0f,   1.0f,      0.5f,  0.3f,  0.1f,      0.0f,  0.0f,  1.0f,  
-			  1.0f,  -1.0f,   1.0f,      0.5f,  0.3f,  0.1f,      0.0f,  0.0f,  1.0f,  
-									    					       
-			  // right				    			   		       
-			  1.0f,   1.0f,   1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  
-			  1.0f,  -1.0f,   1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  
-			  1.0f,  -1.0f,  -1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  
-			  1.0f,   1.0f,  -1.0f,      0.7f,  0.7f,  0.7f,     1.0f,  0.0f,  0.0f,  
-									    					       
-			  // left				   	     	   		       
-			 -1.0f,   1.0f,   1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  
-			 -1.0f,  -1.0f,   1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  
-			 -1.0f,  -1.0f,  -1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  
-			 -1.0f,   1.0f,  -1.0f,      1.0f,  0.5f,  0.31f,   -1.0f,  0.0f,  0.0f,  
-									    					       
-			  // bot				   	     	   		       
-			  1.0f,  -1.0f,   1.0f,      1.f,   1.f,   0.01f,     0.0f, -1.0f,  0.0f,  
-			 -1.0f,  -1.0f,   1.0f,      1.f,   1.f,   0.01f,     0.0f, -1.0f,  0.0f,  
-			  1.0f,  -1.0f,  -1.0f,      1.f,   1.f,   0.01f,     0.0f, -1.0f,  0.0f,  
-			 -1.0f,  -1.0f,  -1.0f,      1.f,   1.f,   0.01f,     0.0f, -1.0f,  0.0f,  
-									    					       
-			  // top				   	     	   		       
-			  1.0f,   1.0f,   1.0f,      1.f,   0.01f,   1.f,      0.0f,  1.0f,  0.0f,  
-			 -1.0f,   1.0f,   1.0f,      1.f,   0.01f,   1.f,      0.0f,  1.0f,  0.0f,  
-			  1.0f,   1.0f,  -1.0f,      1.f,   0.01f,   1.f,      0.0f,  1.0f,  0.0f,  
-			 -1.0f,   1.0f,  -1.0f,      1.f,   0.01f,   1.f,      0.0f,  1.0f,  0.0f,  
-									    					       
-			  // front				   	     	   		       
-			  1.0f,   1.0f,  -1.0f,      0.01f,  1.f,   1.f,      0.0f,  0.0f, -1.0f,  
-			 -1.0f,   1.0f,  -1.0f,      0.01f,  1.f,   1.f,      0.0f,  0.0f, -1.0f,  
-			 -1.0f,  -1.0f,  -1.0f,      0.01f,  1.f,   1.f,      0.0f,  0.0f, -1.0f,  
-			  1.0f,  -1.0f,  -1.0f,      0.01f,  1.f,   1.f,      0.0f,  0.0f, -1.0f   
-		};
-
-		unsigned int indices[] =
-		{
-			0, 1, 3,  2, 1, 3, // front
-			4, 7, 5,  6, 7, 5, // left
-			8, 9, 11, 10, 9, 11, // right
-			12, 13, 14, 15, 13, 14, // bot
-			16, 17, 18, 19, 17, 18, //top
-			20, 21, 23, 22, 21, 23 // back
-		};
-
+		
 		GLCall(glEnable(GL_BLEND));
 		// setting up a blend function, default would be src=0 dest=1 which means override old pixels with new ones
 		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -156,32 +69,13 @@ namespace test
 		GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glDepthFunc(GL_LESS));
 
-		// initializing vertex array
-		m_VAO = std::make_unique<VertexArray>();
-
-		// initializing vertex buffer
-		m_VertexBuffer = std::make_unique<VertexBuffer>(positions, 24 * 9 * sizeof(float));
-		// initializing vertex buffer layout
-		VertexBufferLayout layout;
-		// position of the vertices of the two triangles making up a square
-		// layout(location = 0) in vertex shader
-		layout.Push<float>(3);
-		layout.Push<float>(3);
-		layout.Push<float>(3);
-		// adding vertex buffer and layout to vertex array
-		m_VAO->AddBuffer(*m_VertexBuffer, layout);
-
-		// creating an index buffer
-		m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 36);
-
 		// defining a shader
 		m_Shader = std::make_unique<Shader>("res/shaders/Basic.vert", "res/shaders/Basic.frag");
 		m_Shader->Bind();
 
 		// creating a texture
-		//m_Texture = std::make_unique<Texture>("res/textures/witcher.png");
-		//m_Shader->SetUniform1i("u_Texture", 0);
-
+		m_Texture = std::make_unique<Texture>("res/textures/metal.png");
+		m_Shader->SetUniform1i("u_Texture", 0);
 	}
 
 	//mat[col][row]
@@ -346,7 +240,7 @@ namespace test
 
 		Renderer renderer;
 
-		//m_Texture->Bind();
+		m_Texture->Bind();
 
 		{
 			m_Shader->Bind();
@@ -390,7 +284,6 @@ namespace test
 
 			m_Shader->SetUniformMat4f("u_MVP", mvp);
 
-
 			m_Shader->SetUniform1i("islight", m_IsLight);
 			m_Shader->SetUniform3fv("light0dirn", light0);
 			m_Shader->SetUniform4fv("light0color", light_specular);
@@ -402,9 +295,13 @@ namespace test
 			m_Shader->SetUniform4fv("specular", { m_Specular, m_Specular, m_Specular, 1 });
 			m_Shader->SetUniform1fv("shininess", m_Shininess);
 
+			m_Shader->SetUniform1i("useTexture", m_UseTexture);
 
 			// Draw call
-			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
+			if (m_ChooseMesh)
+				renderer.Draw(*(m_Mesh1.m_VAO), *(m_Mesh1.m_IndexBuffer), *m_Shader);
+			else
+				renderer.Draw(*(m_Mesh2.m_VAO), *(m_Mesh2.m_IndexBuffer), *m_Shader);
 		}
 	}
 
@@ -448,6 +345,23 @@ namespace test
 			ImGui::Text("Using Light");
 		else
 			ImGui::Text("Not Using Light");
+		if(ImGui::Button("enable/disable texture"))
+		{
+			m_UseTexture = (m_UseTexture == 0) ? 1 : 0;
+		}
+		if (m_UseTexture == 1)
+			ImGui::Text("Using Texture");
+		else
+			ImGui::Text("Not Using Texture");
+
+		if(ImGui::Button("m_ChooseMesh"))
+		{
+			m_ChooseMesh = !m_ChooseMesh;
+		}
+		if (m_ChooseMesh)
+			ImGui::Text("Using Mesh1");
+		else
+			ImGui::Text("Using Mesh2");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 

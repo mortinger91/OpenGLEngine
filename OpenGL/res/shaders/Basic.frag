@@ -4,9 +4,14 @@
 in vec3 v_Color;
 in vec3 v_Normal;
 in vec4 v_Vertex;
+in vec2 v_TexCoord;
 
 // output this color for each pixel to the framebuffer
 out vec4 color;
+
+// takes this uniform as input from the cpu
+uniform sampler2D u_Texture;
+uniform int useTexture;
 
 // uniform: inputs from the cpu
 // Assume light 0 is directional, light 1 is a point light.
@@ -42,6 +47,15 @@ vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in v
 // execute this for every fragment we are drawing
 void main()
 {
+	vec4 fragmentColor;
+	if (useTexture == 1)
+	{
+		fragmentColor = texture(u_Texture, v_TexCoord);
+	}
+	else
+	{
+		fragmentColor = vec4(v_Color, 1.f);
+	}
 	if(islight == 1)
 	{
 		// They eye is always at (0,0,0) looking down -z axis 
@@ -65,10 +79,10 @@ void main()
 	    vec3 half1 = normalize (direction1 + eyedirn);
 	    vec4 col1 = ComputeLight(direction1, light1color, normal, half1, diffuse, specular, shininess);
 	
-		color = (ambient + col0 + col1) * vec4(v_Color, 1.f);
+		color = (ambient + col0 + col1) * fragmentColor;
 	}
 	else
 	{
-		color = vec4(v_Color, 1.f);
+		color = fragmentColor;
 	}
 };

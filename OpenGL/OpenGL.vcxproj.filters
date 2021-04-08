@@ -22,6 +22,7 @@
     <ClCompile Include="src\tests\TestTexture2D.cpp" />
     <ClCompile Include="src\tests\Test3DCube.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl" />
@@ -465,5 +466,7 @@
     <ClInclude Include="src\tests\TestTexture2D.h" />
     <ClInclude Include="src\tests\Test3DCube.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="res\meshes\cube.h" />
   </ItemGroup>
 </Project>
