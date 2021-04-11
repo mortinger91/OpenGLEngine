@@ -3,6 +3,8 @@
 #include <functional>
 #include <vector>
 #include <iostream>
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 
 namespace test
 {
@@ -13,7 +15,7 @@ namespace test
 		virtual ~Test() {}
 
 		virtual void OnUpdate(float deltaTime) {}
-		virtual void OnRender() {}
+		virtual void OnRender(GLFWwindow *window, int width, int height) {}
 		virtual void OnImGuiRender() {}
 
 	};

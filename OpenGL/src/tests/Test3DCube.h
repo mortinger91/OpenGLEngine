@@ -21,26 +21,26 @@ namespace test
 		~Test3DCube();
 
 		void OnUpdate(float deltaTime) override;
-		void OnRender() override;
+		void OnRender(GLFWwindow *window, int width, int height);
 		void OnImGuiRender() override;
-		void CreateRotationZMatrix (glm::mat4 &mat, float angle);
-		void CreateRotationYMatrix (glm::mat4 &mat, float angle);
-		void CreateRotationXMatrix (glm::mat4 &mat, float angle);
+		//void CreateRotationZMatrix (glm::mat4 &mat, float angle);
+		//void CreateRotationYMatrix (glm::mat4 &mat, float angle);
+		//void CreateRotationXMatrix (glm::mat4 &mat, float angle);
 		void CreateRotationGenericMatrix(glm::mat4 &mat, float angle, const glm::vec3& axis);
 		void CreateScalingMatrix (glm::mat4 &mat, float scale);
 		void CreateTranslationMatrix (glm::mat4 &mat, glm::vec3 vec);
-
 		void CreateModelMatrix(glm::mat4 &mat, glm::vec3 rotationVec, glm::vec3 translationVec, float scale);
 
-		void CreateViewMatrix(glm::mat4 &mat, glm::vec3 eyeVec, glm::vec3 centerVec, glm::vec3 upVec);
+		void CreateViewMatrix(glm::mat4 &mat);
+		void RotateViewHorizontal(float amount);
+		void RotateViewVertical(float amount);
 
 		glm::mat4 CreateOrthoMatrix(float left, float right, float bottom, float top, float nearVal, float farVal);
-
 		glm::mat4 CreatePerspectiveMatrix(float fovy, float aspect, float nearVal, float farVal);
 
 	private:
 		glm::vec3 m_TranslationVec, m_RotationVec;
-		glm::vec3 eyeVec, centerVec, upVec;
+		glm::vec3 m_EyeVec, m_CenterVec, m_UpVec;
 		std::unique_ptr<Shader> m_Shader;
 		std::unique_ptr<Texture> m_Texture;
 		std::unique_ptr<Camera> m_Camera;

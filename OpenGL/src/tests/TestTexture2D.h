@@ -20,7 +20,7 @@ namespace test
 		~TestTexture2D();
 
 		void OnUpdate(float deltaTime) override;
-		void OnRender() override;
+		void OnRender(GLFWwindow *window, int width, int height) override;
 		void OnImGuiRender() override;
 	private:
 		glm::vec3 m_TranslationA, m_TranslationB;

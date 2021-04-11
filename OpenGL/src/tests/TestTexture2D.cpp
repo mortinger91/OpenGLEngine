@@ -67,7 +67,7 @@ namespace test
 	{
 	}
 
-	void TestTexture2D::OnRender()
+	void TestTexture2D::OnRender(GLFWwindow *window, int width, int height)
 	{
 		GLCall(glClearColor(0.2f, 0.3f, 0.8f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));

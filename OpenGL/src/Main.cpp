@@ -36,7 +36,24 @@ void TestFunction()
 	glEnd();
 }
 
-int Init(GLFWwindow* &window)
+void WindowResizeCallback(GLFWwindow* window, int width, int height)
+{
+	//glfwSetWindowSize(window, width, height);
+	GLCall(glViewport(0, 0, width, height));
+}
+
+void ImGuiInit(GLFWwindow*& window)
+{
+	//Setup ImGui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init((char *)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
+}
+
+int Init(GLFWwindow*& window)
 {
 	/* Initialize the library */
     if (!glfwInit())
@@ -49,7 +66,7 @@ int Init(GLFWwindow* &window)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(1280, 720, "An OpenGL Viewport (GLFW)", NULL, NULL);
     if (!window)
     {
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -58,6 +75,9 @@ int Init(GLFWwindow* &window)
     }
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+
+	// setup the callback called when the window is resized
+	glfwSetWindowSizeCallback(window, WindowResizeCallback);
 
 	glfwSwapInterval(1);
 
@@ -71,10 +91,13 @@ int Init(GLFWwindow* &window)
 
 	GLCall(const unsigned char* version = glGetString(GL_VERSION));
 	std::cout << std::string(reinterpret_cast<const char*>(version)) << std::endl;
+
+	ImGuiInit(window);
+
 	return 0;
 }
 
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow* window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -88,14 +111,6 @@ int main(void)
 		return -1;
 	}
 	{
-		//Setup ImGui
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGui::StyleColorsDark();
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
-		ImGui_ImplOpenGL3_Init((char *)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
-
 		test::Test* currentTest = nullptr;
 		test::TestMenu* testMenu = new test::TestMenu(currentTest);
 		currentTest = testMenu;
@@ -121,10 +136,13 @@ int main(void)
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 
+			int width, height;
+			glfwGetFramebufferSize(window, &width, &height);
+
 			if(currentTest)
 			{
 				currentTest->OnUpdate(0.f);
-				currentTest->OnRender();
+				currentTest->OnRender(window, width, height);
 				ImGui::Begin("Test");
 				if (currentTest != testMenu && ImGui::Button("<-"))
 				{

@@ -111,7 +111,7 @@ void Mesh::parse(const char * filepath)
 			fscanf(fp, "%f %f %f", &x, &y, &z);
 			verticesPositions.push_back(glm::vec3(x, y, z));
 
-			verticesColors.push_back(glm::vec3(218.f,165.f,32.f)); 
+			verticesColors.push_back(glm::vec3(0.8f,0.3f,0.3f)); 
 			verticesTexCoords.push_back(glm::vec2(0.f,0.f));
 
 			if (y < minY) minY = y;

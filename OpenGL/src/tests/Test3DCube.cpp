@@ -10,13 +10,12 @@
 
 void NormalizeVector(glm::vec3 &vec)
 {
-	vec = glm::normalize(vec);
-
 	//float sqrt = glm::sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
 	//if (sqrt == 0) return;
 	//vec.x /= sqrt;
 	//vec.y /= sqrt;
 	//vec.z /= sqrt;
+	vec = glm::normalize(vec);
 }
 
 void ConvertToRadians(float &value)
@@ -39,12 +38,14 @@ void transformvec (const glm::vec4 input, glm::vec4 output, const glm::mat4& mod
 namespace test
 {
 	Test3DCube::Test3DCube()
-		: m_TranslationVec(-25.f, -10.f, -600.f),
+		//: m_TranslationVec(0.f, 0.f, -520.f),
+		: m_TranslationVec(0.f, 0.f, 0.f),
 		  m_RotationVec(0.f, 0.f, 0.f),
-		  m_Scale(90.f),
-		  eyeVec(0.f, 0.f, 0.f),
-		  centerVec(-10.f, -10.f, -100.f),
-		  upVec(0.f, 1.f, 0.f),
+		  m_Scale(6.f),
+		  m_EyeVec(0.f, 0.f, 60.f),
+		  //m_CenterVec(-10.f, -10.f, -100.f),
+		  m_CenterVec(0.f, 0.f, 0.f),
+		  m_UpVec(0.f, 1.f, 0.f),
 		  m_NearPlane(1.f),
 		  m_FarPlane(1000.f),
 		  m_UseOrtho(false),
@@ -60,6 +61,7 @@ namespace test
 		  m_Mesh1(Cube::positions, Cube::colors, Cube::normals, Cube::textures, Cube::indices),
 		  m_Mesh2("res/meshes/teapot.obj"),
 		  m_ChooseMesh(true)
+
 	{
 		
 		GLCall(glEnable(GL_BLEND));
@@ -80,38 +82,38 @@ namespace test
 
 	//mat[col][row]
 
-	void Test3DCube::CreateRotationZMatrix(glm::mat4 &mat, float angle)
-	{
-		mat = glm::mat4(0.f);
-		mat[0][0] = glm::cos(angle);
-		mat[1][0] = -glm::sin(angle);
-		mat[0][1] = glm::sin(angle);
-		mat[1][1] = glm::cos(angle);
-		mat[2][2] = 1;
-		mat[3][3] = 1;
-	}
+	//void Test3DCube::CreateRotationZMatrix(glm::mat4 &mat, float angle)
+	//{
+	//	mat = glm::mat4(0.f);
+	//	mat[0][0] = glm::cos(angle);
+	//	mat[1][0] = -glm::sin(angle);
+	//	mat[0][1] = glm::sin(angle);
+	//	mat[1][1] = glm::cos(angle);
+	//	mat[2][2] = 1;
+	//	mat[3][3] = 1;
+	//}
 
-	void Test3DCube::CreateRotationYMatrix(glm::mat4 &mat, float angle)
-	{
-		mat = glm::mat4(0.f);
-		mat[0][0] = glm::cos(angle);
-		mat[2][0] = glm::sin(angle);
-		mat[1][1] = 1;
-		mat[0][2] = -glm::sin(angle);
-		mat[2][2] = glm::cos(angle);
-		mat[3][3] = 1;
-	}
+	//void Test3DCube::CreateRotationYMatrix(glm::mat4 &mat, float angle)
+	//{
+	//	mat = glm::mat4(0.f);
+	//	mat[0][0] = glm::cos(angle);
+	//	mat[2][0] = glm::sin(angle);
+	//	mat[1][1] = 1;
+	//	mat[0][2] = -glm::sin(angle);
+	//	mat[2][2] = glm::cos(angle);
+	//	mat[3][3] = 1;
+	//}
 
-	void Test3DCube::CreateRotationXMatrix(glm::mat4 &mat, float angle)
-	{
-		mat = glm::mat4(0.f);
-		mat[0][0] = 1;
-		mat[1][1] = glm::cos(angle);
-		mat[2][1] = -glm::sin(angle);
-		mat[1][2] = glm::sin(angle);
-		mat[2][2] = glm::cos(angle);
-		mat[3][3] = 1;
-	}
+	//void Test3DCube::CreateRotationXMatrix(glm::mat4 &mat, float angle)
+	//{
+	//	mat = glm::mat4(0.f);
+	//	mat[0][0] = 1;
+	//	mat[1][1] = glm::cos(angle);
+	//	mat[2][1] = -glm::sin(angle);
+	//	mat[1][2] = glm::sin(angle);
+	//	mat[2][2] = glm::cos(angle);
+	//	mat[3][3] = 1;
+	//}
 
 	void Test3DCube::CreateRotationGenericMatrix(glm::mat4 &mat, float angle, const glm::vec3& axis)
 	{
@@ -164,11 +166,9 @@ namespace test
 
 		CreateTranslationMatrix(matTranslate, translationVec);
 
-		//CreateRotationZMatrix(matRotateZ, rotationVec.z);
+		// TODO: use quaternions to perform model rotation in order to avoid gimbal lock
 		CreateRotationGenericMatrix(matRotateZ, rotationVec.z, glm::vec3(0,0,1));
-		//CreateRotationYMatrix(matRotateY, rotationVec.y);
 		CreateRotationGenericMatrix(matRotateY, rotationVec.y, glm::vec3(0,1,0));
-		//CreateRotationXMatrix(matRotateX, rotationVec.x);
 		CreateRotationGenericMatrix(matRotateX, rotationVec.x, glm::vec3(1,0,0));
 
 		CreateScalingMatrix(matScale, scale);
@@ -176,33 +176,44 @@ namespace test
 		mat = matTranslate * matRotateY * matRotateZ * matRotateX * matScale;
 	}
 
-	void Test3DCube::CreateViewMatrix(glm::mat4 &mat, glm::vec3 eyeVec, glm::vec3 centerVec, glm::vec3 upVec)
+	void Test3DCube::CreateViewMatrix(glm::mat4 &mat)//, glm::vec3 m_EyeVec, glm::vec3 m_CenterVec, glm::vec3 m_UpVec)
 	{
-		glm::vec3 w = eyeVec - centerVec;
-		//NormalizeVector(w);
-		w = glm::normalize(w);
-		glm::vec3 u = upVec;
-		u = glm::cross(u, w);
-		//NormalizeVector(u);
-		u = glm::normalize(u);
+		glm::vec3 w = glm::normalize(m_EyeVec - m_CenterVec);
+		glm::vec3 u = glm::normalize(glm::cross(m_UpVec, w));
 		glm::vec3 v = glm::cross(w, u);
 
 		mat[0][0] = u.x;
 		mat[1][0] = u.y;
 		mat[2][0] = u.z;
-		mat[3][0] = -glm::dot(u, eyeVec); //-u.x*eyeVec.x - u.y*eyeVec.y - u.z*eyeVec.z;
+		mat[3][0] = -glm::dot(u, m_EyeVec); //-u.x*m_EyeVec.x - u.y*m_EyeVec.y - u.z*m_EyeVec.z;
 		mat[0][1] = v.x;
 		mat[1][1] = v.y;
 		mat[2][1] = v.z;
-		mat[3][1] = -glm::dot(v, eyeVec); //-v.x*eyeVec.x - v.y*eyeVec.y - v.z*eyeVec.z;
+		mat[3][1] = -glm::dot(v, m_EyeVec); //-v.x*m_EyeVec.x - v.y*m_EyeVec.y - v.z*m_EyeVec.z;
 		mat[0][2] = w.x;
 		mat[1][2] = w.y;
 		mat[2][2] = w.z;
-		mat[3][2] = -glm::dot(w, eyeVec); //-w.x*eyeVec.x - w.y*eyeVec.y - w.z*eyeVec.z;
+		mat[3][2] = -glm::dot(w, m_EyeVec); //-w.x*m_EyeVec.x - w.y*m_EyeVec.y - w.z*m_EyeVec.z;
 		mat[0][3] = 0;
 		mat[1][3] = 0;
 		mat[2][3] = 0;
 		mat[3][3] = 1;
+	}
+
+	void Test3DCube::RotateViewHorizontal(float amount)
+	{
+		glm::mat4 matRotation;
+		CreateRotationGenericMatrix(matRotation, amount, m_UpVec);
+		m_EyeVec = glm::mat3(matRotation) * m_EyeVec;
+	}
+
+	void Test3DCube::RotateViewVertical(float amount)
+	{
+		glm::mat4 matRotation;
+		CreateRotationGenericMatrix(matRotation, amount, glm::normalize(glm::cross(m_UpVec, glm::normalize(m_EyeVec)))
+		);
+		m_EyeVec = glm::mat3(matRotation) * m_EyeVec;
+		m_UpVec = glm::mat3(matRotation) * m_UpVec;
 	}
 
 	glm::mat4 Test3DCube::CreateOrthoMatrix(float left, float right, float bottom, float top, float nearVal, float farVal)
@@ -232,8 +243,26 @@ namespace test
 		return mat;
 	}
 
-	void Test3DCube::OnRender()
+	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)
 	{
+		if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			RotateViewHorizontal(1.f);
+		}
+		if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			RotateViewHorizontal(-1.f);
+		}
+			
+		if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			RotateViewVertical(1.f);
+		}
+		if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			RotateViewVertical(-1.f);
+		}
+
 		GLCall(glClearColor(0.2f, 0.3f, 0.8f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 		GLCall(glClear(GL_DEPTH_BUFFER_BIT));
@@ -252,7 +281,7 @@ namespace test
 
 			CreateModelMatrix(model, m_RotationVec, m_TranslationVec, m_Scale);
 
-			CreateViewMatrix(view, eyeVec, centerVec, upVec);
+			CreateViewMatrix(view);
 			
 			if (m_UseView)
 				mv = view * model;
@@ -273,13 +302,12 @@ namespace test
 			if(m_UseOrtho)
 			{
 				m_ProjOrtho = CreateOrthoMatrix(-480., 480., -270., 270., m_NearPlane, m_FarPlane);
-				mvp = m_ProjOrtho * mv; // * position
+				mvp = m_ProjOrtho * mv;
 			}
 			else
 			{
-				//m_ProjPersp = glm::perspective(90.0f * glm::pi<float>() / 180.0f, (float)960 / (float)540, m_NearPlane, m_FarPlane);
 				m_ProjPersp = CreatePerspectiveMatrix(m_Fov * glm::pi<float>() / 180.0f, (float)960 / (float)540, m_NearPlane, m_FarPlane);
-				mvp = m_ProjPersp * mv; // * position
+				mvp = m_ProjPersp * mv;
 			}
 
 			m_Shader->SetUniformMat4f("u_MVP", mvp);
@@ -310,13 +338,24 @@ namespace test
 		ImGui::SliderFloat("Translate X", &m_TranslationVec.x, -100.f, 100.f);
 		ImGui::SliderFloat("Translate Y", &m_TranslationVec.y, -100.f, 100.f);
 		ImGui::SliderFloat("Translate Z", &m_TranslationVec.z, -1000.f, 1000.f);
-		ImGui::SliderFloat("Rotate horizontal", &m_RotationVec.y, 0.f, 360.f);
-		ImGui::SliderFloat("Rotate vertical", &m_RotationVec.z, 0.f, 360.f);
-		ImGui::SliderFloat("Rotate on Z", &m_RotationVec.x, 0.f, 360.f);
-		ImGui::SliderFloat("scale", &m_Scale, 0.f, 100.f);
+		ImGui::SliderFloat3("Model Rotation", &m_RotationVec.x, -360.f, 360.f);
+		ImGui::SliderFloat("scale", &m_Scale, 0.f, 50.f);
+		ImGui::SliderFloat3("m_CenterVec", &m_CenterVec.x, -100.f, 100.f);
+		ImGui::SliderFloat3("m_EyeVec", &m_EyeVec.x, -100.f, 100.f);
+		ImGui::SliderFloat3("m_UpVec", &m_UpVec.x, -100.f, 100.f);
+
+		if(ImGui::Button("rotate view horizontal"))
+		{
+			RotateViewHorizontal(5.f);
+		}
+		if(ImGui::Button("rotate view vertical"))
+		{
+			RotateViewVertical(5.f);
+		}
+
 		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
 		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
-		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 360.f);
+		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
 		ImGui::SliderFloat("shininess", &m_Shininess, 0.f, 1000.f); 
 		ImGui::SliderFloat("specular", &m_Specular, 0.f, 1.f); 
 		ImGui::SliderFloat("diffuse", &m_Diffuse, 0.f, 1.f); 
