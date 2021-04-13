@@ -26,6 +26,9 @@
 #include "tests/TestTexture2D.h"
 #include "tests/Test3DCube.h"
 
+#define WIDTH 1920
+#define HEIGHT 1080
+
 // opengl old mode
 void TestFunction()
 {
@@ -66,7 +69,7 @@ int Init(GLFWwindow*& window)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1280, 720, "An OpenGL Viewport (GLFW)", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "An OpenGL Viewport (GLFW)", NULL, NULL);
     if (!window)
     {
 		std::cout << "Failed to create GLFW window" << std::endl;

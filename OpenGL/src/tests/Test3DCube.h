@@ -23,33 +23,27 @@ namespace test
 		void OnUpdate(float deltaTime) override;
 		void OnRender(GLFWwindow *window, int width, int height);
 		void OnImGuiRender() override;
-		//void CreateRotationZMatrix (glm::mat4 &mat, float angle);
-		//void CreateRotationYMatrix (glm::mat4 &mat, float angle);
-		//void CreateRotationXMatrix (glm::mat4 &mat, float angle);
-		void CreateRotationGenericMatrix(glm::mat4 &mat, float angle, const glm::vec3& axis);
-		void CreateScalingMatrix (glm::mat4 &mat, float scale);
-		void CreateTranslationMatrix (glm::mat4 &mat, glm::vec3 vec);
-		void CreateModelMatrix(glm::mat4 &mat, glm::vec3 rotationVec, glm::vec3 translationVec, float scale);
 
-		void CreateViewMatrix(glm::mat4 &mat);
-		void RotateViewHorizontal(float amount);
-		void RotateViewVertical(float amount);
+		//void CreateRotationGenericMatrix(glm::mat4 &mat, float angle, const glm::vec3& axis);
+		//void CreateScalingMatrix (glm::mat4 &mat, float scale);
+		//void CreateTranslationMatrix (glm::mat4 &mat, glm::vec3 vec);
+		//void CreateViewMatrix(glm::mat4 &mat);
+		//void RotateViewHorizontal(float amount);
+		//void RotateViewVertical(float amount);
 
-		glm::mat4 CreateOrthoMatrix(float left, float right, float bottom, float top, float nearVal, float farVal);
+		glm::mat4 CreateOrthoMatrix(float width, float height, float nearVal, float farVal);
 		glm::mat4 CreatePerspectiveMatrix(float fovy, float aspect, float nearVal, float farVal);
 
 	private:
-		glm::vec3 m_TranslationVec, m_RotationVec;
-		glm::vec3 m_EyeVec, m_CenterVec, m_UpVec;
 		std::unique_ptr<Shader> m_Shader;
 		std::unique_ptr<Texture> m_Texture;
-		std::unique_ptr<Camera> m_Camera;
+		Camera m_Camera;
 		glm::mat4 m_ProjOrtho, m_ProjPersp;
-		float m_Scale, m_NearPlane, m_FarPlane, m_Fov;
+		float m_NearPlane, m_FarPlane, m_Fov;
 		bool m_UseOrtho, m_UseView;
 		unsigned int m_IsLight, m_UseTexture;
-		Mesh m_Mesh1, m_Mesh2;
-		bool m_ChooseMesh;
+		std::vector<Mesh> m_MeshVector;
+		bool m_MoveLights;
 
 		// materials and lights parameters
 			const glm::vec4 one = { 1, 1, 1, 1 };

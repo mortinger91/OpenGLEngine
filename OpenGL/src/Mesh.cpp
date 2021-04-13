@@ -6,23 +6,53 @@
 #include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
+#include "Utility.h"
 
 Mesh::Mesh(std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_) 
-		: 
-		verticesPositions(verticesPositions_),
-		verticesColors(verticesColors_),
-		verticesNormals(verticesNormals_),
-		verticesTexCoords(verticesTexCoords_),
-		verticesIndices(verticesIndices_),
-		arrayV(nullptr),
-		arrayI(nullptr)
+	: verticesPositions(verticesPositions_),
+	  verticesColors(verticesColors_),
+	  verticesNormals(verticesNormals_),
+	  verticesTexCoords(verticesTexCoords_),
+	  verticesIndices(verticesIndices_),
+	  arrayV(nullptr),
+	  arrayI(nullptr)
 {
+	std::cout << "Called mesh vectors constructor" << std::endl;
 	init();
 }
 
 Mesh::Mesh(const char * filepath)
 {
+	std::cout << "Called mesh file constructor" << std::endl;
 	parse(filepath);
+	init();
+}
+
+// copy constructor
+Mesh::Mesh(const Mesh& mesh)
+	: verticesPositions(mesh.verticesPositions),
+	  verticesColors(mesh.verticesColors),
+	  verticesNormals(mesh.verticesNormals),
+	  verticesTexCoords(mesh.verticesTexCoords),
+	  verticesIndices(mesh.verticesIndices),
+	  arrayV(nullptr),
+	  arrayI(nullptr)
+{
+	std::cout << "Called mesh copy constructor" << std::endl;
+	init();
+}
+
+// move constructor
+Mesh::Mesh(Mesh&& mesh) noexcept
+	: verticesPositions(mesh.verticesPositions),
+	  verticesColors(mesh.verticesColors),
+	  verticesNormals(mesh.verticesNormals),
+	  verticesTexCoords(mesh.verticesTexCoords),
+	  verticesIndices(mesh.verticesIndices),
+	  arrayV(nullptr),
+	  arrayI(nullptr)
+{
+	std::cout << "Called mesh move constructor" << std::endl;
 	init();
 }
 
@@ -30,50 +60,6 @@ Mesh::~Mesh()
 {
 	free(arrayV);
 	free(arrayI);
-}
-
-//VertexArray Mesh::GetVao()
-//{
-//	return *m_VAO;
-//}
-//
-//IndexBuffer Mesh::GetIndexBuffer()
-//{
-//	return *m_IndexBuffer;
-//}
-
-//void Mesh::ConvertVectorsToArray(float[] verticesArray, int& sizeV, unsigned int[] indexArray, int& sizeI)
-void Mesh::ConvertVectorsToArray(int& sizeV, int& sizeI)
-{
-	sizeV = verticesPositions.size() * 11;
-	arrayV = (float*)malloc(sizeof(float) * sizeV);
-	sizeI = verticesIndices.size();
-	arrayI = (unsigned int*)malloc(sizeof(unsigned int) * sizeI);
-
-	int index = 0;
-	for (unsigned int i = 0; i < verticesPositions.size(); ++i)
-	{
-		arrayV[index++] = verticesPositions[i].x;
-		arrayV[index++] = verticesPositions[i].y;
-		arrayV[index++] = verticesPositions[i].z;
-
-		arrayV[index++] = verticesColors[i].x;
-		arrayV[index++] = verticesColors[i].y;
-		arrayV[index++] = verticesColors[i].z;
-
-		arrayV[index++] = verticesNormals[i].x;
-		arrayV[index++] = verticesNormals[i].y;
-		arrayV[index++] = verticesNormals[i].z;
-
-		arrayV[index++] = verticesTexCoords[i].x;
-		arrayV[index++] = verticesTexCoords[i].y;
-	}
-	
-	index = 0;
-	for (unsigned int i = 0; i < verticesIndices.size(); ++i)
-	{
-		arrayI[index++] = verticesIndices[i];
-	}
 }
 
 // OBJ file parser function. Used for loading the teapot.obj file.
@@ -144,8 +130,46 @@ void Mesh::parse(const char * filepath)
 	}
 }
 
+//void Mesh::ConvertVectorsToArray(float[] verticesArray, int& sizeV, unsigned int[] indexArray, int& sizeI)
+void Mesh::ConvertVectorsToArray(int& sizeV, int& sizeI)
+{
+	sizeV = verticesPositions.size() * 11;
+	arrayV = (float*)malloc(sizeof(float) * sizeV);
+	sizeI = verticesIndices.size();
+	arrayI = (unsigned int*)malloc(sizeof(unsigned int) * sizeI);
+
+	int index = 0;
+	for (unsigned int i = 0; i < verticesPositions.size(); ++i)
+	{
+		arrayV[index++] = verticesPositions[i].x;
+		arrayV[index++] = verticesPositions[i].y;
+		arrayV[index++] = verticesPositions[i].z;
+
+		arrayV[index++] = verticesColors[i].x;
+		arrayV[index++] = verticesColors[i].y;
+		arrayV[index++] = verticesColors[i].z;
+
+		arrayV[index++] = verticesNormals[i].x;
+		arrayV[index++] = verticesNormals[i].y;
+		arrayV[index++] = verticesNormals[i].z;
+
+		arrayV[index++] = verticesTexCoords[i].x;
+		arrayV[index++] = verticesTexCoords[i].y;
+	}
+	
+	index = 0;
+	for (unsigned int i = 0; i < verticesIndices.size(); ++i)
+	{
+		arrayI[index++] = verticesIndices[i];
+	}
+}
+
 void Mesh::init()
 {
+	m_TranslationVec = glm::vec3(0.f, 0.f, 0.f);
+	m_RotationVec = glm::vec3(0.f, 0.f, 0.f);
+	m_Scale = 1.f;
+
 	// initializing vertex array
 	m_VAO = std::make_unique<VertexArray>();
 
@@ -169,4 +193,34 @@ void Mesh::init()
 
 	// creating an index buffer
 	m_IndexBuffer = std::make_unique<IndexBuffer>(arrayI, sizeI);
+}
+
+void Mesh::CreateScalingMatrix(glm::mat4 &mat, float scale)
+{
+	mat = glm::mat4(0.f);
+	mat[0][0] = scale;
+	mat[1][1] = scale;
+	mat[2][2] = scale;
+	mat[3][3] = 1;
+}
+
+//void Mesh::CreateModelMatrix(glm::mat4 &mat, glm::vec3 rotationVec, glm::vec3 translationVec, float scale)
+void Mesh::CreateModelMatrix()
+{
+	glm::mat4 matTranslate;
+	glm::mat4 matRotateZ;
+	glm::mat4 matRotateY;
+	glm::mat4 matRotateX;
+	glm::mat4 matScale;
+
+	Utility::CreateTranslationMatrix(matTranslate, m_TranslationVec);
+
+	// TODO: use quaternions to perform model rotation in order to avoid gimbal lock
+	Utility::CreateRotationGenericMatrix(matRotateZ, m_RotationVec.z, glm::vec3(0,0,1));
+	Utility::CreateRotationGenericMatrix(matRotateY, m_RotationVec.y, glm::vec3(0,1,0));
+	Utility::CreateRotationGenericMatrix(matRotateX, m_RotationVec.x, glm::vec3(1,0,0));
+
+	CreateScalingMatrix(matScale, m_Scale);
+
+	m_ModelMatrix = matTranslate * matRotateY * matRotateZ * matRotateX * matScale;
 }
