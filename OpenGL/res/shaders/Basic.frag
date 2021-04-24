@@ -30,7 +30,17 @@ uniform vec4 light1color;
 uniform vec4 ambient; 
 uniform vec4 diffuse; 
 uniform vec4 specular; 
-uniform float shininess; 
+uniform float shininess;
+
+struct Material 
+{
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+}; 
+  
+uniform Material material;
 
 vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in vec3 normal, const in vec3 halfvec, const in vec4 mydiffuse, const in vec4 myspecular, const in float myshininess)
 {
@@ -56,7 +66,7 @@ void main()
 	{
 		fragmentColor = vec4(v_Color, 1.f);
 	}
-	if(islight == 1)
+	if (islight == 1)
 	{
 		// They eye is always at (0,0,0) looking down -z axis 
 		// Also compute current fragment position and direction to eye 

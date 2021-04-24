@@ -23,6 +23,7 @@
     <ClCompile Include="src\tests\Test3DCube.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Material.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl" />
@@ -469,5 +470,6 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="res\meshes\cube.h" />
     <ClInclude Include="src\Utility.h" />
+    <ClInclude Include="src\Material.h" />
   </ItemGroup>
 </Project>

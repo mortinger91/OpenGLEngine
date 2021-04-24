@@ -2,26 +2,25 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 #include "glm/glm.hpp"
+#include "Material.h"
 
 // forward declarations
 class VertexBuffer;
 class VertexArray;
 class IndexBuffer;
+//class Material;
 
 class Mesh
 {
 private:
+	std::string m_Name;
 	std::vector <glm::vec3> verticesPositions;
 	std::vector <glm::vec3> verticesColors;
 	std::vector <glm::vec3> verticesNormals;
 	std::vector <glm::vec2> verticesTexCoords;
 	std::vector <unsigned int> verticesIndices;
-
-	std::unique_ptr<VertexBuffer> m_VertexBuffer;
-	
-	float* arrayV;
-	unsigned int* arrayI;
 
 	void ConvertVectorsToArray(int& sizeV, int& sizeI);
 	void parse(const char * filepath);
@@ -29,14 +28,19 @@ private:
 	void CreateScalingMatrix(glm::mat4 &mat, float scale);
 
 public:
-	Mesh(std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_);
-	Mesh(const char * filepath);
+	Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_);
+	Mesh(const std::string& name, const char * filepath);
 	Mesh(const Mesh& mesh);
 	Mesh(Mesh&& mesh) noexcept;
 	~Mesh();
 
 	std::unique_ptr<VertexArray> m_VAO;
+	std::unique_ptr<VertexBuffer> m_VertexBuffer;
 	std::unique_ptr<IndexBuffer> m_IndexBuffer;
+	std::unique_ptr<Material> m_Material;
+
+	float* arrayV;
+	unsigned int* arrayI;
 
 	glm::vec3 m_TranslationVec;
 	glm::vec3 m_RotationVec;
@@ -44,4 +48,8 @@ public:
 
 	glm::mat4 m_ModelMatrix;
 	void CreateModelMatrix();
+
+	void SetMaterial(const std::string& texturePath); 
+
+	void Bind() const;
 };

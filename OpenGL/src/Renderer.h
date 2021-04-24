@@ -5,6 +5,7 @@
 class VertexArray;
 class IndexBuffer;
 class Shader;
+class Mesh;
 
 // __ means that the function is compiler intrinsic, so it's specific to msvc, other compilers will use different functions
 #define ASSERT(x) if(!(x)) __debugbreak();
@@ -22,5 +23,5 @@ public:
 	//Renderer();
 	//~Renderer();
 	void Clear() const;
-	void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+	void Draw(const Mesh& mesh, const Shader& shader) const;
 };

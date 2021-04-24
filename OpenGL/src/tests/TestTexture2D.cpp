@@ -82,7 +82,7 @@ namespace test
 			m_Shader->Bind();
 			m_Shader->SetUniformMat4f("u_MVP", mvp);
 			// Draw call
-			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
+			//renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
 		}
 
 		{
@@ -90,7 +90,7 @@ namespace test
 			glm::mat4 mvp = m_Proj * m_View * model;
 			m_Shader->SetUniformMat4f("u_MVP", mvp);
 			// Draw call
-			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
+			//renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
 		}
 	}
 

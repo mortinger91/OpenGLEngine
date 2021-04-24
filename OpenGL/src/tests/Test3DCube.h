@@ -36,14 +36,17 @@ namespace test
 
 	private:
 		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<Texture> m_Texture;
+		std::vector<Mesh> m_MeshVector;
 		Camera m_Camera;
+		Renderer renderer;
+		
 		glm::mat4 m_ProjOrtho, m_ProjPersp;
 		float m_NearPlane, m_FarPlane, m_Fov;
+
 		bool m_UseOrtho, m_UseView;
 		unsigned int m_IsLight, m_UseTexture;
-		std::vector<Mesh> m_MeshVector;
 		bool m_MoveLights;
+		int index;
 
 		// materials and lights parameters
 			const glm::vec4 one = { 1, 1, 1, 1 };
@@ -63,12 +66,6 @@ namespace test
 			GLuint light0color;
 			GLuint light1posn;
 			GLuint light1color;
-			GLuint ambient;
-			GLuint diffuse;
-			GLuint specular;
-			GLuint shininess;
-
-			float m_Shininess, m_Specular;
-			float m_Diffuse, m_Ambient;
+			
 	};
 }

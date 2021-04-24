@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include "Mesh.h"
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
@@ -8,58 +9,67 @@
 #include "VertexArray.h"
 #include "Utility.h"
 
-Mesh::Mesh(std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_) 
-	: verticesPositions(verticesPositions_),
+Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_) 
+	: m_Name(name),
+	  verticesPositions(verticesPositions_),
 	  verticesColors(verticesColors_),
 	  verticesNormals(verticesNormals_),
 	  verticesTexCoords(verticesTexCoords_),
-	  verticesIndices(verticesIndices_),
-	  arrayV(nullptr),
-	  arrayI(nullptr)
+	  verticesIndices(verticesIndices_)
 {
-	std::cout << "Called mesh vectors constructor" << std::endl;
+	std::cout << "Called mesh constructor from vectors of:" << m_Name << std::endl;
 	init();
 }
 
-Mesh::Mesh(const char * filepath)
+Mesh::Mesh(const std::string& name, const char * filepath)
+	: m_Name(name)
 {
-	std::cout << "Called mesh file constructor" << std::endl;
+	std::cout << "Called mesh constructor from file of:" << m_Name << std::endl;
 	parse(filepath);
 	init();
 }
 
 // copy constructor
 Mesh::Mesh(const Mesh& mesh)
-	: verticesPositions(mesh.verticesPositions),
+	: m_Name(mesh.m_Name),
+	  verticesPositions(mesh.verticesPositions),
 	  verticesColors(mesh.verticesColors),
 	  verticesNormals(mesh.verticesNormals),
 	  verticesTexCoords(mesh.verticesTexCoords),
-	  verticesIndices(mesh.verticesIndices),
-	  arrayV(nullptr),
-	  arrayI(nullptr)
+	  verticesIndices(mesh.verticesIndices)
 {
-	std::cout << "Called mesh copy constructor" << std::endl;
+	std::cout << "Called mesh copy constructor of:" << m_Name << std::endl;
 	init();
 }
 
 // move constructor
 Mesh::Mesh(Mesh&& mesh) noexcept
-	: verticesPositions(mesh.verticesPositions),
+	: m_Name(mesh.m_Name),
+	  verticesPositions(mesh.verticesPositions),
 	  verticesColors(mesh.verticesColors),
 	  verticesNormals(mesh.verticesNormals),
 	  verticesTexCoords(mesh.verticesTexCoords),
 	  verticesIndices(mesh.verticesIndices),
-	  arrayV(nullptr),
-	  arrayI(nullptr)
+	  m_VAO(std::move(mesh.m_VAO)),
+	  m_VertexBuffer(std::move(mesh.m_VertexBuffer)),
+	  m_IndexBuffer(std::move(mesh.m_IndexBuffer)),
+	  m_Material(std::move(mesh.m_Material)),
+	  m_TranslationVec(mesh.m_TranslationVec),
+	  m_RotationVec(mesh.m_RotationVec),
+	  m_Scale(mesh.m_Scale),
+	  arrayV(mesh.arrayV),
+	  arrayI(mesh.arrayI)
 {
-	std::cout << "Called mesh move constructor" << std::endl;
-	init();
+	mesh.arrayV = nullptr;
+	mesh.arrayI = nullptr;
+	std::cout << "Called mesh move constructor of:" << m_Name << std::endl;
 }
 
 Mesh::~Mesh()
 {
 	free(arrayV);
 	free(arrayI);
+	std::cout << "Called mesh destructor of:" << m_Name << std::endl;
 }
 
 // OBJ file parser function. Used for loading the teapot.obj file.
@@ -130,8 +140,8 @@ void Mesh::parse(const char * filepath)
 	}
 }
 
-//void Mesh::ConvertVectorsToArray(float[] verticesArray, int& sizeV, unsigned int[] indexArray, int& sizeI)
 void Mesh::ConvertVectorsToArray(int& sizeV, int& sizeI)
+
 {
 	sizeV = verticesPositions.size() * 11;
 	arrayV = (float*)malloc(sizeof(float) * sizeV);
@@ -175,6 +185,7 @@ void Mesh::init()
 
 	int sizeV;
 	int sizeI;
+	//ConvertVectorsToArray(sizeV, sizeI, arrayV, arrayI);
 	ConvertVectorsToArray(sizeV, sizeI);
 
 	// initializing vertex buffer
@@ -204,7 +215,6 @@ void Mesh::CreateScalingMatrix(glm::mat4 &mat, float scale)
 	mat[3][3] = 1;
 }
 
-//void Mesh::CreateModelMatrix(glm::mat4 &mat, glm::vec3 rotationVec, glm::vec3 translationVec, float scale)
 void Mesh::CreateModelMatrix()
 {
 	glm::mat4 matTranslate;
@@ -223,4 +233,16 @@ void Mesh::CreateModelMatrix()
 	CreateScalingMatrix(matScale, m_Scale);
 
 	m_ModelMatrix = matTranslate * matRotateY * matRotateZ * matRotateX * matScale;
+}
+
+void Mesh::SetMaterial(const std::string& texturePath)
+{
+	m_Material = std::make_unique<Material>(texturePath);
+}
+
+void Mesh::Bind() const
+{
+	m_VAO->Bind();
+	m_IndexBuffer->Bind();
+	m_Material->Bind();
 }

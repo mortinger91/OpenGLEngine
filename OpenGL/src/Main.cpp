@@ -174,11 +174,13 @@ int main(void)
 			delete testMenu;
 		}
 	}
+
 	// Shutdown ImGui
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 	// Destroy GLFW
     glfwTerminate();
+
     return 0;
 }

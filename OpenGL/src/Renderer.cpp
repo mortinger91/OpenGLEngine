@@ -3,6 +3,7 @@
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "Mesh.h"
 
 void GLClearError()
 {
@@ -27,11 +28,11 @@ void Renderer::Clear() const
 	GLCall(glClear(GL_COLOR_BUFFER_BIT));
 }
 
-void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+//void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+void Renderer::Draw(const Mesh& mesh, const Shader& shader) const
 {
+	mesh.Bind();
 	shader.Bind();
-	va.Bind();
-	ib.Bind();
 	// DRAW CALL: render primitives from array data
-	GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
+	GLCall(glDrawElements(GL_TRIANGLES, mesh.m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr));
 }

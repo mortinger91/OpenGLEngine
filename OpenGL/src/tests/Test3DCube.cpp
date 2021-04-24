@@ -19,13 +19,10 @@ namespace test
 		  m_UseView(true),
 		  m_Fov(30.0f),
 		  m_IsLight(1),
-		  m_Shininess(100.f),
-		  m_Specular(0.75f),
-		  m_Diffuse(0.5f),
-		  m_Ambient(0.2f),
 		  m_UseTexture(1),
 		  m_MoveLights(true),
-		  m_Camera(glm::vec3(0.f, 0.f, 60.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f))
+		  m_Camera(glm::vec3(0.f, 0.f, 60.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)),
+		  index(0)
 	{
 		GLCall(glEnable(GL_BLEND));
 		// setting up a blend function, default would be src=0 dest=1 which means override old pixels with new ones
@@ -33,18 +30,18 @@ namespace test
 
 		GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glDepthFunc(GL_LESS));
-
+		
 		// defining a shader
 		m_Shader = std::make_unique<Shader>("res/shaders/Basic.vert", "res/shaders/Basic.frag");
 		m_Shader->Bind();
 
-		// creating a texture
-		m_Texture = std::make_unique<Texture>("res/textures/metal.png");
 		m_Shader->SetUniform1i("u_Texture", 0);
 
-		Mesh mesh1(Cube::positions, Cube::colors, Cube::normals, Cube::textures, Cube::indices);
+		Mesh mesh1("Cube", Cube::positions, Cube::colors, Cube::normals, Cube::textures, Cube::indices);
+		mesh1.SetMaterial("res/textures/metal.png");
 		m_MeshVector.push_back(std::move(mesh1));
-		Mesh mesh2("res/meshes/teapot.obj");
+		Mesh mesh2("Teapot", "res/meshes/teapot.obj");
+		mesh2.SetMaterial("res/textures/metal.png");
 		m_MeshVector.push_back(std::move(mesh2));
 
 		m_MeshVector[0].m_Scale = 6.f;
@@ -109,17 +106,13 @@ namespace test
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 		GLCall(glClear(GL_DEPTH_BUFFER_BIT));
 
-		Renderer renderer;
-
-		m_Texture->Bind();
-
 		{
-			m_Shader->Bind();
-			
 			m_Camera.CreateViewMatrix();
 
 			for(int i = 0; i < m_MeshVector.size(); ++i)
 			{
+				//m_MeshVector[i].Bind();
+
 				m_MeshVector[i].CreateModelMatrix();
 
 				glm::mat4 mv;
@@ -168,24 +161,18 @@ namespace test
 				m_Shader->SetUniform4fv("light0color", light_specular);
 				m_Shader->SetUniform4fv("light1posn", light1);
 				m_Shader->SetUniform4fv("light1color", light_specular1);
-				m_Shader->SetUniform4fv("ambient", { m_Ambient, m_Ambient, m_Ambient, 1 });
-				m_Shader->SetUniform4fv("diffuse", { m_Diffuse, m_Diffuse, m_Diffuse, 1 });
-				m_Shader->SetUniform4fv("specular", { m_Specular, m_Specular, m_Specular, 1 });
-				m_Shader->SetUniform1fv("shininess", m_Shininess);
+				m_Shader->SetUniform4fv("ambient", { m_MeshVector[i].m_Material->m_Ambient, m_MeshVector[i].m_Material->m_Ambient, m_MeshVector[i].m_Material->m_Ambient, 1 });
+				m_Shader->SetUniform4fv("diffuse", { m_MeshVector[i].m_Material->m_Diffuse, m_MeshVector[i].m_Material->m_Diffuse, m_MeshVector[i].m_Material->m_Diffuse, 1 });
+				m_Shader->SetUniform4fv("specular", { m_MeshVector[i].m_Material->m_Specular, m_MeshVector[i].m_Material->m_Specular, m_MeshVector[i].m_Material->m_Specular, 1 });
+				m_Shader->SetUniform1fv("shininess", m_MeshVector[i].m_Material->m_Shininess);
 
-				renderer.Draw(*(m_MeshVector[i].m_VAO), *(m_MeshVector[i].m_IndexBuffer), *m_Shader);
+				renderer.Draw(m_MeshVector[i], *m_Shader);
 			}
 		}
 	}
 
 	void Test3DCube::OnImGuiRender()
 	{
-		//int index = 0;
-		//if(ImGui::Button("change mesh index"))
-		//{
-		//	index = (index == 0) ? 1 : 0;
-		//}
-
 		ImGui::SliderFloat("Translate X1", &m_MeshVector[0].m_TranslationVec.x, -100.f, 100.f);
 		ImGui::SliderFloat("Translate Y1", &m_MeshVector[0].m_TranslationVec.y, -100.f, 100.f);
 		ImGui::SliderFloat("Translate Z1", &m_MeshVector[0].m_TranslationVec.z, -1000.f, 1000.f);
@@ -197,10 +184,6 @@ namespace test
 		ImGui::SliderFloat("Translate Z2", &m_MeshVector[1].m_TranslationVec.z, -1000.f, 1000.f);
 		ImGui::SliderFloat3("Model Rotation2", &m_MeshVector[1].m_RotationVec.x, -360.f, 360.f);
 		ImGui::SliderFloat("Scale2", &m_MeshVector[1].m_Scale, 0.f, 50.f);
-
-		//ImGui::SliderFloat3("m_CenterVec", &m_CenterVec.x, -100.f, 100.f);
-		//ImGui::SliderFloat3("m_EyeVec", &m_EyeVec.x, -100.f, 100.f);
-		//ImGui::SliderFloat3("m_UpVec", &m_UpVec.x, -100.f, 100.f);
 
 		if(ImGui::Button("rotate view horizontal"))
 		{
@@ -214,10 +197,14 @@ namespace test
 		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
 		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
 		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
-		ImGui::SliderFloat("shininess", &m_Shininess, 0.f, 1000.f); 
-		ImGui::SliderFloat("specular", &m_Specular, 0.f, 1.f); 
-		ImGui::SliderFloat("diffuse", &m_Diffuse, 0.f, 1.f); 
-		ImGui::SliderFloat("ambient", &m_Ambient, 0.f, 1.f); 
+		ImGui::SliderFloat("shininess1", &m_MeshVector[0].m_Material->m_Shininess, 0.f, 1000.f); 
+		ImGui::SliderFloat("specular1", &m_MeshVector[0].m_Material->m_Specular, 0.f, 1.f); 
+		ImGui::SliderFloat("diffuse1", &m_MeshVector[0].m_Material->m_Diffuse, 0.f, 1.f); 
+		ImGui::SliderFloat("ambient1", &m_MeshVector[0].m_Material->m_Ambient, 0.f, 1.f);
+		ImGui::SliderFloat("shininess2", &m_MeshVector[1].m_Material->m_Shininess, 0.f, 1000.f); 
+		ImGui::SliderFloat("specular2", &m_MeshVector[1].m_Material->m_Specular, 0.f, 1.f); 
+		ImGui::SliderFloat("diffuse2", &m_MeshVector[1].m_Material->m_Diffuse, 0.f, 1.f); 
+		ImGui::SliderFloat("ambient2", &m_MeshVector[1].m_Material->m_Ambient, 0.f, 1.f);
 		if(ImGui::Button("change proj matrix"))
 		{
 			m_UseOrtho = !m_UseOrtho;
@@ -250,16 +237,6 @@ namespace test
 			ImGui::Text("Using Texture");
 		else
 			ImGui::Text("Not Using Texture");
-
-		//if(ImGui::Button("m_ChooseMesh"))
-		//{
-		//	m_ChooseMesh = !m_ChooseMesh;
-		//}
-		//if (m_ChooseMesh)
-		//	ImGui::Text("Using Mesh1");
-		//else
-		//	ImGui::Text("Using Mesh2");
-
 		if(ImGui::Button("Move Lights"))
 		{
 			m_MoveLights = !m_MoveLights;
@@ -268,6 +245,11 @@ namespace test
 			ImGui::Text("Moving lights");
 		else
 			ImGui::Text("Not moving lights");
+		//if(ImGui::Button("change selected mesh"))
+		//{
+		//	index = (index == 0) ? 1 : 0;
+		//}
+
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 
