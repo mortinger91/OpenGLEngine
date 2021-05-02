@@ -8,7 +8,6 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Mesh.h"
-
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 
@@ -24,16 +23,6 @@ namespace test
 		void OnRender(GLFWwindow *window, int width, int height);
 		void OnImGuiRender() override;
 
-		//void CreateRotationGenericMatrix(glm::mat4 &mat, float angle, const glm::vec3& axis);
-		//void CreateScalingMatrix (glm::mat4 &mat, float scale);
-		//void CreateTranslationMatrix (glm::mat4 &mat, glm::vec3 vec);
-		//void CreateViewMatrix(glm::mat4 &mat);
-		//void RotateViewHorizontal(float amount);
-		//void RotateViewVertical(float amount);
-
-		glm::mat4 CreateOrthoMatrix(float width, float height, float nearVal, float farVal);
-		glm::mat4 CreatePerspectiveMatrix(float fovy, float aspect, float nearVal, float farVal);
-
 	private:
 		std::unique_ptr<Shader> m_Shader;
 		std::vector<Mesh> m_MeshVector;
@@ -43,29 +32,16 @@ namespace test
 		glm::mat4 m_ProjOrtho, m_ProjPersp;
 		float m_NearPlane, m_FarPlane, m_Fov;
 
-		bool m_UseOrtho, m_UseView;
+		bool m_UseOrtho, m_StopRotation, m_RotatingPointLight;
 		unsigned int m_IsLight, m_UseTexture;
-		bool m_MoveLights;
 		int index;
 
-		// materials and lights parameters
-			const glm::vec4 one = { 1, 1, 1, 1 };
-			const glm::vec4 medium = { 0.5, 0.5, 0.5, 1 };
-			const glm::vec4 small = { 0.2f, 0.2f, 0.2f, 1 };
-			const float high = 1000.f;
-			const glm::vec4 zero = { 0.0, 0.0, 0.0, 1.0 };
-			const glm::vec4 light_specular = { 1.f, 1.f, 0.f, 1.f };
-			const glm::vec4 light_direction = { 0.f, 0.f, 0.5f, 0.f }; // Dir light 0 in w 
-			const glm::vec4 light_specular1 = { 0, 0.5, 1, 1 };
-			const glm::vec4 light_position1 = { 400, -0.5, 0, 1 };
+		glm::vec4 light_direction = { 0.f, 0.f, 0.5f, 0.f }; // Dir light 0 in w 
+		glm::vec4 light_color = { 1.f, 1.f, 0.f, 1.f };
 
-			glm::vec4 light0;
-			glm::vec4 light1;
+		glm::vec4 light_position1 = { 400, -0.5, 0, 1 };
+		glm::vec4 light_color1 = { 10.f, 10.f, 10.f, 1.f };
 
-			GLuint light0dirn;
-			GLuint light0color;
-			GLuint light1posn;
-			GLuint light1color;
-			
+		float m_PointLightAngle;
 	};
 }

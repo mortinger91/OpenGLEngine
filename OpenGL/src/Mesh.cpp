@@ -141,7 +141,6 @@ void Mesh::parse(const char * filepath)
 }
 
 void Mesh::ConvertVectorsToArray(int& sizeV, int& sizeI)
-
 {
 	sizeV = verticesPositions.size() * 11;
 	arrayV = (float*)malloc(sizeof(float) * sizeV);
