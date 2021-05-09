@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
+#include "glew.h"
+#include "glfw3.h"
 
 #include "Renderer.h"
 
