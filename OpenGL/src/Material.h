@@ -6,8 +6,7 @@
 class Material
 {
 public:
-	Material(const std::string& texturePath);
-	Material();
+	Material(const std::string& texturePath, float _m_Shininess, float _m_Specular, float _m_Diffuse, float _m_Ambient);
 	~Material();
 	float m_Shininess, m_Specular, m_Diffuse, m_Ambient;
 

@@ -30,6 +30,11 @@ void Camera::RotateViewVertical(float amount)
 	m_UpVec = glm::mat3(matRotation) * m_UpVec;
 }
 
+const glm::vec3& Camera::GetEyePos() const
+{
+	return m_EyeVec;
+}
+
 void Camera::CreateViewMatrix()
 {
 	glm::vec3 w = glm::normalize(m_EyeVec - m_CenterVec);

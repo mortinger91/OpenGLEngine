@@ -234,9 +234,9 @@ void Mesh::CreateModelMatrix()
 	m_ModelMatrix = matTranslate * matRotateY * matRotateZ * matRotateX * matScale;
 }
 
-void Mesh::SetMaterial(const std::string& texturePath)
+void Mesh::SetMaterial(const std::string& texturePath, float shininess, float specular, float diffuse, float ambient)
 {
-	m_Material = std::make_unique<Material>(texturePath);
+	m_Material = std::make_unique<Material>(texturePath, shininess, specular, diffuse, ambient);
 }
 
 void Mesh::Bind() const

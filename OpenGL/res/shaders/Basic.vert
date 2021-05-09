@@ -23,7 +23,7 @@ void main()
 	gl_Position = u_MVP * vec4(position, 1.f);
 	v_Color = color;
 	// TODO: move mat3(transpose(inverse(u_MV))) to a uniform
-	v_Normal = mat3(transpose(inverse(u_MV))) * normal; 
-    v_Vertex = u_MV * vec4(position, 1.f);
+	v_Normal = mat3(transpose(inverse(u_MV))) * normal;
+	v_Vertex = u_MV * vec4(position, 1.f);
 	v_TexCoord = texCoord;
 };

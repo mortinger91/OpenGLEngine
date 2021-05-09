@@ -11,9 +11,9 @@ public:
 	Camera(const glm::vec3& _EyeVec, const glm::vec3& _CenterVec, const glm::vec3& _UpVec);
 	~Camera();
 
-	void RotateViewHorizontal(float amount);
-	void RotateViewVertical(float amount);
-
 	glm::mat4 m_ViewMatrix;
 	void CreateViewMatrix();
+	void RotateViewHorizontal(float amount);
+	void RotateViewVertical(float amount);
+	const glm::vec3& GetEyePos() const;
 };

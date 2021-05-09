@@ -49,7 +49,7 @@ public:
 	glm::mat4 m_ModelMatrix;
 	void CreateModelMatrix();
 
-	void SetMaterial(const std::string& texturePath); 
+	void SetMaterial(const std::string& texturePath, float shininess, float specular, float diffuse, float ambient); 
 
 	void Bind() const;
 };

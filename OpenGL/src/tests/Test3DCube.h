@@ -26,7 +26,7 @@ namespace test
 	private:
 		std::unique_ptr<Shader> m_Shader;
 		std::vector<Mesh> m_MeshVector;
-		Camera m_Camera;
+		std::unique_ptr<Camera> m_Camera;
 		Renderer renderer;
 		
 		glm::mat4 m_ProjOrtho, m_ProjPersp;

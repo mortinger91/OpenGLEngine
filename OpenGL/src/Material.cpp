@@ -1,21 +1,12 @@
 #include "Material.h"
 
-Material::Material(const std::string& texturePath)
-	: m_Shininess(100.f),
-	  m_Specular(0.75f),
-	  m_Diffuse(0.5f),
-	  m_Ambient(0.2f)
+Material::Material(const std::string& texturePath, float _m_Shininess, float _m_Specular, float _m_Diffuse, float _m_Ambient)
+	: m_Shininess(_m_Shininess),
+	  m_Specular(_m_Specular),
+	  m_Diffuse(_m_Diffuse),
+	  m_Ambient(_m_Ambient)
 {
 	m_Texture = std::make_unique<Texture>(texturePath);
-}
-
-Material::Material()
-	: m_Shininess(100.f),
-	  m_Specular(0.75f),
-	  m_Diffuse(0.5f),
-	  m_Ambient(0.2f)
-{
-
 }
 
 Material::~Material()

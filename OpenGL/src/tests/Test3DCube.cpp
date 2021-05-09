@@ -19,7 +19,6 @@ namespace test
 		  m_Fov(30.0f),
 		  m_IsLight(1),
 		  m_UseTexture(1),
-		  m_Camera(glm::vec3(0.f, 0.f, 60.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)),
 		  index(0),
 		  m_StopRotation(false),
 		  m_RotatingPointLight(true),
@@ -36,46 +35,49 @@ namespace test
 		m_Shader = std::make_unique<Shader>("res/shaders/Basic.vert", "res/shaders/Basic.frag");
 		m_Shader->Bind();
 
+		// creating the camera
+		m_Camera = std::make_unique<Camera>(glm::vec3(0.f, 0.f, 60.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+
 		m_Shader->SetUniform1i("u_Texture", 0);
 
+		float ambient = 0.15f;
+
 		Mesh mesh1("Cube", Cube::positions, Cube::colors, Cube::normals, Cube::textures, Cube::indices);
-		mesh1.SetMaterial("res/textures/metal.png");
+		mesh1.SetMaterial("res/textures/metal.png", 500.f, 0.75f, 0.2f, ambient);
 		mesh1.m_Scale = 6.f;
 		mesh1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
 		m_MeshVector.push_back(std::move(mesh1));
 		Mesh mesh2("Teapot", "res/meshes/teapot.obj");
-		mesh2.SetMaterial("res/textures/metal.png");
+		mesh2.SetMaterial("res/textures/metal.png", 200.f, 0.25f, 0.8f, ambient);
 		mesh2.m_Scale = 12.f;
 		mesh2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
 		m_MeshVector.push_back(std::move(mesh2));
 		Mesh mesh3("Plane", Plane::positions, Plane::colors, Plane::normals, Plane::textures, Plane::indices);
-		mesh3.SetMaterial("res/textures/metal.png");
+		mesh3.SetMaterial("res/textures/metal.png", 500.f, 0.75f, 0.2f, ambient);
 		mesh3.m_Scale = 500.f;
 		mesh3.m_TranslationVec = glm::vec3(0.f, -10.f, 0.f);
-		//mesh3.m_RotationVec = glm::vec3(10.f, 0.f, 0.f);
 		m_MeshVector.push_back(std::move(mesh3));
 	}
 
-	//mat[col][row]
-
 	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)
 	{
+		// TODO: Move inputs to a input class
 		if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		{
-			m_Camera.RotateViewHorizontal(1.f);
+			m_Camera->RotateViewHorizontal(1.f);
 		}
 		if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		{
-			m_Camera.RotateViewHorizontal(-1.f);
+			m_Camera->RotateViewHorizontal(-1.f);
 		}
 			
 		if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{
-			m_Camera.RotateViewVertical(1.f);
+			m_Camera->RotateViewVertical(1.f);
 		}
 		if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		{
-			m_Camera.RotateViewVertical(-1.f);
+			m_Camera->RotateViewVertical(-1.f);
 		}
 
 		GLCall(glClearColor(0.2f, 0.3f, 0.8f, 1.0f));
@@ -83,7 +85,7 @@ namespace test
 		GLCall(glClear(GL_DEPTH_BUFFER_BIT));
 
 		{
-			m_Camera.CreateViewMatrix();
+			m_Camera->CreateViewMatrix();
 
 			if (!m_StopRotation)
 			{
@@ -98,22 +100,22 @@ namespace test
 
 				Utility::NormalizeAngle(m_MeshVector[i].m_RotationVec.y);
 				m_MeshVector[i].CreateModelMatrix();
-				mv = m_Camera.m_ViewMatrix * m_MeshVector[i].m_ModelMatrix;
+				mv = m_Camera->m_ViewMatrix * m_MeshVector[i].m_ModelMatrix;
 
 				glm::vec4 light0direction;
-				light0direction = m_Camera.m_ViewMatrix * light_direction;
+				light0direction = m_Camera->m_ViewMatrix * light_direction;
 
 				glm::vec4 light1position;
 				if (m_RotatingPointLight)
 				{
-					m_PointLightAngle+=0.5f;
+					m_PointLightAngle+=0.2f;
 				}
 				glm::mat4 matRotateLight;
 				Utility::NormalizeAngle(m_PointLightAngle);
 				Utility::CreateRotationGenericMatrix(matRotateLight, m_PointLightAngle, glm::vec3(0.f, 1.f, 0.f));
-				light1position = m_Camera.m_ViewMatrix * matRotateLight * light_position1;
+				light1position = m_Camera->m_ViewMatrix * matRotateLight * light_position1;
 				
-				// TODO: modify these matrix only if these values are changed
+				// TODO: modify these matrix only if the values are changed
 				if(m_UseOrtho)
 				{
 					m_ProjOrtho = Utility::CreateOrthoMatrix((float)width, (float)height, m_NearPlane, m_FarPlane);
@@ -137,6 +139,9 @@ namespace test
 				m_Shader->SetUniform4fv("diffuse", { m_MeshVector[i].m_Material->m_Diffuse, m_MeshVector[i].m_Material->m_Diffuse, m_MeshVector[i].m_Material->m_Diffuse, 1 });
 				m_Shader->SetUniform4fv("specular", { m_MeshVector[i].m_Material->m_Specular, m_MeshVector[i].m_Material->m_Specular, m_MeshVector[i].m_Material->m_Specular, 1 });
 				m_Shader->SetUniform1fv("shininess", m_MeshVector[i].m_Material->m_Shininess);
+
+				// TODO: is eyepos needed in fragment shader for correct highlights?
+				//m_Shader->SetUniform3fv("eyepos", m_Camera->GetEyePos());
 
 				renderer.Draw(m_MeshVector[i], *m_Shader);
 			}
