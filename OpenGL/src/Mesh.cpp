@@ -17,14 +17,14 @@ Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, 
 	  verticesTexCoords(verticesTexCoords_),
 	  verticesIndices(verticesIndices_)
 {
-	std::cout << "Called mesh constructor from vectors of:" << m_Name << std::endl;
+	//std::cout << "Called mesh constructor from vectors of:" << m_Name << std::endl;
 	init();
 }
 
 Mesh::Mesh(const std::string& name, const char * filepath)
 	: m_Name(name)
 {
-	std::cout << "Called mesh constructor from file of:" << m_Name << std::endl;
+	//std::cout << "Called mesh constructor from file of:" << m_Name << std::endl;
 	parse(filepath);
 	init();
 }
@@ -62,14 +62,14 @@ Mesh::Mesh(Mesh&& mesh) noexcept
 {
 	mesh.arrayV = nullptr;
 	mesh.arrayI = nullptr;
-	std::cout << "Called mesh move constructor of:" << m_Name << std::endl;
+	//std::cout << "Called mesh move constructor of:" << m_Name << std::endl;
 }
 
 Mesh::~Mesh()
 {
 	free(arrayV);
 	free(arrayI);
-	std::cout << "Called mesh destructor of:" << m_Name << std::endl;
+	//std::cout << "Called mesh destructor of:" << m_Name << std::endl;
 }
 
 // OBJ file parser function. Used for loading the teapot.obj file.

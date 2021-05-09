@@ -6,6 +6,7 @@
 #include "VertexBufferLayout.h"
 #include "Shader.h"
 #include "cube.h"
+#include "plane.h"
 #include "Utility.h"
 #include <chrono>
 
@@ -21,7 +22,7 @@ namespace test
 		  m_Camera(glm::vec3(0.f, 0.f, 60.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f)),
 		  index(0),
 		  m_StopRotation(false),
-		  m_RotatingPointLight(false),
+		  m_RotatingPointLight(true),
 		  m_PointLightAngle(0)
 	{
 		GLCall(glEnable(GL_BLEND));
@@ -45,8 +46,14 @@ namespace test
 		Mesh mesh2("Teapot", "res/meshes/teapot.obj");
 		mesh2.SetMaterial("res/textures/metal.png");
 		mesh2.m_Scale = 12.f;
-		mesh2.m_TranslationVec = glm::vec3(+7.f, 0.f, 0.f);
+		mesh2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
 		m_MeshVector.push_back(std::move(mesh2));
+		Mesh mesh3("Plane", Plane::positions, Plane::colors, Plane::normals, Plane::textures, Plane::indices);
+		mesh3.SetMaterial("res/textures/metal.png");
+		mesh3.m_Scale = 500.f;
+		mesh3.m_TranslationVec = glm::vec3(0.f, -10.f, 0.f);
+		//mesh3.m_RotationVec = glm::vec3(10.f, 0.f, 0.f);
+		m_MeshVector.push_back(std::move(mesh3));
 	}
 
 	//mat[col][row]

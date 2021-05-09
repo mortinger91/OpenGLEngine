@@ -340,7 +340,6 @@ ASALocalRun/
 healthchecksdb
 
 Libs source/
-OpenGL/res/textures
 Dependecies/GLUT
 Rotation example/
 OpenGL/imgui.ini
