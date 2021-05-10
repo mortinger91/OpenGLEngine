@@ -25,7 +25,7 @@ uniform vec4 diffuse;
 uniform vec4 specular; 
 uniform float shininess;
 
-// uniform vec3 eyepos;
+ uniform vec3 eyepos;
 
 vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in vec3 normal, const in vec3 halfvec, const in vec4 mydiffuse, const in vec4 myspecular, const in float myshininess)
 {
@@ -54,7 +54,7 @@ void main()
 	if (islight == 1)
 	{
 		vec3 mypos = v_Vertex.xyz / v_Vertex.w ; // Dehomogenize current location
-		// vec3 eyedirn = normalize(eyepos - mypos);
+//		 vec3 eyedirn = normalize(eyepos - mypos);
 		vec3 eyedirn = normalize(-mypos);
 
 		// Compute normal, needed for shading.

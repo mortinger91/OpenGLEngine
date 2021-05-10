@@ -472,5 +472,7 @@
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="res\meshes\plane.h" />
+    <ClInclude Include="src\MeshBuilder.h" />
+    <ClInclude Include="src\PointLight.h" />
   </ItemGroup>
 </Project>

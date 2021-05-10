@@ -37,10 +37,10 @@ namespace test
 		int index;
 
 		glm::vec4 light_direction = { 0.f, 0.f, 0.5f, 0.f }; // Dir light 0 in w 
-		glm::vec4 light_color = { 1.f, 1.f, 0.f, 1.f };
+		glm::vec4 light_color = { 0.f, 0.f, 0.f, 1.f };
 
-		glm::vec4 light_position1 = { 400, -0.5, 0, 1 };
-		glm::vec4 light_color1 = { 10.f, 10.f, 10.f, 1.f };
+		glm::vec4 light_position1 = { 30, 0, 0, 1 };
+		glm::vec4 light_color1 = { 1.5f, 1.5f, 1.5f, 1.f };
 
 		float m_PointLightAngle;
 	};
