@@ -30,17 +30,17 @@ Mesh::Mesh(const std::string& name, const char * filepath)
 }
 
 // copy constructor
-Mesh::Mesh(const Mesh& mesh)
-	: m_Name(mesh.m_Name),
-	  verticesPositions(mesh.verticesPositions),
-	  verticesColors(mesh.verticesColors),
-	  verticesNormals(mesh.verticesNormals),
-	  verticesTexCoords(mesh.verticesTexCoords),
-	  verticesIndices(mesh.verticesIndices)
-{
-	std::cout << "Called mesh copy constructor of:" << m_Name << std::endl;
-	init();
-}
+//Mesh::Mesh(const Mesh& mesh)
+//	: m_Name(mesh.m_Name),
+//	  verticesPositions(mesh.verticesPositions),
+//	  verticesColors(mesh.verticesColors),
+//	  verticesNormals(mesh.verticesNormals),
+//	  verticesTexCoords(mesh.verticesTexCoords),
+//	  verticesIndices(mesh.verticesIndices)
+//{
+//	//std::cout << "Called mesh copy constructor of:" << m_Name << std::endl;
+//	init();
+//}
 
 // move constructor
 Mesh::Mesh(Mesh&& mesh) noexcept
@@ -58,7 +58,8 @@ Mesh::Mesh(Mesh&& mesh) noexcept
 	  m_RotationVec(mesh.m_RotationVec),
 	  m_Scale(mesh.m_Scale),
 	  arrayV(mesh.arrayV),
-	  arrayI(mesh.arrayI)
+	  arrayI(mesh.arrayI),
+	  m_UseTexture(mesh.m_UseTexture)
 {
 	mesh.arrayV = nullptr;
 	mesh.arrayI = nullptr;
@@ -140,11 +141,11 @@ void Mesh::parse(const char * filepath)
 	}
 }
 
-void Mesh::ConvertVectorsToArray(int& sizeV, int& sizeI)
+void Mesh::ConvertVectorsToArray(unsigned int& sizeV, unsigned int& sizeI)
 {
-	sizeV = verticesPositions.size() * 11;
+	sizeV = static_cast<int>(verticesPositions.size()) * 11;
 	arrayV = (float*)malloc(sizeof(float) * sizeV);
-	sizeI = verticesIndices.size();
+	sizeI = static_cast<int>(verticesIndices.size());
 	arrayI = (unsigned int*)malloc(sizeof(unsigned int) * sizeI);
 
 	int index = 0;
@@ -178,17 +179,17 @@ void Mesh::init()
 	m_TranslationVec = glm::vec3(0.f, 0.f, 0.f);
 	m_RotationVec = glm::vec3(0.f, 0.f, 0.f);
 	m_Scale = 1.f;
+	m_UseTexture = true;
 
 	// initializing vertex array
 	m_VAO = std::make_unique<VertexArray>();
 
-	int sizeV;
-	int sizeI;
-	//ConvertVectorsToArray(sizeV, sizeI, arrayV, arrayI);
+	unsigned int sizeV;
+	unsigned int sizeI;
 	ConvertVectorsToArray(sizeV, sizeI);
 
 	// initializing vertex buffer
-	m_VertexBuffer = std::make_unique<VertexBuffer>(arrayV, sizeV * sizeof(float));
+	m_VertexBuffer = std::make_unique<VertexBuffer>(static_cast<const void*>(arrayV), static_cast<unsigned int>(sizeV * sizeof(float)));
 	
 	// initializing vertex buffer layout
 	VertexBufferLayout layout;

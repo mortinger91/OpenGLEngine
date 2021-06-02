@@ -19,7 +19,6 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\tests\TestClearColor.cpp" />
     <ClCompile Include="src\tests\Test.cpp" />
-    <ClCompile Include="src\tests\TestTexture2D.cpp" />
     <ClCompile Include="src\tests\Test3DCube.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
@@ -464,7 +463,6 @@
     <ClInclude Include="src\vendor\imgui\imstb_truetype.h" />
     <ClInclude Include="src\tests\Test.h" />
     <ClInclude Include="src\tests\TestClearColor.h" />
-    <ClInclude Include="src\tests\TestTexture2D.h" />
     <ClInclude Include="src\tests\Test3DCube.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Mesh.h" />

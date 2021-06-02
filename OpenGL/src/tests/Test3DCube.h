@@ -33,7 +33,7 @@ namespace test
 		float m_NearPlane, m_FarPlane, m_Fov;
 
 		bool m_UseOrtho, m_StopRotation, m_RotatingPointLight;
-		unsigned int m_IsLight, m_UseTexture;
+		unsigned int m_IsLight;
 		int index;
 
 		glm::vec4 light_direction = { 0.f, 0.f, 0.5f, 0.f }; // Dir light 0 in w 

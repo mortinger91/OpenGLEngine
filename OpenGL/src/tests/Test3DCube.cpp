@@ -1,9 +1,6 @@
 #include "Test3DCube.h"
 
-#include "Renderer.h"
 #include "imgui/imgui.h"
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
 #include "Shader.h"
 #include "cube.h"
 #include "plane.h"
@@ -18,7 +15,6 @@ namespace test
 		  m_UseOrtho(false),
 		  m_Fov(30.0f),
 		  m_IsLight(1),
-		  m_UseTexture(0),
 		  index(0),
 		  m_StopRotation(true),
 		  m_RotatingPointLight(true),
@@ -42,25 +38,27 @@ namespace test
 
 		float ambient = 0.15f;
 
-		Mesh mesh1("Cube", Cube::positions, Cube::colors, Cube::normals, Cube::textures, Cube::indices);
-		mesh1.SetMaterial("res/textures/metal.png", 500.f, 0.75f, 0.2f, ambient);
+		Mesh mesh1("Cube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUVs, Cube::indices);
+		mesh1.SetMaterial("res/textures/cubeUV.png", 500.f, 0.75f, 0.2f, ambient);
 		mesh1.m_Scale = 6.f;
 		mesh1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
 		m_MeshVector.push_back(std::move(mesh1));
 
 		Mesh mesh2("Teapot", "res/meshes/teapot.obj");
-		mesh2.SetMaterial("res/textures/metal.png", 200.f, 0.25f, 0.5f, ambient);
+		mesh2.SetMaterial("res/textures/metal.png", 200.f, 5.f, 5.f, ambient);
 		mesh2.m_Scale = 12.f;
 		mesh2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
+		mesh1.m_UseTexture = false;
 		m_MeshVector.push_back(std::move(mesh2));
 
 		Mesh mesh3("Plane", Plane::positions, Plane::colors, Plane::normals, Plane::textures, Plane::indices);
 		mesh3.SetMaterial("res/textures/metal.png", 500.f, 0.75f, 0.2f, ambient);
 		mesh3.m_Scale = 500.f;
 		mesh3.m_TranslationVec = glm::vec3(0.f, -10.f, 0.f);
+		mesh1.m_UseTexture = false;
 		m_MeshVector.push_back(std::move(mesh3));
 
-		Mesh mesh4("PointLightCube", Cube::positions, Cube::colors, Cube::normals, Cube::textures, Cube::indices);
+		Mesh mesh4("PointLightCube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUnique, Cube::indices);
 		mesh4.SetMaterial("res/textures/white.png", 1.f, 1.f, 1.f, 300.f);
 		mesh4.m_TranslationVec = glm::vec3(30.f, 0.f, 0.f);
 		m_MeshVector.push_back(std::move(mesh4));
@@ -106,13 +104,12 @@ namespace test
 			Utility::CreateRotationGenericMatrix(matRotateLight, m_PointLightAngle, glm::vec3(0.f, 1.f, 0.f));
 			light1position = m_Camera->m_ViewMatrix * matRotateLight * light_position1;
 
-			m_Shader->SetUniform1i("useTexture", m_UseTexture);
 			m_Shader->SetUniform1i("islight", m_IsLight);
 			m_Shader->SetUniform3fv("light0dirn", light0direction);
 			m_Shader->SetUniform4fv("light0color", light_color);
 			m_Shader->SetUniform4fv("light1posn", light1position);
 			m_Shader->SetUniform4fv("light1color", light_color1);
-			// TODO: is eyepos needed in fragment shader for correct highlights?
+			// TODO: do i need to pass eyepos to fragment shader for correct highlights?
 			m_Shader->SetUniform3fv("eyepos", m_Camera->GetEyePos());
 
 			if (!m_StopRotation)
@@ -149,6 +146,7 @@ namespace test
 					mvp = m_ProjPersp * mv;
 				}
 
+				m_Shader->SetUniform1i("useTexture", m_MeshVector[i].m_UseTexture);
 				m_Shader->SetUniformMat4f("u_MV", mv);
 				m_Shader->SetUniformMat4f("u_MVP", mvp);
 				m_Shader->SetUniform4fv("ambient", { m_MeshVector[i].m_Material->m_Ambient, m_MeshVector[i].m_Material->m_Ambient, m_MeshVector[i].m_Material->m_Ambient, 1 });
@@ -178,14 +176,14 @@ namespace test
 		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
 		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
 		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
-		ImGui::SliderFloat("shininess1", &m_MeshVector[0].m_Material->m_Shininess, 0.f, 1000.f); 
-		ImGui::SliderFloat("specular1", &m_MeshVector[0].m_Material->m_Specular, 0.f, 1.f); 
-		ImGui::SliderFloat("diffuse1", &m_MeshVector[0].m_Material->m_Diffuse, 0.f, 1.f); 
-		ImGui::SliderFloat("ambient1", &m_MeshVector[0].m_Material->m_Ambient, 0.f, 1.f);
-		ImGui::SliderFloat("shininess2", &m_MeshVector[1].m_Material->m_Shininess, 0.f, 1000.f); 
-		ImGui::SliderFloat("specular2", &m_MeshVector[1].m_Material->m_Specular, 0.f, 1.f); 
-		ImGui::SliderFloat("diffuse2", &m_MeshVector[1].m_Material->m_Diffuse, 0.f, 1.f); 
-		ImGui::SliderFloat("ambient2", &m_MeshVector[1].m_Material->m_Ambient, 0.f, 1.f);
+		ImGui::SliderFloat("shininess1", &m_MeshVector[0].m_Material->m_Shininess, 1.f, 1000.f); 
+		ImGui::SliderFloat("specular1", &m_MeshVector[0].m_Material->m_Specular, 1.f, 100.f); 
+		ImGui::SliderFloat("diffuse1", &m_MeshVector[0].m_Material->m_Diffuse, 1.f, 100.f); 
+		ImGui::SliderFloat("ambient1", &m_MeshVector[0].m_Material->m_Ambient, 1.f, 100.f);
+		ImGui::SliderFloat("shininess2", &m_MeshVector[1].m_Material->m_Shininess, 1.f, 1000.f); 
+		ImGui::SliderFloat("specular2", &m_MeshVector[1].m_Material->m_Specular, 1.f, 100.f); 
+		ImGui::SliderFloat("diffuse2", &m_MeshVector[1].m_Material->m_Diffuse, 1.f, 100.f); 
+		ImGui::SliderFloat("ambient2", &m_MeshVector[1].m_Material->m_Ambient, 1.f, 100.f);
 
 		ImGui::SliderFloat("light_color0R", &light_color[0], 0.f, 20.f);
 		ImGui::SliderFloat("light_color0G", &light_color[1], 0.f, 20.f);
@@ -211,14 +209,14 @@ namespace test
 			ImGui::Text("Using Light");
 		else
 			ImGui::Text("Not Using Light");
-		if(ImGui::Button("enable/disable texture"))
-		{
-			m_UseTexture = (m_UseTexture == 0) ? 1 : 0;
-		}
-		if (m_UseTexture == 1)
-			ImGui::Text("Using Texture");
-		else
-			ImGui::Text("Not Using Texture");
+		//if(ImGui::Button("enable/disable texture"))
+		//{
+		//	m_UseTexture = (m_UseTexture == 0) ? 1 : 0;
+		//}
+		//if (m_UseTexture == 1)
+		//	ImGui::Text("Using Texture");
+		//else
+		//	ImGui::Text("Not Using Texture");
 		if(ImGui::Button("stop rotation"))
 		{
 			m_StopRotation = !m_StopRotation;

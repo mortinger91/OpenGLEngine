@@ -22,7 +22,7 @@ private:
 	std::vector <glm::vec2> verticesTexCoords;
 	std::vector <unsigned int> verticesIndices;
 
-	void ConvertVectorsToArray(int& sizeV, int& sizeI);
+	void ConvertVectorsToArray(unsigned int& sizeV, unsigned int& sizeI);
 	void parse(const char * filepath);
 	void init();
 	void CreateScalingMatrix(glm::mat4 &mat, float scale);
@@ -30,7 +30,8 @@ private:
 public:
 	Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_);
 	Mesh(const std::string& name, const char * filepath);
-	Mesh(const Mesh& mesh);
+	// deleted copy constructor
+	Mesh(const Mesh& mesh) = delete;
 	Mesh(Mesh&& mesh) noexcept;
 	~Mesh();
 
@@ -45,6 +46,7 @@ public:
 	glm::vec3 m_TranslationVec;
 	glm::vec3 m_RotationVec;
 	float m_Scale;
+	bool m_UseTexture;
 
 	glm::mat4 m_ModelMatrix;
 	void CreateModelMatrix();

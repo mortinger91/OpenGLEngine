@@ -23,7 +23,6 @@
 #include "imgui/imgui_impl_opengl3.h"
 
 #include "tests/TestClearColor.h"
-#include "tests/TestTexture2D.h"
 #include "tests/Test3DCube.h"
 
 #define WIDTH 1920
@@ -106,34 +105,6 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 }
 
-class A
-{
-public:
-	int x;
-	A(int _x)
-	{
-		x=_x;
-	}
-};
-
-class C
-{
-public:
-	static C n()
-	{
-		C c;
-		return c;
-	}
-	std::unique_ptr<A> build()
-	{
-		return std::make_unique<A>(2);
-	}
-	//A* build()
-	//{
-	//	return new A(2);
-	//}
-};
-
 int main(void)
 {
 	GLFWwindow* window = nullptr;
@@ -147,7 +118,6 @@ int main(void)
 		currentTest = testMenu;
 
 		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
-		testMenu->RegisterTest<test::TestTexture2D>("Texture");
 		testMenu->RegisterTest<test::Test3DCube>("3D Cube");
 
 		Renderer renderer;
