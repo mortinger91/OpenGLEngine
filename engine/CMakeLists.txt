@@ -1,4 +1,4 @@
-message(STATUS "Configuring ${PROJECT_NAME} ${VERSION}")
+message(STATUS "   ${Red}Configuring ${PROJECT_NAME} ${VERSION}${ColourReset}")
 
 # Target
 add_library(
@@ -38,11 +38,11 @@ add_library(
 		src/tests/TestClearColor.cpp
 )
 
-target_precompile_headers(
-		${LIBRARY_TARGET_NAME}
-		PRIVATE
-		###"include/real/pch.hpp"
-)
+# target_precompile_headers(
+		# ${LIBRARY_TARGET_NAME}
+		# PRIVATE
+		#"include/real/pch.hpp"
+# )
 
 # Shaders
 add_shaders(
