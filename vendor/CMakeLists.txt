@@ -15,8 +15,8 @@ add_subdirectory(glm)
 
 # imgui
 message(STATUS "Configuring IMGUI")
-set(IMGUI_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(version-imgui)
+# set(IMGUI_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(imgui-cmake)
 set_target_properties(imgui PROPERTIES FOLDER vendor)
 
 # glew

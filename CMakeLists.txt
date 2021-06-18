@@ -54,9 +54,9 @@ add_subdirectory(engine)
 target_link_libraries(
 		${LIBRARY_TARGET_NAME}
 		PUBLIC
-		version-imgui
+		imgui
 		glfw
-		glew-cmake
+		libglew_static
 		OpenGL::GL
 		glm::glm
 )
