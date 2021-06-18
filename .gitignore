@@ -339,5 +339,9 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-Libs source/
+# CMake
+cmake-build-*/
+build/
+
+# Custom added
 OpenGL/imgui.ini
