@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.17)
+# Version
+cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+# Policies
+cmake_policy(SET CMP0077 NEW) # option honors normal variables
 
 # Name
 set(PROJECT_NAME "OpenGLEngine")

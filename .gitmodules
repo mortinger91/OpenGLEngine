@@ -1,12 +1,12 @@
 [submodule "vendor/glfw"]
 	path = vendor/glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "vendor/version-imgui"]
-	path = vendor/version-imgui
-	url = https://github.com/udv-code/version-imgui.git
+[submodule "vendor/imgui"]
+	path = vendor/imgui
+	url = https://github.com/udvsharp/imgui-cmake/tree/8292417a0044439bed14a95e1fb4029aae1a904b
 [submodule "vendor/glm"]
 	path = vendor/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "vendor/glew-cmake"]
-	path = vendor/glew-cmake
+[submodule "vendor/glew"]
+	path = vendor/glew
 	url = https://github.com/Perlmint/glew-cmake
