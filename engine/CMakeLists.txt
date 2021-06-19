@@ -56,6 +56,12 @@ target_include_directories(
 		${LIBRARY_TARGET_NAME}
 		PUBLIC
 		"src"
+		"src/libs"
+		"res/meshes"
+		"../vendor/glew-cmake/include/GL"
+		"../vendor/glfw/include/GLFW"
+		"../vendor/glm/glm"
+		"../vendor/version-imgui"
 		#"${CMAKE_CURRENT_BINARY_DIR}"
 		#PRIVATE
 		#"src"

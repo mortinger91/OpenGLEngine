@@ -14,8 +14,13 @@ VertexArray::~VertexArray()
 }
 
 // disable warning (const void*)(offset) dynamic cast, only for MSVC(Visual Studio)
-#pragma warning( push )
-#pragma warning( disable : 4312 )
+#ifdef _WIN32
+	#pragma warning( push )
+	#pragma warning( disable : 4312 )
+#elif __linux__
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+#endif
 
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
 {
@@ -34,7 +39,11 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& la
 	}
 }
 
-#pragma warning( pop )
+#ifdef _WIN32
+	#pragma warning( pop )
+#elif __linux__
+	#pragma GCC diagnostic pop
+#endif
 
 void VertexArray::Bind() const
 {

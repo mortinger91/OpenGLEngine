@@ -8,10 +8,17 @@ class Shader;
 class Mesh;
 
 // __ means that the function is compiler intrinsic, so it's specific to msvc, other compilers will use different functions
-#define ASSERT(x) if(!(x)) __debugbreak();
-#define GLCall(x) GLClearError();\
-	x;\
-	ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#ifdef _WIN32
+	#define ASSERT(x) if(!(x)) __debugbreak();
+	#define GLCall(x) GLClearError();\
+		x;\
+		ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#elif __linux__
+	#define ASSERT(x) if(!(x)) ;
+	#define GLCall(x) GLClearError();\
+		x;\
+		ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#endif
 
 void GLClearError();
 

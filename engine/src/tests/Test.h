@@ -3,8 +3,9 @@
 #include <functional>
 #include <vector>
 #include <iostream>
-#include "glew.h"
-#include "glfw3.h"
+// #include "glew.h"
+// #include "glfw3.h"
+#include "vendorLibs.h"
 
 namespace test
 {
