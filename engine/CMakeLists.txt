@@ -58,10 +58,10 @@ target_include_directories(
 		"src"
 		"src/libs"
 		"res/meshes"
-		"../vendor/glew-cmake/include/GL"
-		"../vendor/glfw/include/GLFW"
+		"../vendor/glew-cmake/include"
+		"../vendor/glfw/include"
 		"../vendor/glm/glm"
-		"../vendor/version-imgui"
+		"../vendor/imgui-cmake"
 		#"${CMAKE_CURRENT_BINARY_DIR}"
 		#PRIVATE
 		#"src"

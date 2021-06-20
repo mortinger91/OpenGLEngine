@@ -1,10 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Mesh.h"
-#include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
 #include "Utility.h"
 
 Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_) 
@@ -193,10 +190,14 @@ void Mesh::init()
 	VertexBufferLayout layout;
 	// position of the vertices of the two triangles making up a square
 	// layout(location = 0) in vertex shader
-	layout.Push<float>(3);
-	layout.Push<float>(3);
-	layout.Push<float>(3);
-	layout.Push<float>(2);
+	// layout.Push<float>(3);
+	// layout.Push<float>(3);
+	// layout.Push<float>(3);
+	// layout.Push<float>(2);
+	layout.Push(3);
+	layout.Push(3);
+	layout.Push(3);
+	layout.Push(2);
 	// adding vertex buffer and layout to vertex array
 	m_VAO->AddBuffer(*m_VertexBuffer, layout);
 

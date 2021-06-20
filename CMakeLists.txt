@@ -2,7 +2,9 @@
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 # Policies
 cmake_policy(SET CMP0077 NEW) # option honors normal variables
-cmake_policy(SET CMP0028 NEW) 
+cmake_policy(SET CMP0072 NEW)
+# cmake_policy(SET CMP0028 NEW) 
+
 
 if(NOT WIN32)
   string(ASCII 27 Esc)
@@ -83,4 +85,14 @@ target_link_libraries(
 		libglew_static
 		OpenGL::GL
 		glm::glm
+)
+
+add_executable(
+			exec engine/src/Main.cpp
+)
+
+	target_link_libraries(
+			exec
+			PRIVATE
+			${LIBRARY_TARGET_NAME}
 )

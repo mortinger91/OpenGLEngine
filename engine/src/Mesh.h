@@ -7,9 +7,12 @@
 #include "Material.h"
 
 // forward declarations
-class VertexBuffer;
-class VertexArray;
-class IndexBuffer;
+// class VertexBuffer;
+// class VertexArray;
+// class IndexBuffer;
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "VertexArray.h"
 //class Material;
 
 class Mesh

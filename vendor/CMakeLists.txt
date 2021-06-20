@@ -16,7 +16,7 @@ add_subdirectory(glm)
 # imgui
 message(STATUS "${Red}Configuring IMGUI${ColourReset}")
 set(IMGUI_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(version-imgui)
+add_subdirectory(imgui-cmake)
 set_target_properties(imgui PROPERTIES FOLDER vendor)
 
 # glew

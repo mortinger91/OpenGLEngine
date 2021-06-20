@@ -1,28 +1,28 @@
 {
     "version": "2.0.0",
     "tasks": [
-        {
-            "label": "cmake",
-            "type": "shell",
-            "command": "cmake .",
-            "problemMatcher": []
-            // "group": "build"
-        },
+        // {
+        //     "label": "cmake",
+        //     "type": "shell",
+        //     "command": "cmake .",
+        //     "problemMatcher": []
+        //     // "group": "build"
+        // },
         {
             "label": "make",
             "type": "shell",
             "command": "make -C build/",
             "problemMatcher": [],
             "group": "build"
-        },
-        {
-            "label": "build",
-            "group": "build",
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "cmake",
-                "make"
-            ]
         }
+        // {
+        //     "label": "build",
+        //     // "group": "build",
+        //     "dependsOrder": "sequence",
+        //     "dependsOn": [
+        //         "cmake",
+        //         "make"
+        //     ]
+        // }
     ]
 }
