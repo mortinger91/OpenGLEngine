@@ -23,6 +23,7 @@ set_target_properties(imgui PROPERTIES FOLDER vendor)
 message(STATUS "${Red}Configuring GLEW${ColourReset}")
 set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "" FORCE)
 set(ONLY_LIBS ON CACHE BOOL "" FORCE)
+set(USE_GLU OFF CACHE BOOL "" FORCE)
 add_subdirectory(glew-cmake)
 set_target_properties(libglew_static PROPERTIES FOLDER vendor)
 
