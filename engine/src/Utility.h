@@ -140,7 +140,7 @@ public:
 
 		#ifdef __linux__
 			// if the working directory is inside the project while debugging via vscode
-			std::filesystem::path engine("OpenGLEngine/engine/src");
+			std::filesystem::path engine("OpenGLEngine");
 			if (std::search(currentPath.begin(), currentPath.end(), engine.begin(), engine.end()) != currentPath.end()) 
 			{
 				// engine is a subPath of the currentPath
@@ -151,9 +151,9 @@ public:
 					if (el == "/")
 						continue;
 					resPath += "/";
-					if (el == "engine")
+					if (el == "OpenGLEngine")
 					{
-						resPath += "res";
+						resPath += "engine/res";
 						break;
 					}
 				}
