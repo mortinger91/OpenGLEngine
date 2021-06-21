@@ -47,8 +47,7 @@ namespace test
 		mesh1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
 		m_MeshVector.push_back(std::move(mesh1));
 
-		// Mesh mesh2("Teapot", resPath+"/meshes/teapot.obj");
-		Mesh mesh2("Cube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUVs, Cube::indices);
+		Mesh mesh2("Teapot", resPath+"/meshes/teapot.obj");
 		mesh2.SetMaterial(resPath+"/textures/metal.png", 200.f, 5.f, 5.f, ambient);
 		mesh2.m_Scale = 12.f;
 		mesh2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);

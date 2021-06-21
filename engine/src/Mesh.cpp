@@ -16,11 +16,11 @@ Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, 
 	init();
 }
 
-Mesh::Mesh(const std::string& name, const char * filepath)
+Mesh::Mesh(const std::string& name, const std::string& filepath)
 	: m_Name(name)
 {
 	//std::cout << "Called mesh constructor from file of:" << m_Name << std::endl;
-	parse(filepath);
+	parse(filepath.c_str());
 	init();
 }
 

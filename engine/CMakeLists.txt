@@ -45,14 +45,28 @@ add_library(
 # )
 
 set (source "${CMAKE_SOURCE_DIR}/engine/res")
-set (destination "${BUILD_FOLDER}/bin/res")
-add_custom_command(
- TARGET ${LIBRARY_TARGET_NAME} PRE_BUILD
- COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination} 
- DEPENDS ${destination}
- COMMENT "symbolic link resources folder from ${source} => ${destination}"
-)
-message(STATUS "   ${Red}symbolic link resources folder from ${source} => ${destination}${ColourReset}")
+if (UNIX)
+	set (destination "${BUILD_FOLDER}/bin/res")
+	add_custom_command(
+	 TARGET ${LIBRARY_TARGET_NAME} PRE_BUILD
+	 COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination} 
+	 DEPENDS ${destination}
+	 COMMENT "symbolic link resources folder from ${source} => ${destination}"
+	)
+	message(STATUS "   ${Red}symbolic link resources folder from ${source} => ${destination}${ColourReset}")
+endif (UNIX)
+if (WIN32)
+	# TODO: make it automatic depending on the build configuration selected
+	set (destination "${BUILD_FOLDER}/bin")
+	#add_custom_command(
+	# TARGET ${LIBRARY_TARGET_NAME} PRE_BUILD
+	# COMMAND ${CMAKE_COMMAND} -E copy_directory ${source} ${destination} 
+	# DEPENDS ${destination}
+	# COMMENT "copied resources folder from ${source} => ${destination}"
+	#)
+	file(COPY ${source} DESTINATION ${destination})
+	message(STATUS "   ${Red}copied resources folder from ${source} => ${destination}${ColourReset}")
+endif (WIN32)
 
 # Properties
 target_include_directories(

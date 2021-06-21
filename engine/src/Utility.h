@@ -135,32 +135,47 @@ public:
 	static bool GetPathToRes(std::string& resPath)
 	{
 		auto currentPath = std::filesystem::current_path();
-		std::filesystem::path engine("OpenGLEngine/engine/src");
+		std::cout << "current path: " << currentPath << std::endl;
 		resPath = "";
 
-		// if the working directory is inside the project while debugging via vscode
-		if (std::search(currentPath.begin(), currentPath.end(), engine.begin(), engine.end()) != currentPath.end()) 
-		{
-			// engine is a subPath of the currentPath
-			for (auto& el : currentPath)
+		#ifdef __linux__
+			// if the working directory is inside the project while debugging via vscode
+			std::filesystem::path engine("OpenGLEngine/engine/src");
+			if (std::search(currentPath.begin(), currentPath.end(), engine.begin(), engine.end()) != currentPath.end()) 
 			{
-				resPath += el;
-				if (el == "/")
-					continue;
-				resPath += "/";
-				if (el == "engine")
+				// engine is a subPath of the currentPath
+				for (auto& el : currentPath)
 				{
-					resPath += "res";
-					break;
+					resPath += el;
+
+					if (el == "/")
+						continue;
+					resPath += "/";
+					if (el == "engine")
+					{
+						resPath += "res";
+						break;
+					}
 				}
+				return true;
+			}
+			// if running the executable directly from the build/bin directory
+			else
+			{
+				resPath = "res";
+				return false;
+			}
+		#elif _WIN32
+			std::filesystem::path engine("bin");
+			if (std::search(currentPath.begin(), currentPath.end(), engine.begin(), engine.end()) != currentPath.end()) 
+			{
+				resPath = "res";
+			}
+			else
+			{
+				resPath = "bin\\res";
 			}
 			return true;
-		}
-		// if running the executable directly from the build/bin directory
-		else
-		{
-			resPath = "res";
-			return false;
-		}
+		#endif
 	}
 };
