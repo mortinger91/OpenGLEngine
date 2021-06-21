@@ -12,7 +12,6 @@ struct ShaderProgramSource
 	std::string FragmentSource;
 };
 
-//Shader::Shader(const std::string& filepath)
 Shader::Shader(const std::string& filepathVertex, const std::string& filepathFragment)
 	:m_FilepathVertex(filepathVertex), m_FilepathFragment(filepathFragment), m_RendererID(0)
 {
@@ -42,7 +41,7 @@ Shader::~Shader()
 //	ShaderType type = ShaderType::NONE;
 //	while (getline(stream, line))
 //	{
-//		// std::string::npos è una invalid string position, find ritorna la posizione della stringa
+//		// std::string::npos ï¿½ una invalid string position, find ritorna la posizione della stringa
 //		if (line.find("#shader") != std::string::npos)
 //		{
 //			if (line.find("vertex") != std::string::npos)
@@ -93,7 +92,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 		 GLCall(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &lenght));
 		 char* message = (char*)alloca(lenght * sizeof(char));
 		 GLCall(glGetShaderInfoLog(id, lenght, &lenght, message));
-		 std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << "shader!" << std::endl;
+		 std::cout << "Failed to compile shader: " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << "shader!" << std::endl;
 		 std::cout << message << std::endl;
 		 GLCall(glDeleteShader(id));
 		 return 0;

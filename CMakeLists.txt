@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 # Policies
 cmake_policy(SET CMP0077 NEW) # option honors normal variables
 cmake_policy(SET CMP0072 NEW)
-# cmake_policy(SET CMP0028 NEW) 
-
 
 if(NOT WIN32)
   string(ASCII 27 Esc)
@@ -70,11 +68,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(WriteCompilerDetectionHeader)
 include(GenerateExportHeader)
 include(build)
-include(shaders)
 add_subdirectory(vendor)
 
 find_package(OpenGL REQUIRED)
 
+set(BUILD_FOLDER ${CMAKE_CURRENT_BINARY_DIR})
 add_subdirectory(engine)
 
 target_link_libraries(

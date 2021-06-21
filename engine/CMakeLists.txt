@@ -44,12 +44,15 @@ add_library(
 		#"include/real/pch.hpp"
 # )
 
-# Shaders
-add_shaders(
-		${LIBRARY_TARGET_NAME}
-		"${CMAKE_CURRENT_SOURCE_DIR}/res/shaders/Basic.frag"
-		"${CMAKE_CURRENT_SOURCE_DIR}/res/shaders/Basic.vert"
+set (source "${CMAKE_SOURCE_DIR}/engine/res")
+set (destination "${BUILD_FOLDER}/bin/res")
+add_custom_command(
+ TARGET ${LIBRARY_TARGET_NAME} PRE_BUILD
+ COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination} 
+ DEPENDS ${destination}
+ COMMENT "symbolic link resources folder from ${source} => ${destination}"
 )
+message(STATUS "   ${Red}symbolic link resources folder from ${source} => ${destination}${ColourReset}")
 
 # Properties
 target_include_directories(
@@ -57,7 +60,7 @@ target_include_directories(
 		PUBLIC
 		"src"
 		"src/libs"
-		"res/meshes"
+		"res"
 		"../vendor/glew-cmake/include"
 		"../vendor/glfw/include"
 		"../vendor/glm/glm"

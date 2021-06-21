@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GL/glew.h"
+#include <csignal>
 
 class VertexArray;
 class IndexBuffer;
@@ -14,7 +15,7 @@ class Mesh;
 		x;\
 		ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 #elif __linux__
-	#define ASSERT(x) if(!(x)) ;
+	#define ASSERT(x) if(!(x)) std::raise(SIGTRAP);;
 	#define GLCall(x) GLClearError();\
 		x;\
 		ASSERT(GLLogCall(#x, __FILE__, __LINE__))

@@ -1,4 +1,8 @@
 #pragma once
+#include <filesystem>
+#include <string>
+#include <iostream>
+#include <algorithm>
 
 class Utility
 {
@@ -125,6 +129,38 @@ public:
 		else if (value < 0.f)
 		{
 			value += 360.f;
+		}
+	}
+
+	static bool GetPathToRes(std::string& resPath)
+	{
+		auto currentPath = std::filesystem::current_path();
+		std::filesystem::path engine("OpenGLEngine/engine/src");
+		resPath = "";
+
+		// if the working directory is inside the project while debugging via vscode
+		if (std::search(currentPath.begin(), currentPath.end(), engine.begin(), engine.end()) != currentPath.end()) 
+		{
+			// engine is a subPath of the currentPath
+			for (auto& el : currentPath)
+			{
+				resPath += el;
+				if (el == "/")
+					continue;
+				resPath += "/";
+				if (el == "engine")
+				{
+					resPath += "res";
+					break;
+				}
+			}
+			return true;
+		}
+		// if running the executable directly from the build/bin directory
+		else
+		{
+			resPath = "res";
+			return false;
 		}
 	}
 };

@@ -2,11 +2,10 @@
 
 // #include "imgui/imgui.h"
 #include "Shader.h"
-#include "cube.h"
-#include "plane.h"
+#include "meshes/cube.h"
+#include "meshes/plane.h"
 #include "Utility.h"
 #include <chrono>
-
 namespace test
 {
 	Test3DCube::Test3DCube()
@@ -27,8 +26,12 @@ namespace test
 		GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glDepthFunc(GL_LESS));
 		
+		std::string resPath;
+		Utility::GetPathToRes(resPath);
+		std::cout << "res path:" << resPath << std::endl;
+
 		// defining a shader
-		m_Shader = std::make_unique<Shader>("res/shaders/Basic.vert", "res/shaders/Basic.frag");
+		m_Shader = std::make_unique<Shader>(resPath+"/shaders/Basic.vert", resPath+"/shaders/Basic.frag");
 		m_Shader->Bind();
 
 		// creating the camera
@@ -39,27 +42,28 @@ namespace test
 		float ambient = 0.15f;
 
 		Mesh mesh1("Cube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUVs, Cube::indices);
-		mesh1.SetMaterial("res/textures/cubeUV.png", 500.f, 0.75f, 0.2f, ambient);
+		mesh1.SetMaterial(resPath+"/textures/cubeUV.png", 500.f, 0.75f, 0.2f, ambient);
 		mesh1.m_Scale = 6.f;
 		mesh1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
 		m_MeshVector.push_back(std::move(mesh1));
 
-		Mesh mesh2("Teapot", "res/meshes/teapot.obj");
-		mesh2.SetMaterial("res/textures/metal.png", 200.f, 5.f, 5.f, ambient);
+		// Mesh mesh2("Teapot", resPath+"/meshes/teapot.obj");
+		Mesh mesh2("Cube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUVs, Cube::indices);
+		mesh2.SetMaterial(resPath+"/textures/metal.png", 200.f, 5.f, 5.f, ambient);
 		mesh2.m_Scale = 12.f;
 		mesh2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
 		mesh1.m_UseTexture = false;
 		m_MeshVector.push_back(std::move(mesh2));
 
 		Mesh mesh3("Plane", Plane::positions, Plane::colors, Plane::normals, Plane::textures, Plane::indices);
-		mesh3.SetMaterial("res/textures/metal.png", 500.f, 0.75f, 0.2f, ambient);
+		mesh3.SetMaterial(resPath+"/textures/metal.png", 500.f, 0.75f, 0.2f, ambient);
 		mesh3.m_Scale = 500.f;
 		mesh3.m_TranslationVec = glm::vec3(0.f, -10.f, 0.f);
 		mesh1.m_UseTexture = false;
 		m_MeshVector.push_back(std::move(mesh3));
 
 		Mesh mesh4("PointLightCube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUnique, Cube::indices);
-		mesh4.SetMaterial("res/textures/white.png", 1.f, 1.f, 1.f, 300.f);
+		mesh4.SetMaterial(resPath+"/textures/white.png", 1.f, 1.f, 1.f, 300.f);
 		mesh4.m_TranslationVec = glm::vec3(30.f, 0.f, 0.f);
 		m_MeshVector.push_back(std::move(mesh4));
 	}

@@ -344,4 +344,4 @@ cmake-build-*/
 build/
 
 # Custom added
-OpenGL/imgui.ini
+imgui.ini
