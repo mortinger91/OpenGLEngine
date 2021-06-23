@@ -18,6 +18,25 @@
         }
       ],
       "intelliSenseMode": "windows-msvc-x64"
+    },
+    {
+      "name": "x64-Release",
+      "generator": "Visual Studio 16 2019 Win64",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\build\\vs\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-D CMAKE_C_COMPILER=cl.exe -D CMAKE_CXX_COMPILER=cl.exe",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": [
+        {
+          "name": "CMAKE_BUILD_TYPE",
+          "value": "Release",
+          "type": "STRING"
+        }
+      ],
+      "intelliSenseMode": "windows-msvc-x64"
     }
   ]
 }

@@ -1,11 +1,10 @@
 #include "Test3DCube.h"
 
-// #include "imgui/imgui.h"
+#include <chrono>
 #include "Shader.h"
 #include "meshes/cube.h"
 #include "meshes/plane.h"
 #include "Utility.h"
-#include <chrono>
 namespace test
 {
 	Test3DCube::Test3DCube()
@@ -28,7 +27,7 @@ namespace test
 		
 		std::string resPath;
 		Utility::GetPathToRes(resPath);
-		std::cout << "res path:" << resPath << std::endl;
+		//std::cout << "res path: " << resPath << std::endl;
 
 		// defining a shader
 		m_Shader = std::make_unique<Shader>(resPath+"/shaders/Basic.vert", resPath+"/shaders/Basic.frag");
