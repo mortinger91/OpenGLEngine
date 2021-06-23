@@ -75,8 +75,6 @@ find_package(OpenGL REQUIRED)
 set(BUILD_FOLDER ${CMAKE_CURRENT_BINARY_DIR})
 add_subdirectory(engine)
 
-
-
 target_link_libraries(
 		${LIBRARY_TARGET_NAME}
 		PUBLIC
