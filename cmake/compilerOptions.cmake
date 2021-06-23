@@ -17,68 +17,42 @@ endif ()
 ### Compile options
 set(DEFAULT_COMPILE_OPTIONS)
 
-# MSVC compiler options
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-	set(DEFAULT_COMPILE_OPTIONS ${DEFAULT_COMPILE_OPTIONS}
-			$<$<CXX_COMPILER_ID:MSVC>:
-				PRIVATE
-				/MP           # -> build with multiple processes
-				/W4           # -> warning level 4
-				# /WX         # -> treat warnings as errors
-				
-				$<$<CONFIG:Debug>:
-					/RTCc         # -> value is assigned to a smaller data type and results in a data loss
-					/Zi			  # -> generate debug symbols
-				>
+target_compile_options(
+	exec 
+	PRIVATE
+	# MSVC compiler options
+    $<$<CXX_COMPILER_ID:MSVC>:
+    	/MP
+    	/Wall
+    	$<$<CONFIG:Debug>:
+			/ZI			  # -> generate debug symbols and continue
+			/Gy
+    	>
+    	$<$<CONFIG:Release>:
+    		/Gw           # -> whole program global optimization
+			/GS-          # -> buffer security check: no
+			/GL           # -> whole program optimization: enable link-time code generation (disables Zi)
+			/GF           # -> enable string pooling
+    	>
+    >
 
-				$<$<CONFIG:Release>:
-					/Gw           # -> whole program global optimization
-					/GS-          # -> buffer security check: no
-					/GL           # -> whole program optimization: enable link-time code generation (disables Zi)
-					/GF           # -> enable string pooling
-				>
-			>
-			)
-endif ()
-
-# GCC and Clang compiler options
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-	set(DEFAULT_COMPILE_OPTIONS ${DEFAULT_COMPILE_OPTIONS}
-			PRIVATE
-			-Wall
-			-Wextra
-			-Wunused
-			-g
-			-Wreorder
-			-Wignored-qualifiers
-			-Wmissing-braces
-			-Wreturn-type
-			-Wswitch
-			-Wswitch-default
-			-Wuninitialized
-			-Wmissing-field-initializers
-
-			$<$<CXX_COMPILER_ID:GNU>:
-				-Wmaybe-uninitialized
-				$<$<VERSION_GREATER:$<CXX_COMPILER_VERSION>,4.8>:
-					-Wpedantic
-					-Wreturn-local-addr
-				>
-			>
-
-			$<$<CXX_COMPILER_ID:Clang>:
-				-Wpedantic
-			>
-			)
-endif ()
+    # GCC compiler options
+    $<$<CXX_COMPILER_ID:GNU>:
+    	-pthread
+    	-Wall
+		-Wextra
+		-Wunused
+		-g
+		-Wreorder
+		-Wignored-qualifiers
+		-Wmissing-braces
+		-Wreturn-type
+		-Wswitch
+		-Wswitch-default
+		-Wuninitialized
+		-Wmissing-field-initializers
+    >
+    )
 
 # Linker options
 set(DEFAULT_LINKER_OPTIONS)
-
-# Use pthreads on mingw and linux
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
-	set(DEFAULT_LINKER_OPTIONS
-			${DEFAULT_LINKER_OPTIONS}
-			-pthread
-			)
-endif()

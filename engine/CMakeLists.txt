@@ -5,6 +5,7 @@ add_library(
 		${LIBRARY_TARGET_NAME}
 		STATIC
 
+		# header files
 		src/Camera.h
 		src/IndexBuffer.h
 		src/Material.h
@@ -18,26 +19,33 @@ add_library(
 		src/VertexArray.h
 		src/VertexBuffer.h
 		src/VertexBufferLayout.h
+		src/Model.h
+
 		src/libs/stb_image/stb_image.h
 		src/tests/Test.h
 		src/tests/Test3DCube.h
 		src/tests/TestClearColor.h
 
+		# cpp files
 		src/Camera.cpp
 		src/IndexBuffer.cpp
 		src/Material.cpp
 		src/Mesh.cpp
-		src/Renderer.cpp
+		src/Renderer.cpp 
 		src/Shader.cpp
 		src/Texture.cpp
 		src/VertexArray.cpp
 		src/VertexBuffer.cpp
+		src/Model.cpp
+
 		src/libs/stb_image/stb_image.cpp
 		src/tests/Test.cpp
 		src/tests/Test3DCube.cpp
 		src/tests/TestClearColor.cpp
 )
 
+# Commented copy and symbolic link of res folder, execution is supported only inside the editor
+#[[
 set (source "${CMAKE_SOURCE_DIR}/engine/res")
 if (UNIX)
 	set (destination "${BUILD_FOLDER}/bin/res")
@@ -54,6 +62,7 @@ if (WIN32)
 	file(COPY ${source} DESTINATION ${destination})
 	message(STATUS "   ${Red}copied resources folder from ${source} => ${destination}${ColourReset}")
 endif (WIN32)
+]]
 
 # Properties
 target_include_directories(
@@ -95,17 +104,10 @@ set_target_properties(
 target_compile_definitions(
 		${LIBRARY_TARGET_NAME}
 		PRIVATE
-
-		PUBLIC
+		
 		# Build type macros
 		$<$<CONFIG:Debug>:DEBUG>
 		$<$<CONFIG:Release>:RELEASE>
-		# $<$<CONFIG:Profile>:PROFILE>
-		# Platform macros
-		# $<$<PLATFORM_ID:Windows>:PLATFORM_WINDOWS>
-
-		# INTERFACE
-		# CLIENT
 )
 
 target_compile_options(
