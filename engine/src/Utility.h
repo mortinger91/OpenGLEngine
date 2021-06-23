@@ -135,7 +135,7 @@ public:
 	static bool GetPathToRes(std::string& resPath)
 	{
 		auto currentPath = std::filesystem::current_path();
-		std::cout << "current path: " << currentPath << std::endl;
+		std::cout << "current path: " << currentPath.string() << std::endl;
 		resPath = "";
 
 		#ifdef __linux__
@@ -166,14 +166,14 @@ public:
 				return false;
 			}
 		#elif _WIN32
-			std::filesystem::path engine("bin");
+			std::filesystem::path engine("build");
 			if (std::search(currentPath.begin(), currentPath.end(), engine.begin(), engine.end()) != currentPath.end()) 
 			{
-				resPath = "res";
+				resPath = (currentPath.parent_path() / "engine" / "res").string();
 			}
 			else
 			{
-				resPath = "bin\\res";
+				resPath = "res";
 			}
 			return true;
 		#endif

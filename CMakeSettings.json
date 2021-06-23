@@ -7,7 +7,7 @@
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "buildRoot": "${projectDir}\\build\\vs\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
+      "cmakeCommandArgs": "-D CMAKE_C_COMPILER=cl.exe -D CMAKE_CXX_COMPILER=cl.exe",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "variables": [
@@ -17,19 +17,7 @@
           "type": "STRING"
         }
       ],
-      "intelliSenseMode": "android-clang-arm64"
-    },
-    {
-      "name": "x64-Release",
-      "generator": "Ninja",
-      "configurationType": "Release",
-      "buildRoot": "${projectDir}\\build\\vs\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": []
+      "intelliSenseMode": "windows-msvc-x64"
     }
   ]
 }

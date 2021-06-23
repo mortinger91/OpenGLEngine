@@ -38,12 +38,6 @@ add_library(
 		src/tests/TestClearColor.cpp
 )
 
-# target_precompile_headers(
-		# ${LIBRARY_TARGET_NAME}
-		# PRIVATE
-		#"include/real/pch.hpp"
-# )
-
 set (source "${CMAKE_SOURCE_DIR}/engine/res")
 if (UNIX)
 	set (destination "${BUILD_FOLDER}/bin/res")
@@ -56,14 +50,7 @@ if (UNIX)
 	message(STATUS "   ${Red}symbolic link resources folder from ${source} => ${destination}${ColourReset}")
 endif (UNIX)
 if (WIN32)
-	# TODO: make it automatic depending on the build configuration selected
 	set (destination "${BUILD_FOLDER}/bin")
-	#add_custom_command(
-	# TARGET ${LIBRARY_TARGET_NAME} PRE_BUILD
-	# COMMAND ${CMAKE_COMMAND} -E copy_directory ${source} ${destination} 
-	# DEPENDS ${destination}
-	# COMMENT "copied resources folder from ${source} => ${destination}"
-	#)
 	file(COPY ${source} DESTINATION ${destination})
 	message(STATUS "   ${Red}copied resources folder from ${source} => ${destination}${ColourReset}")
 endif (WIN32)
@@ -79,9 +66,6 @@ target_include_directories(
 		"../vendor/glfw/include"
 		"../vendor/glm/glm"
 		"../vendor/imgui-cmake"
-		#"${CMAKE_CURRENT_BINARY_DIR}"
-		#PRIVATE
-		#"src"
 )
 
 set_target_properties(
@@ -116,11 +100,12 @@ target_compile_definitions(
 		# Build type macros
 		$<$<CONFIG:Debug>:DEBUG>
 		$<$<CONFIG:Release>:RELEASE>
-		$<$<CONFIG:Profile>:PROFILE>
+		# $<$<CONFIG:Profile>:PROFILE>
 		# Platform macros
-		$<$<PLATFORM_ID:Windows>:PLATFORM_WINDOWS>
-		INTERFACE
-		CLIENT
+		# $<$<PLATFORM_ID:Windows>:PLATFORM_WINDOWS>
+
+		# INTERFACE
+		# CLIENT
 )
 
 target_compile_options(
@@ -143,49 +128,3 @@ set_target_properties(
 		C_VISIBILITY_PRESET hidden
 		ASM_VISIBILITY_PRESET hidden
 )
-
-# Utility
-# Generated Files
-write_compiler_detection_header(
-		FILE "${PROJECT_NAME}/core-compiler.hpp"
-		PREFIX ${PROJECT_NAME}
-		COMPILERS Clang GNU MSVC
-		FEATURES cxx_override
-)
-
-generate_export_header(
-		${LIBRARY_TARGET_NAME}
-		BASE_NAME "${PROJECT_NAME}"
-		PREFIX_NAME "${PROJECT_NAME}_"
-		INCLUDE_GUARD_NAME "${PROJECT_NAME}_CORE_COMPILER"
-		EXPORT_MACRO_NAME "API"
-		EXPORT_FILE_NAME "${PROJECT_NAME}/core-export.hpp"
-		NO_EXPORT_MACRO_NAME "NO_EXPORT"
-		DEPRECATED_MACRO_NAME "DEPRECATED"
-		INCLUDE_GUARD_NAME "${PROJECT_NAME}_CORE_API"
-		STATIC_DEFINE "STATIC"
-		NO_DEPRECATED_MACRO_NAME "NO_DEPRECATED"
-
-		# DEFINE_NO_DEPRECATED
-)
-
-# Custom commands
-set(LOGS_DIR "${CMAKE_CURRENT_BINARY_DIR}/logs")
-set(LOG_EXPORTS_FILE "${LOGS_DIR}/exports.txt")
-
-file(MAKE_DIRECTORY "${LOGS_DIR}")
-
-# TODO: add support for other platforms
-if (WIN32 AND MSVC)
-	# Save DLL exports
-	add_custom_command(
-			TARGET ${LIBRARY_TARGET_NAME} POST_BUILD
-			WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-			COMMENT "Saving DLL file exports"
-			BYPRODUCTS "${LOG_EXPORTS_FILE}"
-
-			COMMAND dumpbin /exports $<TARGET_FILE:${LIBRARY_TARGET_NAME}> > "${LOG_EXPORTS_FILE}"
-
-			VERBATIM
-	)
-endif ()
