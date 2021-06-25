@@ -26,8 +26,8 @@ namespace test
 		void OnImGuiRender() override;
 
 	private:
-		std::unordered_map< const std::string, std::shared_ptr<Shader> > m_Shaders;
-		std::unordered_map< const std::string, std::shared_ptr<Material> > m_Materials;
+		std::unordered_map< std::string, std::shared_ptr<Shader> > m_Shaders;
+		std::unordered_map< std::string, std::shared_ptr<Material> > m_Materials;
 		std::unique_ptr<Camera> m_Camera;
 		std::vector<Model> m_Models;
 		Renderer m_Renderer;

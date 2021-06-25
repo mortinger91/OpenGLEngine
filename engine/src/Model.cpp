@@ -10,9 +10,9 @@ Model::Model(const std::string& name)
 }
 
 // moves the mesh inside the mesh vector
-void Model::MoveMesh(const Mesh&& mesh) noexcept
+void Model::MoveMesh(Mesh& mesh) noexcept
 {
-	m_Meshes.push_back(mesh);
+	m_Meshes.push_back(std::move(mesh));
 }
 
 void Model::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix)

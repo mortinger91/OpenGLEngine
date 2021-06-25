@@ -29,7 +29,7 @@ public:
 	Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_);
 	Mesh(const std::string& name, const std::string& filepath);
 	// deleted copy constructor
-	Mesh(const Mesh& mesh);// = delete;
+	Mesh(const Mesh& mesh) = delete;
 	Mesh(Mesh&& mesh) noexcept;
 	~Mesh();
 
@@ -49,7 +49,7 @@ public:
 	void CreateModelMatrix();
 
 	//void SetMaterial(const std::string& texturePath, float shininess, float specular, float diffuse, float ambient);
-	void SetMaterial(const std::shared_ptr<Material> mat);
+	void SetMaterial(std::shared_ptr<Material> mat);
 
 	void Bind() const;
 	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix);

@@ -1,5 +1,7 @@
 #pragma once
-#include <filesystem>
+#ifndef RESPATH
+	#include <filesystem>
+#endif
 #include <string>
 #include <iostream>
 #include <algorithm>
@@ -135,7 +137,7 @@ public:
 	static bool GetPathToRes(std::string& resString)
 	{
 		bool result = false;
-		#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L)
+		#ifndef RESPATH
 			auto currentPath = std::filesystem::current_path();
 			#ifdef DEBUG
 				std::cout << "current path: " << currentPath.string() << std::endl;
@@ -166,6 +168,9 @@ public:
 			#ifdef DEBUG
 				std::cout << "res path: " << resPath << std::endl;
 			#endif
+		#else
+			// override respath function if a custom path is defined as a preprocessor directive
+			resPath = RESPATH;
 		#endif
 		return result;
 	}

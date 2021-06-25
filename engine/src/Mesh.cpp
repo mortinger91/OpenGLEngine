@@ -14,30 +14,34 @@ Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, 
 	  m_VerticesTexCoords(verticesTexCoords_),
 	  m_VerticesIndices(verticesIndices_)
 {
-	//std::cout << "Called mesh constructor from vectors of:" << m_Name << std::endl;
+	#ifdef DEBUG
+		std::cout << "Called mesh constructor from vectors of:" << m_Name << std::endl;
+	#endif
 	init();
 }
 
 Mesh::Mesh(const std::string& name, const std::string& filepath)
 	: m_Name(name)
 {
-	//std::cout << "Called mesh constructor from file of:" << m_Name << std::endl;
+	#ifdef DEBUG
+		std::cout << "Called mesh constructor from file of:" << m_Name << std::endl;
+	#endif
 	parse(filepath.c_str());
 	init();
 }
 
-// copy constructor
-Mesh::Mesh(const Mesh& mesh)
-	: m_Name(mesh.m_Name),
-	  m_VerticesPositions(mesh.m_VerticesPositions),
-	  m_VerticesColors(mesh.m_VerticesColors),
-	  m_VerticesNormals(mesh.m_VerticesNormals),
-	  m_VerticesTexCoords(mesh.m_VerticesTexCoords),
-	  m_VerticesIndices(mesh.m_VerticesIndices)
-{
-	//std::cout << "Called mesh copy constructor of:" << m_Name << std::endl;
-	init();
-}
+//// copy constructor
+//Mesh::Mesh(const Mesh& mesh)
+//	: m_Name(mesh.m_Name),
+//	  m_VerticesPositions(mesh.m_VerticesPositions),
+//	  m_VerticesColors(mesh.m_VerticesColors),
+//	  m_VerticesNormals(mesh.m_VerticesNormals),
+//	  m_VerticesTexCoords(mesh.m_VerticesTexCoords),
+//	  m_VerticesIndices(mesh.m_VerticesIndices)
+//{
+//	//std::cout << "Called mesh copy constructor of:" << m_Name << std::endl;
+//	init();
+//}
 
 // move constructor
 Mesh::Mesh(Mesh&& mesh) noexcept
@@ -59,14 +63,18 @@ Mesh::Mesh(Mesh&& mesh) noexcept
 {
 	mesh.arrayV = nullptr;
 	mesh.arrayI = nullptr;
-	//std::cout << "Called mesh move constructor of:" << m_Name << std::endl;
+	#ifdef DEBUG
+		std::cout << "Called mesh move constructor of:" << m_Name << std::endl;
+	#endif
 }
 
 Mesh::~Mesh()
 {
 	free(arrayV);
 	free(arrayI);
-	//std::cout << "Called mesh destructor of:" << m_Name << std::endl;
+	#ifdef DEBUG
+		std::cout << "Called mesh destructor of:" << m_Name << std::endl;
+	#endif
 }
 
 // OBJ file parser function. Used for loading the teapot.obj file.
@@ -230,7 +238,7 @@ void Mesh::CreateModelMatrix()
 	m_ModelMatrix = matTranslate * matRotateY * matRotateZ * matRotateX * matScale;
 }
 
-void Mesh::SetMaterial(const std::shared_ptr<Material> mat)
+void Mesh::SetMaterial(std::shared_ptr<Material> mat)
 {
 	m_Material = mat;
 }

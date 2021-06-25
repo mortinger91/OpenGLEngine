@@ -26,20 +26,18 @@ namespace test
 		
 		std::string resPath;
 		Utility::GetPathToRes(resPath);
-		// override respath if a custom one is defined as a preprocessor directive
-		#ifdef RESPATH
-			resPath = RESPATH;
-		#endif
 
 		// defining a shader
 		m_Shaders["default"] = std::make_shared<Shader>(resPath + "/shaders/Basic.vert", resPath + "/shaders/Basic.frag");
 
+		auto x = m_Shaders["default"];
+
 		// creating the materials
 		float ambient = 0.15f;
-		m_Materials["cubeuv"] = std::make_shared<Material>(resPath + "/textures/cubeUV.png", 500.f, 0.75f, 0.2f, ambient);
-		m_Materials["teapot"] = std::make_shared<Material>(resPath + "/textures/metal.png", 200.f, 5.f, 5.f, ambient);
-		m_Materials["plane"] = std::make_shared<Material>(resPath + "/textures/metal.png", 500.f, 0.75f, 0.2f, ambient);
-		m_Materials["white"] = std::make_shared<Material>(resPath + "/textures/white.png", 1.f, 1.f, 1.f, 300.f);
+		m_Materials["cubeuv"] = std::make_shared<Material>(resPath + "/textures/cubeUV.png", 500.f, 0.75f, 0.2f, ambient, m_Shaders["default"]);
+		m_Materials["teapot"] = std::make_shared<Material>(resPath + "/textures/metal.png", 200.f, 5.f, 5.f, ambient, m_Shaders["default"]);
+		m_Materials["plane"] = std::make_shared<Material>(resPath + "/textures/metal.png", 500.f, 0.75f, 0.2f, ambient, m_Shaders["default"]);
+		m_Materials["white"] = std::make_shared<Material>(resPath + "/textures/white.png", 1.f, 1.f, 1.f, 300.f, m_Shaders["default"]);
 
 		// creating the camera
 		m_Camera = std::make_unique<Camera>(glm::vec3(0.f, 0.f, 60.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
@@ -50,7 +48,7 @@ namespace test
 		mesh1.SetMaterial(m_Materials["cubeuv"]);
 		mesh1.m_Scale = 6.f;
 		mesh1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
-		model1.MoveMesh(std::move(mesh1));
+		model1.MoveMesh(mesh1);
 		m_Models.push_back(std::move(model1));
 
 		Model model2("Teapot");
@@ -58,7 +56,7 @@ namespace test
 		mesh2.SetMaterial(m_Materials["teapot"]);
 		mesh2.m_Scale = 12.f;
 		mesh2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
-		model2.MoveMesh(std::move(mesh2));
+		model2.MoveMesh(mesh2);
 		m_Models.push_back(std::move(model2));
 
 		Model model3("Teapot");
@@ -66,14 +64,14 @@ namespace test
 		mesh3.SetMaterial(m_Materials["plane"]);
 		mesh3.m_Scale = 500.f;
 		mesh3.m_TranslationVec = glm::vec3(0.f, -10.f, 0.f);
-		model3.MoveMesh(std::move(mesh3));
+		model3.MoveMesh(mesh3);
 		m_Models.push_back(std::move(model3));
 
 		Model model4("PointLightCube");
 		Mesh mesh4("PointLightCube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUnique, Cube::indices);
 		mesh4.SetMaterial(m_Materials["white"]);
 		mesh4.m_TranslationVec = glm::vec3(30.f, 0.f, 0.f);
-		model4.MoveMesh(std::move(mesh4));
+		model4.MoveMesh(mesh4);
 		m_Models.push_back(std::move(model4));
 	}
 
@@ -129,6 +127,7 @@ namespace test
 				m_ProjMatrix = Utility::CreatePerspectiveMatrix(m_Fov, (float)width / (float)height, m_NearPlane, m_FarPlane);
 			}
 
+			m_Shaders["default"]->Bind();
 			// Uniforms regarding point and directional lights
 			m_Shaders["default"]->SetUniform1i("islight", m_IsLight);
 			m_Shaders["default"]->SetUniform3fv("light0dirn", light0direction);
@@ -150,10 +149,10 @@ namespace test
 			for(int i = 0; i < m_Models.size(); ++i)
 			{
 				// only for point light mesh
-				if (i == 3)
-				{
-					m_Models[i].m_Meshes[0].m_ModelMatrix = matRotateLight * m_Models[i].m_Meshes[0].m_ModelMatrix;
-				}
+				//if (i == 3)
+				//{
+				//	m_Models[i].m_Meshes[0].m_ModelMatrix = matRotateLight * m_Models[i].m_Meshes[0].m_ModelMatrix;
+				//}
 
 				m_Models[i].Draw(m_Camera->m_ViewMatrix, m_ProjMatrix);
 			}

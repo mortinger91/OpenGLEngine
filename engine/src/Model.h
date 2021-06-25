@@ -7,7 +7,7 @@ class Model
 {
 public:
 	Model(const std::string& name);
-	void MoveMesh(const Mesh&& mesh) noexcept;
+	void MoveMesh(Mesh& mesh) noexcept;
 	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
 
 	// these vector are applied to all the meshes composing the model, they are the actual model matrix of the whole model
