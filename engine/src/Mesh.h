@@ -20,6 +20,9 @@ private:
 	std::vector <glm::vec2> m_VerticesTexCoords;
 	std::vector <unsigned int> m_VerticesIndices;
 
+	float* arrayV;
+	unsigned int* arrayI;
+
 	void ConvertVectorsToArray(unsigned int& sizeV, unsigned int& sizeI);
 	void parse(const char * filepath);
 	void init();
@@ -38,19 +41,16 @@ public:
 	std::unique_ptr<IndexBuffer> m_IndexBuffer;
 	std::shared_ptr<Material> m_Material;
 
-	float* arrayV;
-	unsigned int* arrayI;
-
 	glm::vec3 m_TranslationVec;
 	glm::vec3 m_RotationVec;
 	float m_Scale;
+	glm::mat4 m_CustomTransform;
 
-	glm::mat4 m_ModelMatrix;
-	void CreateModelMatrix();
-
-	//void SetMaterial(const std::string& texturePath, float shininess, float specular, float diffuse, float ambient);
 	void SetMaterial(std::shared_ptr<Material> mat);
 
+	glm::mat4 m_ModelMatrix;
+	void CreateModelMatrix(const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale);
+
 	void Bind() const;
-	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
+	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale);
 };

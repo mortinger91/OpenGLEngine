@@ -58,6 +58,7 @@ Mesh::Mesh(Mesh&& mesh) noexcept
 	  m_TranslationVec(mesh.m_TranslationVec),
 	  m_RotationVec(mesh.m_RotationVec),
 	  m_Scale(mesh.m_Scale),
+	  m_CustomTransform(mesh.m_CustomTransform),
 	  arrayV(mesh.arrayV),
 	  arrayI(mesh.arrayI)
 {
@@ -183,6 +184,7 @@ void Mesh::init()
 	m_TranslationVec = glm::vec3(0.f, 0.f, 0.f);
 	m_RotationVec = glm::vec3(0.f, 0.f, 0.f);
 	m_Scale = 1.f;
+	m_CustomTransform = glm::mat4(1.f);
 
 	// initializing vertex array
 	m_VAO = std::make_unique<VertexArray>();
@@ -218,7 +220,12 @@ void Mesh::CreateScalingMatrix(glm::mat4 &mat, float scale)
 	mat[3][3] = 1;
 }
 
-void Mesh::CreateModelMatrix()
+void Mesh::SetMaterial(std::shared_ptr<Material> mat)
+{
+	m_Material = mat;
+}
+
+void Mesh::CreateModelMatrix(const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale)
 {
 	glm::mat4 matTranslate;
 	glm::mat4 matRotateZ;
@@ -226,21 +233,16 @@ void Mesh::CreateModelMatrix()
 	glm::mat4 matRotateX;
 	glm::mat4 matScale;
 
-	Utility::CreateTranslationMatrix(matTranslate, m_TranslationVec);
+	Utility::CreateTranslationMatrix(matTranslate, m_TranslationVec+ModelTranslationVec);
 
 	// TODO: use quaternions to perform model rotation in order to avoid gimbal lock
-	Utility::CreateRotationGenericMatrix(matRotateZ, m_RotationVec.z, glm::vec3(0,0,1));
-	Utility::CreateRotationGenericMatrix(matRotateY, m_RotationVec.y, glm::vec3(0,1,0));
-	Utility::CreateRotationGenericMatrix(matRotateX, m_RotationVec.x, glm::vec3(1,0,0));
+	Utility::CreateRotationGenericMatrix(matRotateZ, m_RotationVec.z+ModelRotationVec.z, glm::vec3(0,0,1));
+	Utility::CreateRotationGenericMatrix(matRotateY, m_RotationVec.y+ModelRotationVec.y, glm::vec3(0,1,0));
+	Utility::CreateRotationGenericMatrix(matRotateX, m_RotationVec.x+ModelRotationVec.x, glm::vec3(1,0,0));
 
-	CreateScalingMatrix(matScale, m_Scale);
+	CreateScalingMatrix(matScale, m_Scale+ModelScale);
 
 	m_ModelMatrix = matTranslate * matRotateY * matRotateZ * matRotateX * matScale;
-}
-
-void Mesh::SetMaterial(std::shared_ptr<Material> mat)
-{
-	m_Material = mat;
 }
 
 void Mesh::Bind() const
@@ -250,7 +252,7 @@ void Mesh::Bind() const
 	m_Material->Bind();
 }
 
-void Mesh::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
+void Mesh::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale)
 {
 	Renderer renderer;
 	m_Material->Bind();
@@ -258,7 +260,9 @@ void Mesh::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
 	glm::mat4 mv;
 	glm::mat4 mvp;
 
-	CreateModelMatrix();
+	CreateModelMatrix(ModelTranslationVec, ModelRotationVec, ModelScale);
+	m_ModelMatrix = m_CustomTransform * m_ModelMatrix;
+
 	mv = viewMatrix * m_ModelMatrix;
 	mvp = projMatrix * mv;
 

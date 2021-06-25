@@ -149,10 +149,10 @@ namespace test
 			for(int i = 0; i < m_Models.size(); ++i)
 			{
 				// only for point light mesh
-				//if (i == 3)
-				//{
-				//	m_Models[i].m_Meshes[0].m_ModelMatrix = matRotateLight * m_Models[i].m_Meshes[0].m_ModelMatrix;
-				//}
+				if (i == 3)
+				{
+					m_Models[i].m_Meshes[0].m_CustomTransform = matRotateLight;
+				}
 
 				m_Models[i].Draw(m_Camera->m_ViewMatrix, m_ProjMatrix);
 			}

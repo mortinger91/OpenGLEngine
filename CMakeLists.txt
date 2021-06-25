@@ -85,6 +85,8 @@ target_link_libraries(
 		glm::glm
 )
 
+include(build)
+
 add_executable(
 			exec engine/src/Main.cpp
 )
@@ -94,5 +96,3 @@ add_executable(
 			PRIVATE
 			${LIBRARY_TARGET_NAME}
 )
-
-include(build)

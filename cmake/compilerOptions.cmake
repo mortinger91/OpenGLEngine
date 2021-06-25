@@ -18,12 +18,12 @@ endif ()
 set(DEFAULT_COMPILE_OPTIONS)
 
 target_compile_options(
-	exec 
+	${LIBRARY_TARGET_NAME}
 	PRIVATE
 	# MSVC compiler options
     $<$<CXX_COMPILER_ID:MSVC>:
     	/MP
-    	/Wall
+    	/W4
     	$<$<CONFIG:Debug>:
 			/ZI			  # -> generate debug symbols and continue
 			/Gy

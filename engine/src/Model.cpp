@@ -19,6 +19,6 @@ void Model::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
 {
 	for (Mesh& mesh : m_Meshes)
 	{
-		mesh.Draw(viewMatrix, projMatrix);
+		mesh.Draw(viewMatrix, projMatrix, m_TranslationVec, m_RotationVec, m_Scale);
 	}
 }
