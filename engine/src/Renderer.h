@@ -28,8 +28,6 @@ bool GLLogCall(const char* function, const char* file, int line);
 class Renderer
 {
 public:
-	//Renderer();
-	//~Renderer();
 	void Clear() const;
 	void Draw(const Mesh& mesh, const Shader& shader) const;
 };

@@ -134,31 +134,39 @@ public:
 
 	static bool GetPathToRes(std::string& resString)
 	{
-		auto currentPath = std::filesystem::current_path();
-		//std::cout << "current path: " << currentPath.string() << std::endl;
-		std::filesystem::path resPath;
+		bool result = false;
+		#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L)
+			auto currentPath = std::filesystem::current_path();
+			#ifdef DEBUG
+				std::cout << "current path: " << currentPath.string() << std::endl;
+			#endif
+			std::filesystem::path resPath;
 
-		std::filesystem::path engine("OpenGLEngine");
-		if (std::search(currentPath.begin(), currentPath.end(), engine.begin(), engine.end()) != currentPath.end()) 
-		{
-			// engine is a subPath of the currentPath
-			for (auto& el : currentPath)
+			std::filesystem::path engine("OpenGLEngine");
+			if (std::search(currentPath.begin(), currentPath.end(), engine.begin(), engine.end()) != currentPath.end()) 
 			{
-				resPath = resPath / el;
-				if (el == "OpenGLEngine")
+				// engine is a subPath of the currentPath
+				for (auto& el : currentPath)
 				{
-					resPath = resPath / "engine" / "res";
-					resString = resPath.string();
-					break;
+					resPath = resPath / el;
+					if (el == "OpenGLEngine")
+					{
+						resPath = resPath / "engine" / "res";
+						resString = resPath.string();
+						break;
+					}
 				}
+				result = true;
 			}
-			return true;
-		}
-		// if running the executable out of the project dir, res folder is needed
-		else
-		{
-			resString = "res";
-			return false;
-		}
+			// if running the executable out of the project dir, res folder is needed
+			else
+			{
+				resString = "res";
+			}
+			#ifdef DEBUG
+				std::cout << "res path: " << resPath << std::endl;
+			#endif
+		#endif
+		return result;
 	}
 };

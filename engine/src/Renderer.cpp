@@ -32,6 +32,7 @@ void Renderer::Clear() const
 void Renderer::Draw(const Mesh& mesh, const Shader& shader) const
 {
 	mesh.Bind();
+	// already bound while binding the material before the draw call
 	shader.Bind();
 	// DRAW CALL: render primitives from array data
 	GLCall(glDrawElements(GL_TRIANGLES, mesh.m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr));

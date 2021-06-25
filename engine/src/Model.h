@@ -1,4 +1,23 @@
+#include <vector>
+#include <memory>
+#include "Mesh.h"
+#include "Shader.h"
+
 class Model
 {
+public:
+	Model(const std::string& name);
+	void MoveMesh(const Mesh&& mesh) noexcept;
+	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
 
+	// these vector are applied to all the meshes composing the model, they are the actual model matrix of the whole model
+	glm::vec3 m_TranslationVec;
+	glm::vec3 m_RotationVec;
+	float m_Scale;
+	std::vector<Mesh> m_Meshes;
+
+private:
+	std::string m_Name;
+	// the translation, rotation and scale vector of the meshes are relative to the model center, they perform the mesh->model transformation
+	//std::vector<std::unique_ptr<Mesh>> m_Meshes;
 };

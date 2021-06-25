@@ -3,14 +3,16 @@
 #include "Mesh.h"
 #include "VertexBufferLayout.h"
 #include "Utility.h"
+#include "Renderer.h"
+#include "Shader.h"
 
 Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_) 
-	: m_Name(name),
-	  verticesPositions(verticesPositions_),
-	  verticesColors(verticesColors_),
-	  verticesNormals(verticesNormals_),
-	  verticesTexCoords(verticesTexCoords_),
-	  verticesIndices(verticesIndices_)
+	: m_Name(std::move(name)),
+	  m_VerticesPositions(verticesPositions_),
+	  m_VerticesColors(verticesColors_),
+	  m_VerticesNormals(verticesNormals_),
+	  m_VerticesTexCoords(verticesTexCoords_),
+	  m_VerticesIndices(verticesIndices_)
 {
 	//std::cout << "Called mesh constructor from vectors of:" << m_Name << std::endl;
 	init();
@@ -25,26 +27,26 @@ Mesh::Mesh(const std::string& name, const std::string& filepath)
 }
 
 // copy constructor
-//Mesh::Mesh(const Mesh& mesh)
-//	: m_Name(mesh.m_Name),
-//	  verticesPositions(mesh.verticesPositions),
-//	  verticesColors(mesh.verticesColors),
-//	  verticesNormals(mesh.verticesNormals),
-//	  verticesTexCoords(mesh.verticesTexCoords),
-//	  verticesIndices(mesh.verticesIndices)
-//{
-//	//std::cout << "Called mesh copy constructor of:" << m_Name << std::endl;
-//	init();
-//}
+Mesh::Mesh(const Mesh& mesh)
+	: m_Name(mesh.m_Name),
+	  m_VerticesPositions(mesh.m_VerticesPositions),
+	  m_VerticesColors(mesh.m_VerticesColors),
+	  m_VerticesNormals(mesh.m_VerticesNormals),
+	  m_VerticesTexCoords(mesh.m_VerticesTexCoords),
+	  m_VerticesIndices(mesh.m_VerticesIndices)
+{
+	//std::cout << "Called mesh copy constructor of:" << m_Name << std::endl;
+	init();
+}
 
 // move constructor
 Mesh::Mesh(Mesh&& mesh) noexcept
 	: m_Name(mesh.m_Name),
-	  verticesPositions(mesh.verticesPositions),
-	  verticesColors(mesh.verticesColors),
-	  verticesNormals(mesh.verticesNormals),
-	  verticesTexCoords(mesh.verticesTexCoords),
-	  verticesIndices(mesh.verticesIndices),
+	  m_VerticesPositions(mesh.m_VerticesPositions),
+	  m_VerticesColors(mesh.m_VerticesColors),
+	  m_VerticesNormals(mesh.m_VerticesNormals),
+	  m_VerticesTexCoords(mesh.m_VerticesTexCoords),
+	  m_VerticesIndices(mesh.m_VerticesIndices),
 	  m_VAO(std::move(mesh.m_VAO)),
 	  m_VertexBuffer(std::move(mesh.m_VertexBuffer)),
 	  m_IndexBuffer(std::move(mesh.m_IndexBuffer)),
@@ -53,8 +55,7 @@ Mesh::Mesh(Mesh&& mesh) noexcept
 	  m_RotationVec(mesh.m_RotationVec),
 	  m_Scale(mesh.m_Scale),
 	  arrayV(mesh.arrayV),
-	  arrayI(mesh.arrayI),
-	  m_UseTexture(mesh.m_UseTexture)
+	  arrayI(mesh.arrayI)
 {
 	mesh.arrayV = nullptr;
 	mesh.arrayI = nullptr;
@@ -101,10 +102,10 @@ void Mesh::parse(const char * filepath)
 		if ((c1 == 'v') && (c2 == ' ')) 
 		{
 			fscanf(fp, "%f %f %f", &x, &y, &z);
-			verticesPositions.push_back(glm::vec3(x, y, z));
+			m_VerticesPositions.push_back(glm::vec3(x, y, z));
 
-			verticesColors.push_back(glm::vec3(0.8f,0.3f,0.3f)); 
-			verticesTexCoords.push_back(glm::vec2(0.f,0.f));
+			m_VerticesColors.push_back(glm::vec3(0.8f,0.3f,0.3f));
+			m_VerticesTexCoords.push_back(glm::vec2(0.f,0.f));
 
 			if (y < minY) minY = y;
 			if (z < minZ) minZ = z;
@@ -114,14 +115,14 @@ void Mesh::parse(const char * filepath)
 		else if ((c1 == 'v') && (c2 == 'n')) 
 		{
 			fscanf(fp, "%f %f %f", &x, &y, &z);
-			verticesNormals.push_back(glm::normalize(glm::vec3(x, y, z)));
+			m_VerticesNormals.push_back(glm::normalize(glm::vec3(x, y, z)));
 		}
 		else if (c1 == 'f')
 		{
 			fscanf(fp, "%d//%d %d//%d %d//%d", &fx, &ignore, &fy, &ignore, &fz, &ignore);
-			verticesIndices.push_back(fx - 1);
-			verticesIndices.push_back(fy - 1);
-			verticesIndices.push_back(fz - 1);
+			m_VerticesIndices.push_back(fx - 1);
+			m_VerticesIndices.push_back(fy - 1);
+			m_VerticesIndices.push_back(fz - 1);
 		}
 	}
 
@@ -129,43 +130,43 @@ void Mesh::parse(const char * filepath)
 	// Recenter the teapot
 	float avgY = (minY + maxY) / 2.0f - 0.0234f;
 	float avgZ = (minZ + maxZ) / 2.0f;
-	for (unsigned int i = 0; i < verticesPositions.size(); ++i) 
+	for (unsigned int i = 0; i < m_VerticesPositions.size(); ++i)
 	{
-		glm::vec3 shiftedVertex = (verticesPositions[i] - glm::vec3(0.0f, avgY, avgZ)) * glm::vec3(0.975f, 0.975f, 0.975f);
-		verticesPositions[i] = shiftedVertex;
+		glm::vec3 shiftedVertex = (m_VerticesPositions[i] - glm::vec3(0.0f, avgY, avgZ)) * glm::vec3(0.975f, 0.975f, 0.975f);
+		m_VerticesPositions[i] = shiftedVertex;
 	}
 }
 
 void Mesh::ConvertVectorsToArray(unsigned int& sizeV, unsigned int& sizeI)
 {
-	sizeV = static_cast<int>(verticesPositions.size()) * 11;
+	sizeV = static_cast<int>(m_VerticesPositions.size()) * 11;
 	arrayV = (float*)malloc(sizeof(float) * sizeV);
-	sizeI = static_cast<int>(verticesIndices.size());
+	sizeI = static_cast<int>(m_VerticesIndices.size());
 	arrayI = (unsigned int*)malloc(sizeof(unsigned int) * sizeI);
 
 	int index = 0;
-	for (unsigned int i = 0; i < verticesPositions.size(); ++i)
+	for (unsigned int i = 0; i < m_VerticesPositions.size(); ++i)
 	{
-		arrayV[index++] = verticesPositions[i].x;
-		arrayV[index++] = verticesPositions[i].y;
-		arrayV[index++] = verticesPositions[i].z;
+		arrayV[index++] = m_VerticesPositions[i].x;
+		arrayV[index++] = m_VerticesPositions[i].y;
+		arrayV[index++] = m_VerticesPositions[i].z;
 
-		arrayV[index++] = verticesColors[i].x;
-		arrayV[index++] = verticesColors[i].y;
-		arrayV[index++] = verticesColors[i].z;
+		arrayV[index++] = m_VerticesColors[i].x;
+		arrayV[index++] = m_VerticesColors[i].y;
+		arrayV[index++] = m_VerticesColors[i].z;
 
-		arrayV[index++] = verticesNormals[i].x;
-		arrayV[index++] = verticesNormals[i].y;
-		arrayV[index++] = verticesNormals[i].z;
+		arrayV[index++] = m_VerticesNormals[i].x;
+		arrayV[index++] = m_VerticesNormals[i].y;
+		arrayV[index++] = m_VerticesNormals[i].z;
 
-		arrayV[index++] = verticesTexCoords[i].x;
-		arrayV[index++] = verticesTexCoords[i].y;
+		arrayV[index++] = m_VerticesTexCoords[i].x;
+		arrayV[index++] = m_VerticesTexCoords[i].y;
 	}
 	
 	index = 0;
-	for (unsigned int i = 0; i < verticesIndices.size(); ++i)
+	for (unsigned int i = 0; i < m_VerticesIndices.size(); ++i)
 	{
-		arrayI[index++] = verticesIndices[i];
+		arrayI[index++] = m_VerticesIndices[i];
 	}
 }
 
@@ -174,7 +175,6 @@ void Mesh::init()
 	m_TranslationVec = glm::vec3(0.f, 0.f, 0.f);
 	m_RotationVec = glm::vec3(0.f, 0.f, 0.f);
 	m_Scale = 1.f;
-	m_UseTexture = true;
 
 	// initializing vertex array
 	m_VAO = std::make_unique<VertexArray>();
@@ -190,14 +190,10 @@ void Mesh::init()
 	VertexBufferLayout layout;
 	// position of the vertices of the two triangles making up a square
 	// layout(location = 0) in vertex shader
-	// layout.Push<float>(3);
-	// layout.Push<float>(3);
-	// layout.Push<float>(3);
-	// layout.Push<float>(2);
-	layout.Push(3);
-	layout.Push(3);
-	layout.Push(3);
-	layout.Push(2);
+	layout.Push<float>(3);
+	layout.Push<float>(3);
+	layout.Push<float>(3);
+	layout.Push<float>(2);
 	// adding vertex buffer and layout to vertex array
 	m_VAO->AddBuffer(*m_VertexBuffer, layout);
 
@@ -234,9 +230,9 @@ void Mesh::CreateModelMatrix()
 	m_ModelMatrix = matTranslate * matRotateY * matRotateZ * matRotateX * matScale;
 }
 
-void Mesh::SetMaterial(const std::string& texturePath, float shininess, float specular, float diffuse, float ambient)
+void Mesh::SetMaterial(const std::shared_ptr<Material> mat)
 {
-	m_Material = std::make_unique<Material>(texturePath, shininess, specular, diffuse, ambient);
+	m_Material = mat;
 }
 
 void Mesh::Bind() const
@@ -244,4 +240,26 @@ void Mesh::Bind() const
 	m_VAO->Bind();
 	m_IndexBuffer->Bind();
 	m_Material->Bind();
+}
+
+void Mesh::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
+{
+	Renderer renderer;
+	m_Material->Bind();
+
+	glm::mat4 mv;
+	glm::mat4 mvp;
+
+	CreateModelMatrix();
+	mv = viewMatrix * m_ModelMatrix;
+	mvp = projMatrix * mv;
+
+	m_Material->m_Shader->SetUniformMat4f("u_MV", mv);
+	m_Material->m_Shader->SetUniformMat4f("u_MVP", mvp);
+	// TODO: create a batch renderer:
+		// calling draw does not draw the object but add it in a queue
+		// another command is implemented to render the whole frame
+		// all the meshes that shares the same materials, shaders, uniforms are added together
+		// in one big vertex array, that is rendered using one draw call
+	renderer.Draw(*this, *m_Material->m_Shader);
 }

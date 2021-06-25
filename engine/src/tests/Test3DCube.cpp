@@ -13,7 +13,6 @@ namespace test
 		  m_UseOrtho(false),
 		  m_Fov(30.0f),
 		  m_IsLight(1),
-		  index(0),
 		  m_StopRotation(true),
 		  m_RotatingPointLight(true),
 		  m_PointLightAngle(0)
@@ -27,43 +26,55 @@ namespace test
 		
 		std::string resPath;
 		Utility::GetPathToRes(resPath);
-		//std::cout << "res path: " << resPath << std::endl;
+		// override respath if a custom one is defined as a preprocessor directive
+		#ifdef RESPATH
+			resPath = RESPATH;
+		#endif
 
 		// defining a shader
-		m_Shader = std::make_unique<Shader>(resPath+"/shaders/Basic.vert", resPath+"/shaders/Basic.frag");
-		m_Shader->Bind();
+		m_Shaders["default"] = std::make_shared<Shader>(resPath + "/shaders/Basic.vert", resPath + "/shaders/Basic.frag");
+
+		// creating the materials
+		float ambient = 0.15f;
+		m_Materials["cubeuv"] = std::make_shared<Material>(resPath + "/textures/cubeUV.png", 500.f, 0.75f, 0.2f, ambient);
+		m_Materials["teapot"] = std::make_shared<Material>(resPath + "/textures/metal.png", 200.f, 5.f, 5.f, ambient);
+		m_Materials["plane"] = std::make_shared<Material>(resPath + "/textures/metal.png", 500.f, 0.75f, 0.2f, ambient);
+		m_Materials["white"] = std::make_shared<Material>(resPath + "/textures/white.png", 1.f, 1.f, 1.f, 300.f);
 
 		// creating the camera
 		m_Camera = std::make_unique<Camera>(glm::vec3(0.f, 0.f, 60.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 
-		m_Shader->SetUniform1i("u_Texture", 0);
-
-		float ambient = 0.15f;
-
+		// creating the models
+		Model model1("Cube");
 		Mesh mesh1("Cube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUVs, Cube::indices);
-		mesh1.SetMaterial(resPath+"/textures/cubeUV.png", 500.f, 0.75f, 0.2f, ambient);
+		mesh1.SetMaterial(m_Materials["cubeuv"]);
 		mesh1.m_Scale = 6.f;
 		mesh1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
-		m_MeshVector.push_back(std::move(mesh1));
+		model1.MoveMesh(std::move(mesh1));
+		m_Models.push_back(std::move(model1));
 
+		Model model2("Teapot");
 		Mesh mesh2("Teapot", resPath+"/meshes/teapot.obj");
-		mesh2.SetMaterial(resPath+"/textures/metal.png", 200.f, 5.f, 5.f, ambient);
+		mesh2.SetMaterial(m_Materials["teapot"]);
 		mesh2.m_Scale = 12.f;
 		mesh2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
-		mesh1.m_UseTexture = false;
-		m_MeshVector.push_back(std::move(mesh2));
+		model2.MoveMesh(std::move(mesh2));
+		m_Models.push_back(std::move(model2));
 
+		Model model3("Teapot");
 		Mesh mesh3("Plane", Plane::positions, Plane::colors, Plane::normals, Plane::textures, Plane::indices);
-		mesh3.SetMaterial(resPath+"/textures/metal.png", 500.f, 0.75f, 0.2f, ambient);
+		mesh3.SetMaterial(m_Materials["plane"]);
 		mesh3.m_Scale = 500.f;
 		mesh3.m_TranslationVec = glm::vec3(0.f, -10.f, 0.f);
-		mesh1.m_UseTexture = false;
-		m_MeshVector.push_back(std::move(mesh3));
+		model3.MoveMesh(std::move(mesh3));
+		m_Models.push_back(std::move(model3));
 
+		Model model4("PointLightCube");
 		Mesh mesh4("PointLightCube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUnique, Cube::indices);
-		mesh4.SetMaterial(resPath+"/textures/white.png", 1.f, 1.f, 1.f, 300.f);
+		mesh4.SetMaterial(m_Materials["white"]);
 		mesh4.m_TranslationVec = glm::vec3(30.f, 0.f, 0.f);
-		m_MeshVector.push_back(std::move(mesh4));
+		model4.MoveMesh(std::move(mesh4));
+		m_Models.push_back(std::move(model4));
 	}
 
 	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)
@@ -92,6 +103,8 @@ namespace test
 		}
 
 		{
+			// TODO: cache these matrix and modify them only if the values are changed
+			// View matrix, common for all models and meshes
 			m_Camera->CreateViewMatrix();
 			
 			glm::vec4 light0direction;
@@ -106,86 +119,72 @@ namespace test
 			Utility::CreateRotationGenericMatrix(matRotateLight, m_PointLightAngle, glm::vec3(0.f, 1.f, 0.f));
 			light1position = m_Camera->m_ViewMatrix * matRotateLight * light_position1;
 
-			m_Shader->SetUniform1i("islight", m_IsLight);
-			m_Shader->SetUniform3fv("light0dirn", light0direction);
-			m_Shader->SetUniform4fv("light0color", light_color);
-			m_Shader->SetUniform4fv("light1posn", light1position);
-			m_Shader->SetUniform4fv("light1color", light_color1);
+			// Perspective matrix, common for all models and meshes
+			if (m_UseOrtho)
+			{
+				m_ProjMatrix = Utility::CreateOrthoMatrix((float)width, (float)height, m_NearPlane, m_FarPlane);
+			}
+			else
+			{
+				m_ProjMatrix = Utility::CreatePerspectiveMatrix(m_Fov, (float)width / (float)height, m_NearPlane, m_FarPlane);
+			}
+
+			// Uniforms regarding point and directional lights
+			m_Shaders["default"]->SetUniform1i("islight", m_IsLight);
+			m_Shaders["default"]->SetUniform3fv("light0dirn", light0direction);
+			m_Shaders["default"]->SetUniform4fv("light0color", light_color);
+			m_Shaders["default"]->SetUniform4fv("light1posn", light1position);
+			m_Shaders["default"]->SetUniform4fv("light1color", light_color1);
 			// TODO: do i need to pass eyepos to fragment shader for correct highlights?
-			m_Shader->SetUniform3fv("eyepos", m_Camera->GetEyePos());
+			//m_Shader->SetUniform3fv("eyepos", m_Camera->GetEyePos());
 
 			if (!m_StopRotation)
 			{
-				m_MeshVector[0].m_RotationVec.y+=0.2f;
-				m_MeshVector[1].m_RotationVec.y-=0.3f;
+				m_Models[0].m_RotationVec.y+=0.2f;
+				Utility::NormalizeAngle(m_Models[0].m_RotationVec.y);
+				m_Models[1].m_RotationVec.y-=0.3f;
+				Utility::NormalizeAngle(m_Models[1].m_RotationVec.y);
 			}
 
-			for(int i = 0; i < m_MeshVector.size(); ++i)
+			// draw each model
+			for(int i = 0; i < m_Models.size(); ++i)
 			{
-				glm::mat4 mv;
-				glm::mat4 mvp;
-
-				Utility::NormalizeAngle(m_MeshVector[i].m_RotationVec.y);
-				m_MeshVector[i].CreateModelMatrix();
-				
 				// only for point light mesh
 				if (i == 3)
 				{
-					m_MeshVector[i].m_ModelMatrix = matRotateLight * m_MeshVector[i].m_ModelMatrix;
+					m_Models[i].m_Meshes[0].m_ModelMatrix = matRotateLight * m_Models[i].m_Meshes[0].m_ModelMatrix;
 				}
 
-				mv = m_Camera->m_ViewMatrix * m_MeshVector[i].m_ModelMatrix;
-
-				// TODO: modify these matrix only if the values are changed
-				if(m_UseOrtho)
-				{
-					m_ProjOrtho = Utility::CreateOrthoMatrix((float)width, (float)height, m_NearPlane, m_FarPlane);
-					mvp = m_ProjOrtho * mv;
-				}
-				else
-				{
-					m_ProjPersp = Utility::CreatePerspectiveMatrix(m_Fov, (float)width / (float)height, m_NearPlane, m_FarPlane);
-					mvp = m_ProjPersp * mv;
-				}
-
-				m_Shader->SetUniform1i("useTexture", m_MeshVector[i].m_UseTexture);
-				m_Shader->SetUniformMat4f("u_MV", mv);
-				m_Shader->SetUniformMat4f("u_MVP", mvp);
-				m_Shader->SetUniform4fv("ambient", { m_MeshVector[i].m_Material->m_Ambient, m_MeshVector[i].m_Material->m_Ambient, m_MeshVector[i].m_Material->m_Ambient, 1 });
-				m_Shader->SetUniform4fv("diffuse", { m_MeshVector[i].m_Material->m_Diffuse, m_MeshVector[i].m_Material->m_Diffuse, m_MeshVector[i].m_Material->m_Diffuse, 1 });
-				m_Shader->SetUniform4fv("specular", { m_MeshVector[i].m_Material->m_Specular, m_MeshVector[i].m_Material->m_Specular, m_MeshVector[i].m_Material->m_Specular, 1 });
-				m_Shader->SetUniform1fv("shininess", m_MeshVector[i].m_Material->m_Shininess);
-
-				renderer.Draw(m_MeshVector[i], *m_Shader);
+				m_Models[i].Draw(m_Camera->m_ViewMatrix, m_ProjMatrix);
 			}
 		}
 	}
 
 	void Test3DCube::OnImGuiRender()
 	{
-		ImGui::SliderFloat("Translate X1", &m_MeshVector[0].m_TranslationVec.x, -100.f, 100.f);
-		ImGui::SliderFloat("Translate Y1", &m_MeshVector[0].m_TranslationVec.y, -100.f, 100.f);
-		ImGui::SliderFloat("Translate Z1", &m_MeshVector[0].m_TranslationVec.z, -1000.f, 1000.f);
-		ImGui::SliderFloat3("Model Rotation1", &m_MeshVector[0].m_RotationVec.x, 0.f, 360.f);
-		ImGui::SliderFloat("Scale1", &m_MeshVector[0].m_Scale, 0.f, 50.f);
+		ImGui::SliderFloat("Translate X1", &m_Models[0].m_TranslationVec.x, -100.f, 100.f);
+		ImGui::SliderFloat("Translate Y1", &m_Models[0].m_TranslationVec.y, -100.f, 100.f);
+		ImGui::SliderFloat("Translate Z1", &m_Models[0].m_TranslationVec.z, -1000.f, 1000.f);
+		ImGui::SliderFloat3("Model Rotation1", &m_Models[0].m_RotationVec.x, 0.f, 360.f);
+		ImGui::SliderFloat("Scale1", &m_Models[0].m_Scale, 0.f, 50.f);
 
-		ImGui::SliderFloat("Translate X2", &m_MeshVector[1].m_TranslationVec.x, -100.f, 100.f);
-		ImGui::SliderFloat("Translate Y2", &m_MeshVector[1].m_TranslationVec.y, -100.f, 100.f);
-		ImGui::SliderFloat("Translate Z2", &m_MeshVector[1].m_TranslationVec.z, -1000.f, 1000.f);
-		ImGui::SliderFloat3("Model Rotation2", &m_MeshVector[1].m_RotationVec.x, 0.f, 360.f);
-		ImGui::SliderFloat("Scale2", &m_MeshVector[1].m_Scale, 0.f, 50.f);
+		ImGui::SliderFloat("Translate X2", &m_Models[1].m_TranslationVec.x, -100.f, 100.f);
+		ImGui::SliderFloat("Translate Y2", &m_Models[1].m_TranslationVec.y, -100.f, 100.f);
+		ImGui::SliderFloat("Translate Z2", &m_Models[1].m_TranslationVec.z, -1000.f, 1000.f);
+		ImGui::SliderFloat3("Model Rotation2", &m_Models[1].m_RotationVec.x, 0.f, 360.f);
+		ImGui::SliderFloat("Scale2", &m_Models[1].m_Scale, 0.f, 50.f);
 
 		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
 		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
 		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
-		ImGui::SliderFloat("shininess1", &m_MeshVector[0].m_Material->m_Shininess, 1.f, 1000.f); 
-		ImGui::SliderFloat("specular1", &m_MeshVector[0].m_Material->m_Specular, 1.f, 100.f); 
-		ImGui::SliderFloat("diffuse1", &m_MeshVector[0].m_Material->m_Diffuse, 1.f, 100.f); 
-		ImGui::SliderFloat("ambient1", &m_MeshVector[0].m_Material->m_Ambient, 1.f, 100.f);
-		ImGui::SliderFloat("shininess2", &m_MeshVector[1].m_Material->m_Shininess, 1.f, 1000.f); 
-		ImGui::SliderFloat("specular2", &m_MeshVector[1].m_Material->m_Specular, 1.f, 100.f); 
-		ImGui::SliderFloat("diffuse2", &m_MeshVector[1].m_Material->m_Diffuse, 1.f, 100.f); 
-		ImGui::SliderFloat("ambient2", &m_MeshVector[1].m_Material->m_Ambient, 1.f, 100.f);
+		/*ImGui::SliderFloat("shininess1", &m_Models[0].m_Material->m_Shininess, 1.f, 1000.f); 
+		ImGui::SliderFloat("specular1", &m_Models[0].m_Material->m_Specular, 1.f, 100.f); 
+		ImGui::SliderFloat("diffuse1", &m_Models[0].m_Material->m_Diffuse, 1.f, 100.f); 
+		ImGui::SliderFloat("ambient1", &m_Models[0].m_Material->m_Ambient, 1.f, 100.f);
+		ImGui::SliderFloat("shininess2", &m_Models[1].m_Material->m_Shininess, 1.f, 1000.f); 
+		ImGui::SliderFloat("specular2", &m_Models[1].m_Material->m_Specular, 1.f, 100.f); 
+		ImGui::SliderFloat("diffuse2", &m_Models[1].m_Material->m_Diffuse, 1.f, 100.f); 
+		ImGui::SliderFloat("ambient2", &m_Models[1].m_Material->m_Ambient, 1.f, 100.f);*/
 
 		ImGui::SliderFloat("light_color0R", &light_color[0], 0.f, 20.f);
 		ImGui::SliderFloat("light_color0G", &light_color[1], 0.f, 20.f);
@@ -211,14 +210,6 @@ namespace test
 			ImGui::Text("Using Light");
 		else
 			ImGui::Text("Not Using Light");
-		//if(ImGui::Button("enable/disable texture"))
-		//{
-		//	m_UseTexture = (m_UseTexture == 0) ? 1 : 0;
-		//}
-		//if (m_UseTexture == 1)
-		//	ImGui::Text("Using Texture");
-		//else
-		//	ImGui::Text("Not Using Texture");
 		if(ImGui::Button("stop rotation"))
 		{
 			m_StopRotation = !m_StopRotation;
@@ -235,7 +226,6 @@ namespace test
 			ImGui::Text("Rotation Point light Going");
 		else
 			ImGui::Text("Rotation Point light Stopped");
-
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
