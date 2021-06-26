@@ -23,7 +23,7 @@ jobs:
       with:
         submodules: recursive
         
-    - name: Install xmllint
+    - name: Install mesa-dev
       run: sudo apt-get install xorg-dev libglu1-mesa-dev
 
     - name: Configure CMake

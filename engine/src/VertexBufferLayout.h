@@ -39,11 +39,12 @@ public:
 	inline unsigned int GetStride() const { return m_Stride; }
 };
 
-template<typename T>
-void VertexBufferLayout::Push(unsigned int count)
-{
-	static_assert(false, "");
-}
+// this throws error at compilation time using GCC, no errors using MSVC
+// template<typename T>
+// void VertexBufferLayout::Push(unsigned int count);
+//{
+	// static_assert(false, "");
+//}
 
 // inlined because they are included multiple times in the same translation unit, resulting in a linkage error. Inlining increases the size of the binary.
 template<>
