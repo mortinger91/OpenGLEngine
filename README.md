@@ -1,4 +1,5 @@
 # OpenGLEngine
+![build](https://github.com/mortinger91/OpenGLEngine/actions/workflows/cmake.yml/badge.svg)
 Work in progress 3D engine.
 
 
