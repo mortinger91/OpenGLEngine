@@ -38,9 +38,10 @@ target_compile_options(
 
     # GCC compiler options
     $<$<CXX_COMPILER_ID:GNU>:
+		-D DEBUG
     	-pthread
-    	-Wall
-		-Wextra
+    	# -Wall
+		# -Wextra
 		-Wunused
 		-g
 		-Wreorder

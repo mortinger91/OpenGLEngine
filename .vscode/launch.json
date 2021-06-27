@@ -5,7 +5,7 @@
 			"name": "DEBUG",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}/build/exec",
+			"program": "${workspaceFolder}/build/bin/exec",
 			"args": [],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",

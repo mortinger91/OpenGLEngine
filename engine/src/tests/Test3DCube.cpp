@@ -73,6 +73,14 @@ namespace test
 		mesh4.m_TranslationVec = glm::vec3(30.f, 0.f, 0.f);
 		model4.MoveMesh(mesh4);
 		m_Models.push_back(std::move(model4));
+
+		Model model5("Car");
+		Mesh mesh5("Car", resPath+"/meshes/car.obj");
+		mesh5.SetMaterial(m_Materials["teapot"]);
+		mesh5.m_Scale = 1000.f;
+		mesh5.m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
+		model5.MoveMesh(mesh5);
+		m_Models.push_back(std::move(model5));
 	}
 
 	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)

@@ -240,7 +240,7 @@ void Mesh::CreateModelMatrix(const glm::vec3& ModelTranslationVec, const glm::ve
 	Utility::CreateRotationGenericMatrix(matRotateY, m_RotationVec.y+ModelRotationVec.y, glm::vec3(0,1,0));
 	Utility::CreateRotationGenericMatrix(matRotateX, m_RotationVec.x+ModelRotationVec.x, glm::vec3(1,0,0));
 
-	CreateScalingMatrix(matScale, m_Scale+ModelScale);
+	CreateScalingMatrix(matScale, m_Scale*ModelScale);
 
 	m_ModelMatrix = matTranslate * matRotateY * matRotateZ * matRotateX * matScale;
 }

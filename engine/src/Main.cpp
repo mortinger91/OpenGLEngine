@@ -3,23 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-// #include "Renderer.h"
-// #include "VertexBuffer.h"
-// #include "VertexBufferLayout.h"
-// #include "IndexBuffer.h"
-// #include "VertexArray.h"
-// #include "Shader.h"
-// #include "Texture.h"
-
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
-#include "glm.hpp"
-#include "gtc/matrix_transform.hpp"
-#include "imgui.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
-
-// #include "vendorLibs.h"
+#include "vendorLibs.h"
 
 #include "tests/TestClearColor.h"
 #include "tests/Test3DCube.h"
