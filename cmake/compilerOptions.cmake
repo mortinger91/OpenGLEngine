@@ -36,14 +36,15 @@ target_compile_options(
     	>
     >
 
-    # GCC compiler options
+    # GCC C/C++ compiler options
     $<$<CXX_COMPILER_ID:GNU>:
 		-D DEBUG
     	-pthread
-    	# -Wall
+		-g
+
+		# -Wall
 		# -Wextra
 		-Wunused
-		-g
 		-Wreorder
 		-Wignored-qualifiers
 		-Wmissing-braces
@@ -52,7 +53,12 @@ target_compile_options(
 		-Wswitch-default
 		-Wuninitialized
 		-Wmissing-field-initializers
-    >
+	>
+	
+	# Specific options for C++
+	$<$<COMPILE_LANG_AND_ID:C,GNU>:
+	
+	>
     )
 
 # Linker options

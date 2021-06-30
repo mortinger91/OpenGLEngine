@@ -10,7 +10,7 @@ Build using CMAKE:<br/>
 3 - mkdir build<br/>
 4 - cd build<br/>
 5 - cmake ..<br/>
-6 - (optional)cmake --build .<br/>
+6 - (optional)cmake --build -v .<br/>
 
 
 Windows: Open OpenGLEngine/build/OpenGLEngine.sln, set "exec" as startup project.<br/>
