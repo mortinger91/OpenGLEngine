@@ -20,6 +20,7 @@ add_library(
 		src/VertexBuffer.h
 		src/VertexBufferLayout.h
 		src/Model.h
+		src/vendorLibs.h
 
 		src/libs/stb_image/stb_image.h
 		src/tests/Test.h
@@ -71,10 +72,8 @@ target_include_directories(
 		"src"
 		"src/libs"
 		"res"
-		"../vendor/glew-cmake/include"
-		"../vendor/glfw/include"
-		"../vendor/glm/glm"
-		"../vendor/imgui-cmake"
+		${CMAKE_SOURCE_DIR}/vendor/assimp/include
+		${PROJECT_BINARY_DIR}/vendor/assimp/include
 )
 
 set_target_properties(

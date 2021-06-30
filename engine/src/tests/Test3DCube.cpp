@@ -5,6 +5,39 @@
 #include "meshes/cube.h"
 #include "meshes/plane.h"
 #include "Utility.h"
+
+
+
+bool DoTheImportThing( const std::string& pFile) 
+{
+  // Create an instance of the Importer class
+  Assimp::Importer importer;
+
+  // And have it read the given file with some example postprocessing
+  // Usually - if speed is not the most important aspect for you - you'll
+  // probably to request more postprocessing than we do in this example.
+  const aiScene* scene = importer.ReadFile( pFile,
+    aiProcess_CalcTangentSpace       |
+    aiProcess_Triangulate            |
+    aiProcess_JoinIdenticalVertices  |
+    aiProcess_SortByPType);
+
+  // If the import failed, report it
+  if( !scene) {
+    //DoTheErrorLogging( importer.GetErrorString());
+    return false;
+  }
+
+  // Now we can access the file's contents.
+  //DoTheSceneProcessing( scene);
+
+
+
+  // We're done. Everything will be cleaned up by the importer destructor
+  return true;
+}
+
+
 namespace test
 {
 	Test3DCube::Test3DCube()
@@ -74,13 +107,15 @@ namespace test
 		model4.MoveMesh(mesh4);
 		m_Models.push_back(std::move(model4));
 
-		Model model5("Car");
-		Mesh mesh5("Car", resPath+"/meshes/car.obj");
-		mesh5.SetMaterial(m_Materials["teapot"]);
-		mesh5.m_Scale = 1000.f;
-		mesh5.m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
-		model5.MoveMesh(mesh5);
-		m_Models.push_back(std::move(model5));
+		DoTheImportThing(resPath+"/meshes/car.obj");
+
+		//Model model5("Car");
+		//Mesh mesh5("Car", resPath+"/meshes/car.obj");
+		//mesh5.SetMaterial(m_Materials["teapot"]);
+		//mesh5.m_Scale = 1000.f;
+		//mesh5.m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
+		//model5.MoveMesh(mesh5);
+		//m_Models.push_back(std::move(model5));
 	}
 
 	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)

@@ -54,7 +54,7 @@ project(${PROJECT_NAME}
 
 ### Language Options
 # C
-set(C_STANDARD_DEFAULT 11)
+set(C_STANDARD_DEFAULT 99)
 set(CMAKE_C_STANDARD ${C_STANDARD_DEFAULT})
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -83,6 +83,7 @@ target_link_libraries(
 		libglew_static
 		OpenGL::GL
 		glm::glm
+		assimp
 )
 
 include(build)
