@@ -88,6 +88,7 @@ void Mesh::parse(const char * filepath)
 	float minY = INFINITY, minZ = INFINITY;
 	float maxY = -INFINITY, maxZ = -INFINITY;
 
+	std::string pathString = std::string(filepath);
 	fp = fopen(filepath, "rb");
 
 	if (fp == NULL) 

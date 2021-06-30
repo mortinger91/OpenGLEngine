@@ -10,3 +10,6 @@
 [submodule "vendor/imgui-cmake"]
 	path = vendor/imgui-cmake
 	url = https://github.com/mortinger91/imgui-cmake.git
+[submodule "vendor/assimp"]
+	path = vendor/assimp
+	url = https://github.com/assimp/assimp.git

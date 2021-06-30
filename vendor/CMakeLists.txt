@@ -27,4 +27,14 @@ set(USE_GLU OFF CACHE BOOL "" FORCE)
 add_subdirectory(glew-cmake)
 set_target_properties(libglew_static PROPERTIES FOLDER vendor)
 
+# assimp
+message(STATUS "${Red}Configuring ASSIMP${ColourReset}")
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+add_subdirectory(assimp)
+set_target_properties(assimp PROPERTIES FOLDER vendor)
+
 message(STATUS "   ${Yellow}Finished configuring vendor libraries${ColourReset}")
