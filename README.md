@@ -1,5 +1,5 @@
 # OpenGLEngine
-![Build MSVC & G++](https://github.com/mortinger91/OpenGLEngine/actions/workflows/cmake.yml/badge.svg)<br/>
+![Compile using MSVC and g++](https://github.com/mortinger91/OpenGLEngine/actions/workflows/cmake.yml/badge.svg)<br/>
 Work in progress 3D engine.
 
 
@@ -10,7 +10,7 @@ Build using CMAKE:<br/>
 3 - mkdir build<br/>
 4 - cd build<br/>
 5 - cmake ..<br/>
-6 - (optional)cmake --build -v .<br/>
+6 - (optional)cmake --build . -v<br/>
 
 
 Windows: Open OpenGLEngine/build/OpenGLEngine.sln, set "exec" as startup project.<br/>
