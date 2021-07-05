@@ -6,35 +6,65 @@
 #include "meshes/plane.h"
 #include "Utility.h"
 
-
-
-bool DoTheImportThing( const std::string& pFile) 
+Model DoTheImportThing( const std::string& pFile, std::shared_ptr<Material> mat) 
 {
-  // Create an instance of the Importer class
-  Assimp::Importer importer;
+	// Create an instance of the Importer class
+	Assimp::Importer importer;
+	// And have it read the given file with some example postprocessing
+	// Usually - if speed is not the most important aspect for you - you'll
+	// probably to request more postprocessing than we do in this example.
+	const aiScene* scene = importer.ReadFile( pFile,
+		aiProcess_CalcTangentSpace       |
+		aiProcess_Triangulate            |
+		aiProcess_JoinIdenticalVertices  |
+		aiProcess_SortByPType);
 
-  // And have it read the given file with some example postprocessing
-  // Usually - if speed is not the most important aspect for you - you'll
-  // probably to request more postprocessing than we do in this example.
-  const aiScene* scene = importer.ReadFile( pFile,
-    aiProcess_CalcTangentSpace       |
-    aiProcess_Triangulate            |
-    aiProcess_JoinIdenticalVertices  |
-    aiProcess_SortByPType);
+	// If the import failed, report it
+	//if( !scene) {
+	//	//DoTheErrorLogging( importer.GetErrorString());
+	//	return false;
+	//}
 
-  // If the import failed, report it
-  if( !scene) {
-    //DoTheErrorLogging( importer.GetErrorString());
-    return false;
-  }
+	Model model("car");
 
-  // Now we can access the file's contents.
-  //DoTheSceneProcessing( scene);
+	for (int m = 0; m < scene->mNumMeshes; m++)
+	{
+		std::vector<glm::vec3> vertices;
+		std::vector<glm::vec3> colors;
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec2> texcoords;
+		std::vector<unsigned int> indices;
 
+		for (unsigned int i = 0; i < scene->mMeshes[m]->mNumVertices; ++i)
+		{
+			normals.push_back(glm::vec3(scene->mMeshes[m]->mNormals[i].x, scene->mMeshes[m]->mNormals[i].y, scene->mMeshes[m]->mNormals[i].z));
+			vertices.push_back(glm::vec3(scene->mMeshes[m]->mVertices[i].x, scene->mMeshes[m]->mVertices[i].y, scene->mMeshes[m]->mVertices[i].z));
+			colors.push_back(glm::vec3(scene->mMeshes[m]->mVertices[i].x, scene->mMeshes[m]->mVertices[i].y, scene->mMeshes[m]->mVertices[i].z));
+			texcoords.push_back(glm::vec2(0.f,0.f));
+		}
 
+		for (unsigned int i = 0; i < scene->mMeshes[m]->mNumFaces; ++i)
+		{
+			ASSERT(scene->mMeshes[m]->mFaces->mNumIndices == 3)
+			indices.push_back(scene->mMeshes[m]->mFaces[i].mIndices[0]);
+			indices.push_back(scene->mMeshes[m]->mFaces[i].mIndices[1]);
+			indices.push_back(scene->mMeshes[m]->mFaces[i].mIndices[2]);
+		}
 
-  // We're done. Everything will be cleaned up by the importer destructor
-  return true;
+		Mesh mesh("ciao", vertices, colors, normals, texcoords, indices);
+		mesh.SetMaterial(mat);
+		mesh.m_Scale = 1.f;
+		mesh.m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
+		model.MoveMesh(mesh);
+	}
+
+	//Cube::positions, Cube::colors, Cube::normals, Cube::texturesUnique, Cube::indices);
+
+	// Now we can access the file's contents.
+	//DoTheSceneProcessing( scene);
+
+	// We're done. Everything will be cleaned up by the importer destructor
+	return model;
 }
 
 
@@ -107,15 +137,8 @@ namespace test
 		model4.MoveMesh(mesh4);
 		m_Models.push_back(std::move(model4));
 
-		DoTheImportThing(resPath+"/meshes/car.obj");
-
-		//Model model5("Car");
-		//Mesh mesh5("Car", resPath+"/meshes/car.obj");
-		//mesh5.SetMaterial(m_Materials["teapot"]);
-		//mesh5.m_Scale = 1000.f;
-		//mesh5.m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
-		//model5.MoveMesh(mesh5);
-		//m_Models.push_back(std::move(model5));
+		Model model5 = DoTheImportThing(resPath+"/meshes/car.obj", m_Materials["teapot"]);
+		m_Models.push_back(std::move(model5));
 	}
 
 	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)
