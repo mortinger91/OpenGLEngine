@@ -21,8 +21,7 @@ Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_,
 	  sizeI(0)
 {
 	#ifdef DEBUG
-		std::string debug = "Called default mesh constructor of: " + name + "\n";
-		std::cout << debug;
+		std::cout << "Called default mesh constructor of: " + name + "\n";
 	#endif
 	init(threaded);
 }
@@ -199,8 +198,8 @@ void Mesh::init(bool threaded)
 	ConvertVectorsToArray(sizeV, sizeI);
 
 	#ifdef DEBUG
-	passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000000;
-		std::cout << "init of mesh: " << m_Name << ": " << passed << " seconds" << std::endl;
+	passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000;
+		std::cout << "init of mesh: " + m_Name + ": " + std::to_string(passed) + " ms\n";
 	#endif
 
 	if (!threaded)

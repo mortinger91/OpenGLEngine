@@ -1,12 +1,18 @@
 #include "Model.h"
 
 Model::Model(const std::string& name)
-	: m_Name(std::move(name)),
+	: m_Name(name),
 	  m_TranslationVec(0.f,0.f,0.f),
 	  m_RotationVec(0.f, 0.f, 0.f),
 	  m_Scale(1.f)
 {
 	
+}
+
+Model::Model(const std::string& name, const Model& model)
+	: Model(name)
+{
+	m_Meshes = model.m_Meshes;
 }
 
 // moves the mesh inside the mesh vector

@@ -9,6 +9,7 @@ class Model
 {
 public:
 	Model(const std::string& name);
+	Model(const std::string& name, const Model& model);
 	void MoveMesh(std::unique_ptr<Mesh> mesh) noexcept;
 	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
 	std::string GetName() const;
@@ -17,7 +18,7 @@ public:
 	glm::vec3 m_TranslationVec;
 	glm::vec3 m_RotationVec;
 	float m_Scale;
-	std::vector<std::unique_ptr<Mesh>> m_Meshes;
+	std::vector<std::shared_ptr<Mesh>> m_Meshes;
 
 private:
 	std::string m_Name;

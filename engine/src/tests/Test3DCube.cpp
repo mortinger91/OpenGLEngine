@@ -29,10 +29,9 @@ namespace test
 		std::string resPath;
 		Utility::GetPathToRes(resPath);
 
+		// Init of all the elements in the Test3DCube scene
 		// defining a shader
 		m_Shaders["default"] = std::make_shared<Shader>(resPath + "/shaders/Basic.vert", resPath + "/shaders/Basic.frag");
-
-		auto x = m_Shaders["default"];
 
 		// creating the materials
 		float ambient = 0.15f;
@@ -63,7 +62,13 @@ namespace test
 		model2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
 		m_Models.push_back(std::move(model2));
 
-		Model model3("Teapot");
+		Model model2b("Teapot");
+		ModelLoader::LoadModel(model2b, resPath + "/meshes/teapot.obj", m_Materials["teapot"]);
+		model2b.m_Scale = 6.f;
+		model2b.m_TranslationVec = glm::vec3(0.f, 0.f, 0.f);
+		m_Models.push_back(std::move(model2b));
+
+		Model model3("Plane");
 		auto mesh3 = std::make_unique<Mesh>("Plane", Plane::positions, 
 											//Plane::colors, 
 											Plane::normals, Plane::textures, Plane::indices);
@@ -85,7 +90,11 @@ namespace test
 		Model model5("Car");
 		ModelLoader::LoadModel(model5, resPath+"/meshes/car.obj", m_Materials["teapot"]);
 		model5.m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
-		m_Models.push_back(std::move(model5));
+		m_Models.push_back(Model("Car_0", model5));
+		m_Models.push_back(Model("Car_1", model5));
+		m_Models[m_Models.size()-1].m_TranslationVec = glm::vec3(-15.f, 0.f, 0.f);
+
+		std::cout << "Finished loading models" << std::endl;
 	}
 
 	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)
