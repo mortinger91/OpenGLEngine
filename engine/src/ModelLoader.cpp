@@ -22,8 +22,10 @@ std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int m
 	std::vector<glm::vec2> texcoords;
 	std::vector<unsigned int> indices;
 
+	ASSERT(scene->HasMeshes())
 	for (unsigned int i = 0; i < scene->mMeshes[meshIndex]->mNumVertices; ++i)
 	{
+		ASSERT(scene->mMeshes[meshIndex]->HasNormals())
 		normals.push_back(
 			glm::vec3(
 				scene->mMeshes[meshIndex]->mNormals[i].x, 
@@ -37,17 +39,35 @@ std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int m
 		//	glm::vec3(scene->mMeshes[meshIndex]->mVertices[i].x, 
 		//		scene->mMeshes[meshIndex]->mVertices[i].y, 
 		//		scene->mMeshes[meshIndex]->mVertices[i].z));
+
 		// TODO: add tex UV coordinates if present in the loaded object
+		// TEXTURES IF PRESENT
+		auto x5 = scene->mMeshes[meshIndex]->mNumUVComponents;
+		auto x1 = scene->mMeshes[meshIndex]->GetNumUVChannels();
+		auto x3 = scene->mMeshes[meshIndex]->mTextureCoords;
+
+		//auto x2 = scene->mMeshes[meshIndex]->HasTextureCoords();
+		auto x4 = scene->mMeshes[meshIndex]->mName;
+		auto x7 = scene->mMeshes[meshIndex]->mTextureCoordsNames;
+		auto x = scene->mMaterials[scene->mMeshes[meshIndex]->mMaterialIndex]->GetName();
+
 		texcoords.push_back(glm::vec2(0.f, 0.f));
 	}
 
 	for (unsigned int i = 0; i < scene->mMeshes[meshIndex]->mNumFaces; ++i)
 	{
+		ASSERT(scene->mMeshes[meshIndex]->HasFaces())
 		ASSERT(scene->mMeshes[meshIndex]->mFaces->mNumIndices == 3)
 		indices.push_back(scene->mMeshes[meshIndex]->mFaces[i].mIndices[0]);
 		indices.push_back(scene->mMeshes[meshIndex]->mFaces[i].mIndices[1]);
 		indices.push_back(scene->mMeshes[meshIndex]->mFaces[i].mIndices[2]);
 	}
+	
+	// auto x = scene->mMeshes[0]->HasTextureCoords(0);
+	// auto x2 = scene->mMeshes[0]->GetNumUVChannels();
+	// auto x3 = scene->HasTextures();
+	// auto x4 = scene->HasMaterials();
+	// auto x5 = scene->mMaterials[0]->GetTextureCount(aiTextureType::aiTextureType_DIFFUSE);
 
 	#ifdef DEBUG
 	passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000;

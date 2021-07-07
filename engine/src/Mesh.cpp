@@ -212,10 +212,13 @@ void Mesh::MakeVertexArray()
 	VertexBufferLayout layout;
 	// position of the vertices of the two triangles making up a square
 	// layout(location = 0) in vertex shader
+	// vertices
 	layout.Push<float>(3);
+	// normals
 	layout.Push<float>(3);
 	// removed color data from vertex
 	//layout.Push<float>(3);
+	// texture UV coordinates
 	layout.Push<float>(2);
 
 	// these operations must be done on main thread, context cannot be shared between threads

@@ -42,5 +42,6 @@ namespace test
 		glm::vec4 light_color1 = { 1.5f, 1.5f, 1.5f, 1.f };
 
 		float m_PointLightAngle;
+		unsigned int m_SelectedModel;
 	};
 }

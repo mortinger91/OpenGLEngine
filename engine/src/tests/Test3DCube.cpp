@@ -17,7 +17,8 @@ namespace test
 		  m_IsLight(1),
 		  m_StopRotation(true),
 		  m_RotatingPointLight(true),
-		  m_PointLightAngle(0)
+		  m_PointLightAngle(0),
+		  m_SelectedModel(0)
 	{
 		GLCall(glEnable(GL_BLEND));
 		// setting up a blend function, default would be src=0 dest=1 which means override old pixels with new ones
@@ -54,7 +55,7 @@ namespace test
 		model1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
 		m_Models.push_back(std::move(model1));
 
-		Model model2("Teapot");
+		Model model2("Teapot_0");
 		auto mesh2 = std::make_unique<Mesh>("Teapot", resPath+"/meshes/teapot.obj");
 		mesh2->SetMaterial(m_Materials["teapot"]);
 		mesh2->m_Scale = 12.f;
@@ -62,7 +63,7 @@ namespace test
 		model2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
 		m_Models.push_back(std::move(model2));
 
-		Model model2b("Teapot");
+		Model model2b("Teapot_1");
 		ModelLoader::LoadModel(model2b, resPath + "/meshes/teapot.obj", m_Materials["teapot"]);
 		model2b.m_Scale = 6.f;
 		model2b.m_TranslationVec = glm::vec3(0.f, 0.f, 0.f);
@@ -89,12 +90,15 @@ namespace test
 
 		Model model5("Car");
 		ModelLoader::LoadModel(model5, resPath+"/meshes/car.obj", m_Materials["teapot"]);
-		model5.m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
+
 		m_Models.push_back(Model("Car_0", model5));
+		m_Models[m_Models.size() - 1].m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
 		m_Models.push_back(Model("Car_1", model5));
 		m_Models[m_Models.size()-1].m_TranslationVec = glm::vec3(-15.f, 0.f, 0.f);
 
 		std::cout << "Finished loading models" << std::endl;
+
+		m_Camera->CreateViewMatrix();
 	}
 
 	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)
@@ -103,29 +107,35 @@ namespace test
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 		GLCall(glClear(GL_DEPTH_BUFFER_BIT));
 
+		bool cameraMoved = false;
 		// TODO: Move inputs to a input class
 		if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		{
 			m_Camera->RotateViewHorizontal(1.f);
+			cameraMoved = true;
 		}
 		if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		{
 			m_Camera->RotateViewHorizontal(-1.f);
+			cameraMoved = true;
 		}
 			
 		if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{
 			m_Camera->RotateViewVertical(1.f);
+			cameraMoved = true;
 		}
 		if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		{
 			m_Camera->RotateViewVertical(-1.f);
+			cameraMoved = true;
 		}
 
 		{
 			// TODO: cache these matrix and modify them only if the values are changed
 			// View matrix, common for all models and meshes
-			m_Camera->CreateViewMatrix();
+			if (cameraMoved)
+				m_Camera->CreateViewMatrix();
 			
 			glm::vec4 light0direction;
 			light0direction = m_Camera->m_ViewMatrix * light_direction;
@@ -133,9 +143,9 @@ namespace test
 			if (m_RotatingPointLight)
 			{
 				m_PointLightAngle+=0.1f;
+				Utility::NormalizeAngle(m_PointLightAngle);
 			}
 			glm::mat4 matRotateLight;
-			Utility::NormalizeAngle(m_PointLightAngle);
 			Utility::CreateRotationGenericMatrix(matRotateLight, m_PointLightAngle, glm::vec3(0.f, 1.f, 0.f));
 			light1position = m_Camera->m_ViewMatrix * matRotateLight * light_position1;
 
@@ -183,17 +193,11 @@ namespace test
 
 	void Test3DCube::OnImGuiRender()
 	{
-		ImGui::SliderFloat("Translate X1", &m_Models[0].m_TranslationVec.x, -100.f, 100.f);
-		ImGui::SliderFloat("Translate Y1", &m_Models[0].m_TranslationVec.y, -100.f, 100.f);
-		ImGui::SliderFloat("Translate Z1", &m_Models[0].m_TranslationVec.z, -1000.f, 1000.f);
-		ImGui::SliderFloat3("Model Rotation1", &m_Models[0].m_RotationVec.x, 0.f, 360.f);
-		ImGui::SliderFloat("Scale1", &m_Models[0].m_Scale, 0.f, 50.f);
-
-		ImGui::SliderFloat("Translate X2", &m_Models[1].m_TranslationVec.x, -100.f, 100.f);
-		ImGui::SliderFloat("Translate Y2", &m_Models[1].m_TranslationVec.y, -100.f, 100.f);
-		ImGui::SliderFloat("Translate Z2", &m_Models[1].m_TranslationVec.z, -1000.f, 1000.f);
-		ImGui::SliderFloat3("Model Rotation2", &m_Models[1].m_RotationVec.x, 0.f, 360.f);
-		ImGui::SliderFloat("Scale2", &m_Models[1].m_Scale, 0.f, 50.f);
+		ImGui::SliderFloat("Translate X", &m_Models[m_SelectedModel].m_TranslationVec.x, -100.f, 100.f);
+		ImGui::SliderFloat("Translate Y", &m_Models[m_SelectedModel].m_TranslationVec.y, -100.f, 100.f);
+		ImGui::SliderFloat("Translate Z", &m_Models[m_SelectedModel].m_TranslationVec.z, -1000.f, 1000.f);
+		ImGui::SliderFloat3("Model Rotation", &m_Models[m_SelectedModel].m_RotationVec.x, 0.f, 360.f);
+		ImGui::SliderFloat("Scale", &m_Models[m_SelectedModel].m_Scale, 0.f, 50.f);
 
 		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
 		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
@@ -206,6 +210,16 @@ namespace test
 		ImGui::SliderFloat("light_color1R", &light_color1[0], 0.f, 20.f);
 		ImGui::SliderFloat("light_color1G", &light_color1[1], 0.f, 20.f);
 		ImGui::SliderFloat("light_color1B", &light_color1[2], 0.f, 20.f);
+
+		if (ImGui::Button( ("Selected Model: "+ m_Models[m_SelectedModel].GetName()).c_str() ))
+		{
+			m_SelectedModel = m_SelectedModel>=m_Models.size()-1 ? 0 : m_SelectedModel+1;
+		}
+
+		if (m_UseOrtho)
+			ImGui::Text("Using Ortho");
+		else
+			ImGui::Text("Using Perspective");
 
 		if(ImGui::Button("change proj matrix"))
 		{
