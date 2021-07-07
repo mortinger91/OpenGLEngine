@@ -21,6 +21,7 @@ add_library(
 		src/VertexBufferLayout.h
 		src/Model.h
 		src/vendorLibs.h
+		src/ModelLoader.h
 
 		src/libs/stb_image/stb_image.h
 		src/tests/Test.h
@@ -38,6 +39,7 @@ add_library(
 		src/VertexArray.cpp
 		src/VertexBuffer.cpp
 		src/Model.cpp
+		src/ModelLoader.cpp
 
 		src/libs/stb_image/stb_image.cpp
 		src/tests/Test.cpp

@@ -9,9 +9,6 @@
 #include "Material.h"
 #include "Camera.h"
 #include "Model.h"
-//#include "Texture.h"
-//#include "IndexBuffer.h"
-//#include "VertexArray.h"
 
 namespace test
 {

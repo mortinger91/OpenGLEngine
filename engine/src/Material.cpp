@@ -28,7 +28,7 @@ void Material::Bind() const
 void Material::SetUniforms() const
 {
 	m_Shader->SetUniform1i("u_Texture", 0);
-	m_Shader->SetUniform1i("useTexture", 1);
+	//m_Shader->SetUniform1i("useTexture", 1);
 	m_Shader->SetUniform4fv("ambient", { m_Ambient, m_Ambient, m_Ambient, 1 });
 	m_Shader->SetUniform4fv("diffuse", { m_Diffuse, m_Diffuse, m_Diffuse, 1 });
 	m_Shader->SetUniform4fv("specular", { m_Specular, m_Specular, m_Specular, 1 });

@@ -1,56 +1,59 @@
+#include "Mesh.h"
+
 #include <iostream>
 #include <string>
-#include "Mesh.h"
+
 #include "VertexBufferLayout.h"
 #include "Utility.h"
 #include "Renderer.h"
 #include "Shader.h"
 
-Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesColors_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_) 
-	: m_Name(std::move(name)),
+Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, 
+		   //std::vector <glm::vec3> verticesColors_, 
+		   std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_, bool threaded) 
+	: m_Name(name),
 	  m_VerticesPositions(verticesPositions_),
-	  m_VerticesColors(verticesColors_),
+	  //m_VerticesColors(verticesColors_),
 	  m_VerticesNormals(verticesNormals_),
 	  m_VerticesTexCoords(verticesTexCoords_),
-	  m_VerticesIndices(verticesIndices_)
+	  m_VerticesIndices(verticesIndices_),
+	  sizeV(0),
+	  sizeI(0)
 {
 	#ifdef DEBUG
-		std::cout << "Called mesh constructor from vectors of:" << m_Name << std::endl;
+		std::string debug = "Called default mesh constructor of: " + name + "\n";
+		std::cout << debug;
 	#endif
-	init();
+	init(threaded);
 }
 
+// only used for teapot object, deprecated
 Mesh::Mesh(const std::string& name, const std::string& filepath)
 	: m_Name(name)
 {
 	#ifdef DEBUG
-		std::cout << "Called mesh constructor from file of:" << m_Name << std::endl;
+		std::cout << "Called mesh constructor from file of: " << m_Name << std::endl;
 	#endif
 	parse(filepath.c_str());
-	init();
+	init(false);
 }
 
-//// copy constructor
-//Mesh::Mesh(const Mesh& mesh)
-//	: m_Name(mesh.m_Name),
-//	  m_VerticesPositions(mesh.m_VerticesPositions),
-//	  m_VerticesColors(mesh.m_VerticesColors),
-//	  m_VerticesNormals(mesh.m_VerticesNormals),
-//	  m_VerticesTexCoords(mesh.m_VerticesTexCoords),
-//	  m_VerticesIndices(mesh.m_VerticesIndices)
-//{
-//	//std::cout << "Called mesh copy constructor of:" << m_Name << std::endl;
-//	init();
-//}
+Mesh::Mesh(const std::string& name, aiVector3D* vertices, aiVector3D* normals, unsigned int sizeVertices, aiFace* indices, unsigned int sizeIndices, bool threaded)
+	: m_Name(name)
+{
+
+
+
+}
 
 // move constructor
 Mesh::Mesh(Mesh&& mesh) noexcept
 	: m_Name(mesh.m_Name),
-	  m_VerticesPositions(mesh.m_VerticesPositions),
-	  m_VerticesColors(mesh.m_VerticesColors),
-	  m_VerticesNormals(mesh.m_VerticesNormals),
-	  m_VerticesTexCoords(mesh.m_VerticesTexCoords),
-	  m_VerticesIndices(mesh.m_VerticesIndices),
+	  //m_VerticesPositions(mesh.m_VerticesPositions),
+	  ////m_VerticesColors(mesh.m_VerticesColors),
+	  //m_VerticesNormals(mesh.m_VerticesNormals),
+	  //m_VerticesTexCoords(mesh.m_VerticesTexCoords),
+	  //m_VerticesIndices(mesh.m_VerticesIndices),
 	  m_VAO(std::move(mesh.m_VAO)),
 	  m_VertexBuffer(std::move(mesh.m_VertexBuffer)),
 	  m_IndexBuffer(std::move(mesh.m_IndexBuffer)),
@@ -114,7 +117,7 @@ void Mesh::parse(const char * filepath)
 			fscanf(fp, "%f %f %f", &x, &y, &z);
 			m_VerticesPositions.push_back(glm::vec3(x, y, z));
 
-			m_VerticesColors.push_back(glm::vec3(0.8f,0.3f,0.3f));
+			//m_VerticesColors.push_back(glm::vec3(0.8f,0.3f,0.3f));
 			m_VerticesTexCoords.push_back(glm::vec2(0.f,0.f));
 
 			if (y < minY) minY = y;
@@ -161,9 +164,9 @@ void Mesh::ConvertVectorsToArray(unsigned int& sizeV, unsigned int& sizeI)
 		arrayV[index++] = m_VerticesPositions[i].y;
 		arrayV[index++] = m_VerticesPositions[i].z;
 
-		arrayV[index++] = m_VerticesColors[i].x;
-		arrayV[index++] = m_VerticesColors[i].y;
-		arrayV[index++] = m_VerticesColors[i].z;
+		//arrayV[index++] = m_VerticesColors[i].x;
+		//arrayV[index++] = m_VerticesColors[i].y;
+		//arrayV[index++] = m_VerticesColors[i].z;
 
 		arrayV[index++] = m_VerticesNormals[i].x;
 		arrayV[index++] = m_VerticesNormals[i].y;
@@ -180,31 +183,49 @@ void Mesh::ConvertVectorsToArray(unsigned int& sizeV, unsigned int& sizeI)
 	}
 }
 
-void Mesh::init()
+void Mesh::init(bool threaded)
 {
+	#ifdef DEBUG
+		long double start;
+		long double passed;
+		start = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	#endif
+
 	m_TranslationVec = glm::vec3(0.f, 0.f, 0.f);
 	m_RotationVec = glm::vec3(0.f, 0.f, 0.f);
 	m_Scale = 1.f;
 	m_CustomTransform = glm::mat4(1.f);
 
-	// initializing vertex array
-	m_VAO = std::make_unique<VertexArray>();
-
-	unsigned int sizeV;
-	unsigned int sizeI;
 	ConvertVectorsToArray(sizeV, sizeI);
 
-	// initializing vertex buffer
-	m_VertexBuffer = std::make_unique<VertexBuffer>(static_cast<const void*>(arrayV), static_cast<unsigned int>(sizeV * sizeof(float)));
-	
+	#ifdef DEBUG
+	passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000000;
+		std::cout << "init of mesh: " << m_Name << ": " << passed << " seconds" << std::endl;
+	#endif
+
+	if (!threaded)
+		MakeVertexArray();
+}
+
+void Mesh::MakeVertexArray()
+{
 	// initializing vertex buffer layout
 	VertexBufferLayout layout;
 	// position of the vertices of the two triangles making up a square
 	// layout(location = 0) in vertex shader
 	layout.Push<float>(3);
 	layout.Push<float>(3);
-	layout.Push<float>(3);
+	// removed color data from vertex
+	//layout.Push<float>(3);
 	layout.Push<float>(2);
+
+	// these operations must be done on main thread, context cannot be shared between threads
+	// initializing vertex array
+	m_VAO = std::make_unique<VertexArray>();
+
+	// initializing vertex buffer
+	m_VertexBuffer = std::make_unique<VertexBuffer>(static_cast<const void*>(arrayV), static_cast<unsigned int>(sizeV * sizeof(float)));
+
 	// adding vertex buffer and layout to vertex array
 	m_VAO->AddBuffer(*m_VertexBuffer, layout);
 
@@ -256,7 +277,7 @@ void Mesh::Bind() const
 void Mesh::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale)
 {
 	Renderer renderer;
-	m_Material->Bind();
+	Bind();
 
 	glm::mat4 mv;
 	glm::mat4 mvp;

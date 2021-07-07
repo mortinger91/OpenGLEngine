@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include <memory>
 #include "Mesh.h"
@@ -7,14 +9,15 @@ class Model
 {
 public:
 	Model(const std::string& name);
-	void MoveMesh(Mesh& mesh) noexcept;
+	void MoveMesh(std::unique_ptr<Mesh> mesh) noexcept;
 	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
+	std::string GetName() const;
 
 	// these vector are applied to all the meshes composing the model, they are the actual model matrix of the whole model
 	glm::vec3 m_TranslationVec;
 	glm::vec3 m_RotationVec;
 	float m_Scale;
-	std::vector<Mesh> m_Meshes;
+	std::vector<std::unique_ptr<Mesh>> m_Meshes;
 
 private:
 	std::string m_Name;

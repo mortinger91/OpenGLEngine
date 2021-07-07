@@ -10,15 +10,20 @@ Model::Model(const std::string& name)
 }
 
 // moves the mesh inside the mesh vector
-void Model::MoveMesh(Mesh& mesh) noexcept
+void Model::MoveMesh(std::unique_ptr<Mesh> mesh) noexcept
 {
 	m_Meshes.push_back(std::move(mesh));
 }
 
 void Model::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
 {
-	for (Mesh& mesh : m_Meshes)
+	for (auto& mesh : m_Meshes)
 	{
-		mesh.Draw(viewMatrix, projMatrix, m_TranslationVec, m_RotationVec, m_Scale);
+		mesh->Draw(viewMatrix, projMatrix, m_TranslationVec, m_RotationVec, m_Scale);
 	}
+}
+
+std::string Model::GetName() const
+{
+	return m_Name;
 }

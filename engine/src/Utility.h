@@ -1,7 +1,9 @@
 #pragma once
+
 #ifndef RESPATH
 	#include <filesystem>
 #endif
+
 #include <string>
 #include <iostream>
 #include <algorithm>
@@ -170,7 +172,7 @@ public:
 			#endif
 		#else
 			// override respath function if a custom path is defined as a preprocessor directive
-			resPath = RESPATH;
+			resString = RESPATH;
 		#endif
 		return result;
 	}

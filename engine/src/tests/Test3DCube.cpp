@@ -5,68 +5,7 @@
 #include "meshes/cube.h"
 #include "meshes/plane.h"
 #include "Utility.h"
-
-Model DoTheImportThing( const std::string& pFile, std::shared_ptr<Material> mat) 
-{
-	// Create an instance of the Importer class
-	Assimp::Importer importer;
-	// And have it read the given file with some example postprocessing
-	// Usually - if speed is not the most important aspect for you - you'll
-	// probably to request more postprocessing than we do in this example.
-	const aiScene* scene = importer.ReadFile( pFile,
-		aiProcess_CalcTangentSpace       |
-		aiProcess_Triangulate            |
-		aiProcess_JoinIdenticalVertices  |
-		aiProcess_SortByPType);
-
-	// If the import failed, report it
-	//if( !scene) {
-	//	//DoTheErrorLogging( importer.GetErrorString());
-	//	return false;
-	//}
-
-	Model model("car");
-
-	for (int m = 0; m < scene->mNumMeshes; m++)
-	{
-		std::vector<glm::vec3> vertices;
-		std::vector<glm::vec3> colors;
-		std::vector<glm::vec3> normals;
-		std::vector<glm::vec2> texcoords;
-		std::vector<unsigned int> indices;
-
-		for (unsigned int i = 0; i < scene->mMeshes[m]->mNumVertices; ++i)
-		{
-			normals.push_back(glm::vec3(scene->mMeshes[m]->mNormals[i].x, scene->mMeshes[m]->mNormals[i].y, scene->mMeshes[m]->mNormals[i].z));
-			vertices.push_back(glm::vec3(scene->mMeshes[m]->mVertices[i].x, scene->mMeshes[m]->mVertices[i].y, scene->mMeshes[m]->mVertices[i].z));
-			colors.push_back(glm::vec3(scene->mMeshes[m]->mVertices[i].x, scene->mMeshes[m]->mVertices[i].y, scene->mMeshes[m]->mVertices[i].z));
-			texcoords.push_back(glm::vec2(0.f,0.f));
-		}
-
-		for (unsigned int i = 0; i < scene->mMeshes[m]->mNumFaces; ++i)
-		{
-			ASSERT(scene->mMeshes[m]->mFaces->mNumIndices == 3)
-			indices.push_back(scene->mMeshes[m]->mFaces[i].mIndices[0]);
-			indices.push_back(scene->mMeshes[m]->mFaces[i].mIndices[1]);
-			indices.push_back(scene->mMeshes[m]->mFaces[i].mIndices[2]);
-		}
-
-		Mesh mesh("ciao", vertices, colors, normals, texcoords, indices);
-		mesh.SetMaterial(mat);
-		mesh.m_Scale = 1.f;
-		mesh.m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
-		model.MoveMesh(mesh);
-	}
-
-	//Cube::positions, Cube::colors, Cube::normals, Cube::texturesUnique, Cube::indices);
-
-	// Now we can access the file's contents.
-	//DoTheSceneProcessing( scene);
-
-	// We're done. Everything will be cleaned up by the importer destructor
-	return model;
-}
-
+#include "ModelLoader.h"
 
 namespace test
 {
@@ -107,37 +46,45 @@ namespace test
 
 		// creating the models
 		Model model1("Cube");
-		Mesh mesh1("Cube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUVs, Cube::indices);
-		mesh1.SetMaterial(m_Materials["cubeuv"]);
-		mesh1.m_Scale = 6.f;
-		mesh1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
-		model1.MoveMesh(mesh1);
+		auto mesh1 = std::make_unique<Mesh>("Cube", Cube::positions, 
+											//Cube::colors, 
+											Cube::normals, Cube::texturesUVs, Cube::indices);
+		mesh1->SetMaterial(m_Materials["cubeuv"]);
+		mesh1->m_Scale = 6.f;
+		model1.MoveMesh(std::move(mesh1));
+		model1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
 		m_Models.push_back(std::move(model1));
 
 		Model model2("Teapot");
-		Mesh mesh2("Teapot", resPath+"/meshes/teapot.obj");
-		mesh2.SetMaterial(m_Materials["teapot"]);
-		mesh2.m_Scale = 12.f;
-		mesh2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
-		model2.MoveMesh(mesh2);
+		auto mesh2 = std::make_unique<Mesh>("Teapot", resPath+"/meshes/teapot.obj");
+		mesh2->SetMaterial(m_Materials["teapot"]);
+		mesh2->m_Scale = 12.f;
+		model2.MoveMesh(std::move(mesh2));
+		model2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
 		m_Models.push_back(std::move(model2));
 
 		Model model3("Teapot");
-		Mesh mesh3("Plane", Plane::positions, Plane::colors, Plane::normals, Plane::textures, Plane::indices);
-		mesh3.SetMaterial(m_Materials["plane"]);
-		mesh3.m_Scale = 500.f;
-		mesh3.m_TranslationVec = glm::vec3(0.f, -10.f, 0.f);
-		model3.MoveMesh(mesh3);
+		auto mesh3 = std::make_unique<Mesh>("Plane", Plane::positions, 
+											//Plane::colors, 
+											Plane::normals, Plane::textures, Plane::indices);
+		mesh3->SetMaterial(m_Materials["plane"]);
+		mesh3->m_Scale = 500.f;
+		model3.MoveMesh(std::move(mesh3));
+		model3.m_TranslationVec = glm::vec3(0.f, -10.f, 0.f);
 		m_Models.push_back(std::move(model3));
 
 		Model model4("PointLightCube");
-		Mesh mesh4("PointLightCube", Cube::positions, Cube::colors, Cube::normals, Cube::texturesUnique, Cube::indices);
-		mesh4.SetMaterial(m_Materials["white"]);
-		mesh4.m_TranslationVec = glm::vec3(30.f, 0.f, 0.f);
-		model4.MoveMesh(mesh4);
+		auto mesh4 = std::make_unique<Mesh>("PointLightCube", Cube::positions, 
+											//Cube::colors, 
+											Cube::normals, Cube::texturesUnique, Cube::indices);
+		mesh4->SetMaterial(m_Materials["white"]);
+		model4.MoveMesh(std::move(mesh4));
+		model4.m_TranslationVec = glm::vec3(30.f, 0.f, 0.f);
 		m_Models.push_back(std::move(model4));
 
-		Model model5 = DoTheImportThing(resPath+"/meshes/car.obj", m_Materials["teapot"]);
+		Model model5("Car");
+		ModelLoader::LoadModel(model5, resPath+"/meshes/car.obj", m_Materials["teapot"]);
+		model5.m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
 		m_Models.push_back(std::move(model5));
 	}
 
@@ -215,9 +162,9 @@ namespace test
 			for(int i = 0; i < m_Models.size(); ++i)
 			{
 				// only for point light mesh
-				if (i == 3)
+				if (m_Models[i].GetName() == "PointLightCube")
 				{
-					m_Models[i].m_Meshes[0].m_CustomTransform = matRotateLight;
+					m_Models[i].m_Meshes[0]->m_CustomTransform = matRotateLight;
 				}
 
 				m_Models[i].Draw(m_Camera->m_ViewMatrix, m_ProjMatrix);
@@ -242,14 +189,6 @@ namespace test
 		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
 		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
 		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
-		/*ImGui::SliderFloat("shininess1", &m_Models[0].m_Material->m_Shininess, 1.f, 1000.f); 
-		ImGui::SliderFloat("specular1", &m_Models[0].m_Material->m_Specular, 1.f, 100.f); 
-		ImGui::SliderFloat("diffuse1", &m_Models[0].m_Material->m_Diffuse, 1.f, 100.f); 
-		ImGui::SliderFloat("ambient1", &m_Models[0].m_Material->m_Ambient, 1.f, 100.f);
-		ImGui::SliderFloat("shininess2", &m_Models[1].m_Material->m_Shininess, 1.f, 1000.f); 
-		ImGui::SliderFloat("specular2", &m_Models[1].m_Material->m_Specular, 1.f, 100.f); 
-		ImGui::SliderFloat("diffuse2", &m_Models[1].m_Material->m_Diffuse, 1.f, 100.f); 
-		ImGui::SliderFloat("ambient2", &m_Models[1].m_Material->m_Ambient, 1.f, 100.f);*/
 
 		ImGui::SliderFloat("light_color0R", &light_color[0], 0.f, 20.f);
 		ImGui::SliderFloat("light_color0G", &light_color[1], 0.f, 20.f);
