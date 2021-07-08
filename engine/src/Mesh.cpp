@@ -276,7 +276,7 @@ void Mesh::Bind() const
 	m_Material->Bind();
 }
 
-void Mesh::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale)
+void Mesh::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale, bool UseTextures)
 {
 	Renderer renderer;
 	Bind();
@@ -292,6 +292,7 @@ void Mesh::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const 
 
 	m_Material->m_Shader->SetUniformMat4f("u_MV", mv);
 	m_Material->m_Shader->SetUniformMat4f("u_MVP", mvp);
+	m_Material->m_Shader->SetUniform1i("useTexture",UseTextures);
 	// TODO: create a batch renderer:
 		// calling draw does not draw the object but add it in a queue
 		// another command is implemented to render the whole frame

@@ -40,7 +40,9 @@ namespace test
 		m_Materials["teapot"] = std::make_shared<Material>(resPath + "/textures/metal.png", 200.f, 5.f, 5.f, ambient, m_Shaders["default"]);
 		m_Materials["plane"] = std::make_shared<Material>(resPath + "/textures/metal.png", 500.f, 0.75f, 0.2f, ambient, m_Shaders["default"]);
 		m_Materials["white"] = std::make_shared<Material>(resPath + "/textures/white.png", 1.f, 1.f, 1.f, 300.f, m_Shaders["default"]);
-
+		m_Materials["medkit_base"] = std::make_shared<Material>(resPath + "/textures/medkit_BaseColor.png", 1.f, 1.f, 1.f, 1.f, m_Shaders["default"]);
+		m_Materials["medkit_light_base"] = std::make_shared<Material>(resPath + "/textures/medkit_Light_BaseColor.png", 1.f, 1.f, 1.f, 1.f, m_Shaders["default"]);
+		
 		// creating the camera
 		m_Camera = std::make_unique<Camera>(glm::vec3(0.f, 0.f, 60.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 
@@ -95,6 +97,13 @@ namespace test
 		m_Models[m_Models.size() - 1].m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
 		m_Models.push_back(Model("Car_1", model5));
 		m_Models[m_Models.size()-1].m_TranslationVec = glm::vec3(-15.f, 0.f, 0.f);
+
+		Model model6("Medkit");
+		ModelLoader::LoadModel(model6, resPath+"/meshes/medkit.fbx", m_Materials["medkit_base"]);
+		m_Models.push_back(Model("Medkit", model6));
+		m_Models[m_Models.size() - 1].m_TranslationVec = glm::vec3(0.f, 0.f, 10.f);
+		m_Models[m_Models.size() - 1].m_Scale = 10.f;
+		m_Models[m_Models.size() - 1].m_RotationVec.x = 270.f;
 
 		std::cout << "Finished loading models" << std::endl;
 
@@ -199,9 +208,14 @@ namespace test
 		ImGui::SliderFloat3("Model Rotation", &m_Models[m_SelectedModel].m_RotationVec.x, 0.f, 360.f);
 		ImGui::SliderFloat("Scale", &m_Models[m_SelectedModel].m_Scale, 0.f, 50.f);
 
-		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
-		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
-		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
+		ImGui::SliderFloat("shininess1", &m_Models[m_SelectedModel].m_Meshes[0]->m_Material->m_Shininess, 1.f, 1000.f); 
+		ImGui::SliderFloat("specular1", &m_Models[m_SelectedModel].m_Meshes[0]->m_Material->m_Specular, 1.f, 100.f); 
+		ImGui::SliderFloat("diffuse1", &m_Models[m_SelectedModel].m_Meshes[0]->m_Material->m_Diffuse, 1.f, 100.f); 
+		ImGui::SliderFloat("ambient1", &m_Models[m_SelectedModel].m_Meshes[0]->m_Material->m_Ambient, 1.f, 100.f);
+
+		//ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
+		//ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
+		//ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
 
 		ImGui::SliderFloat("light_color0R", &light_color[0], 0.f, 20.f);
 		ImGui::SliderFloat("light_color0G", &light_color[1], 0.f, 20.f);
@@ -215,7 +229,11 @@ namespace test
 		{
 			m_SelectedModel = m_SelectedModel>=m_Models.size()-1 ? 0 : m_SelectedModel+1;
 		}
-
+		std::string usingTex = m_Models[m_SelectedModel].m_UseTextures ? std::string("Yes") : std::string("No");
+		if(ImGui::Button( ("Use Textures: "+usingTex).c_str() ))
+		{
+			m_Models[m_SelectedModel].m_UseTextures = !m_Models[m_SelectedModel].m_UseTextures;
+		}
 		if (m_UseOrtho)
 			ImGui::Text("Using Ortho");
 		else

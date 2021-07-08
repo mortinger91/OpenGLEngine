@@ -1,4 +1,5 @@
 #include "ModelLoader.h"
+#include "Utility.h"
 
 #include <future>
 #include <chrono>
@@ -23,6 +24,9 @@ std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int m
 	std::vector<unsigned int> indices;
 
 	ASSERT(scene->HasMeshes())
+	bool getUVs = false;
+	if (scene->mMeshes[meshIndex]->GetNumUVChannels() == 1 && scene->mMeshes[meshIndex]->mNumUVComponents[0] == 2)
+		getUVs = true;
 	for (unsigned int i = 0; i < scene->mMeshes[meshIndex]->mNumVertices; ++i)
 	{
 		ASSERT(scene->mMeshes[meshIndex]->HasNormals())
@@ -40,18 +44,17 @@ std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int m
 		//		scene->mMeshes[meshIndex]->mVertices[i].y, 
 		//		scene->mMeshes[meshIndex]->mVertices[i].z));
 
-		// TODO: add tex UV coordinates if present in the loaded object
-		// TEXTURES IF PRESENT
-		auto x5 = scene->mMeshes[meshIndex]->mNumUVComponents;
-		auto x1 = scene->mMeshes[meshIndex]->GetNumUVChannels();
-		auto x3 = scene->mMeshes[meshIndex]->mTextureCoords;
-
-		//auto x2 = scene->mMeshes[meshIndex]->HasTextureCoords();
-		auto x4 = scene->mMeshes[meshIndex]->mName;
-		auto x7 = scene->mMeshes[meshIndex]->mTextureCoordsNames;
 		auto x = scene->mMaterials[scene->mMeshes[meshIndex]->mMaterialIndex]->GetName();
-
-		texcoords.push_back(glm::vec2(0.f, 0.f));
+		//auto x2 = scene->mMeshes[meshIndex]->HasTextureCoords();
+		auto x7 = scene->mMeshes[meshIndex]->mTextureCoordsNames;
+		if (getUVs)
+		{
+			texcoords.push_back(glm::vec2(scene->mMeshes[meshIndex]->mTextureCoords[0][i].x, scene->mMeshes[meshIndex]->mTextureCoords[0][i].y));
+		}
+		else
+		{
+			texcoords.push_back(glm::vec2(0.f, 0.f));
+		}
 	}
 
 	for (unsigned int i = 0; i < scene->mMeshes[meshIndex]->mNumFaces; ++i)
@@ -99,7 +102,7 @@ bool ModelLoader::LoadModel(Model& model, const std::string& pFile, std::shared_
 	);
 	#ifdef DEBUG
 	passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000;
-		std::cout << "ReadFile of model: " << model.GetName() << ": " << passed << " ms" << std::endl;
+		std::cout << REDTEXT("   ReadFile of model: " + model.GetName() + ": " + std::to_string(passed) + " ms\n");
 	#endif
 
 	#ifdef DEBUG
@@ -142,7 +145,7 @@ bool ModelLoader::LoadModel(Model& model, const std::string& pFile, std::shared_
 
 	#ifdef DEBUG
 		passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000;
-		std::cout << "   LoadModel excluded ReadFile of model: " << model.GetName() << ": " << passed << " ms" << std::endl;
+		std::cout << REDTEXT("   LoadModel excluded ReadFile of model: " + model.GetName() + ": " + std::to_string(passed) + " ms\n");
 	#endif
 
 	// We're done. Everything will be cleaned up by the importer destructor

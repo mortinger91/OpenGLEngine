@@ -10,7 +10,7 @@ in vec2 v_TexCoord;
 out vec4 color;
 
 uniform sampler2D u_Texture;
-//uniform int useTexture;
+uniform int useTexture;
 
 // light 0 is directional, light 1 is a point light.
 uniform int islight;
@@ -43,14 +43,14 @@ vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in v
 void main()
 {
 	vec4 fragmentColor;
-	//if (useTexture == 1)
-	//{
+	if (useTexture == 1)
+	{
 		fragmentColor = texture(u_Texture, v_TexCoord);
-	//}
-	//else
-	//{
-	//	fragmentColor = vec4(v_Color, 1.f);
-	//}
+	}
+	else
+	{
+		fragmentColor = vec4(0.1f, 0.8f, 0.1f, 1.f);
+	}
 	if (islight == 1)
 	{
 		vec3 mypos = v_Vertex.xyz / v_Vertex.w ; // Dehomogenize current location

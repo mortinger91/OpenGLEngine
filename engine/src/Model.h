@@ -20,6 +20,7 @@ public:
 	float m_Scale;
 	std::vector<std::shared_ptr<Mesh>> m_Meshes;
 
+	bool m_UseTextures;
 private:
 	std::string m_Name;
 	// the translation, rotation and scale vector of the meshes are relative to the model center, they perform the mesh->model transformation

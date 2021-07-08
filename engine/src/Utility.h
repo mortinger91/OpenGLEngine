@@ -8,6 +8,10 @@
 #include <iostream>
 #include <algorithm>
 
+#define REDTEXT(x) std::string("\033[31m")+x+std::string("\033[0m")
+#define GREENTEXT(x) std::string("\033[32m")+x+std::string("\033[0m")
+#define YELLOWTEXT(x) std::string("\033[33m")+x+std::string("\033[0m")
+
 class Utility
 {
 public:

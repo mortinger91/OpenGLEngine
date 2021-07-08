@@ -16,8 +16,8 @@ public:
 	void Bind() const;
 	void UpdateUniforms(float shininess, float specular, float diffuse, float ambient);
 
+	float m_Shininess, m_Specular, m_Diffuse, m_Ambient;
 private:
 	Texture m_Texture;
-	float m_Shininess, m_Specular, m_Diffuse, m_Ambient;
 	void SetUniforms() const;
 };

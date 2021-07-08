@@ -67,5 +67,5 @@ public:
 	void CreateModelMatrix(const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale);
 
 	void Bind() const;
-	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale);
+	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale, bool UseTextures);
 };

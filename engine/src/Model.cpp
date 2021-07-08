@@ -4,7 +4,8 @@ Model::Model(const std::string& name)
 	: m_Name(name),
 	  m_TranslationVec(0.f,0.f,0.f),
 	  m_RotationVec(0.f, 0.f, 0.f),
-	  m_Scale(1.f)
+	  m_Scale(1.f),
+	  m_UseTextures(true)
 {
 	
 }
@@ -25,7 +26,7 @@ void Model::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
 {
 	for (auto& mesh : m_Meshes)
 	{
-		mesh->Draw(viewMatrix, projMatrix, m_TranslationVec, m_RotationVec, m_Scale);
+		mesh->Draw(viewMatrix, projMatrix, m_TranslationVec, m_RotationVec, m_Scale, m_UseTextures);
 	}
 }
 
