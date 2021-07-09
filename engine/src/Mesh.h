@@ -21,7 +21,6 @@ class Mesh
 private:
 	std::string m_Name;
 	std::vector <glm::vec3> m_VerticesPositions;
-	//std::vector <glm::vec3> m_VerticesColors;
 	std::vector <glm::vec3> m_VerticesNormals;
 	std::vector <glm::vec2> m_VerticesTexCoords;
 	std::vector <unsigned int> m_VerticesIndices;
@@ -37,9 +36,7 @@ private:
 	void CreateScalingMatrix(glm::mat4 &mat, float scale);
 
 public:
-	Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, 
-		 //std::vector <glm::vec3> verticesColors_, 
-		 std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_, bool threaded = false);
+	Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_, bool threaded = false);
 	Mesh(const std::string& name, const std::string& filepath);
 	// assimp constructor
 	Mesh(const std::string& name, aiVector3D* vertices, aiVector3D* normals, unsigned int sizeVertices, aiFace* indices, unsigned int sizeIndices, bool threaded = false);

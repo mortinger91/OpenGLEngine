@@ -48,9 +48,7 @@ namespace test
 
 		// creating the models
 		Model model1("Cube");
-		auto mesh1 = std::make_unique<Mesh>("Cube", Cube::positions, 
-											//Cube::colors, 
-											Cube::normals, Cube::texturesUVs, Cube::indices);
+		auto mesh1 = std::make_unique<Mesh>("Cube", Cube::positions, Cube::normals, Cube::texturesUVs, Cube::indices);
 		mesh1->SetMaterial(m_Materials["cubeuv"]);
 		mesh1->m_Scale = 6.f;
 		model1.MoveMesh(std::move(mesh1));
@@ -66,15 +64,13 @@ namespace test
 		m_Models.push_back(std::move(model2));
 
 		Model model2b("Teapot_1");
-		ModelLoader::LoadModel(model2b, resPath + "/meshes/teapot.obj", m_Materials["teapot"]);
+		ModelLoader::LoadModel(model2b, resPath + "/meshes/teapot.obj", {m_Materials["teapot"]}, {0});
 		model2b.m_Scale = 6.f;
 		model2b.m_TranslationVec = glm::vec3(0.f, 0.f, 0.f);
 		m_Models.push_back(std::move(model2b));
 
 		Model model3("Plane");
-		auto mesh3 = std::make_unique<Mesh>("Plane", Plane::positions, 
-											//Plane::colors, 
-											Plane::normals, Plane::textures, Plane::indices);
+		auto mesh3 = std::make_unique<Mesh>("Plane", Plane::positions, Plane::normals, Plane::textures, Plane::indices);
 		mesh3->SetMaterial(m_Materials["plane"]);
 		mesh3->m_Scale = 500.f;
 		model3.MoveMesh(std::move(mesh3));
@@ -82,29 +78,27 @@ namespace test
 		m_Models.push_back(std::move(model3));
 
 		Model model4("PointLightCube");
-		auto mesh4 = std::make_unique<Mesh>("PointLightCube", Cube::positions, 
-											//Cube::colors, 
-											Cube::normals, Cube::texturesUnique, Cube::indices);
+		auto mesh4 = std::make_unique<Mesh>("PointLightCube", Cube::positions, Cube::normals, Cube::texturesUnique, Cube::indices);
 		mesh4->SetMaterial(m_Materials["white"]);
 		model4.MoveMesh(std::move(mesh4));
 		model4.m_TranslationVec = glm::vec3(30.f, 0.f, 0.f);
 		m_Models.push_back(std::move(model4));
 
 		Model model5("Car");
-		ModelLoader::LoadModel(model5, resPath+"/meshes/car.obj", m_Materials["teapot"]);
+		ModelLoader::LoadModel(model5, resPath+"/meshes/car.obj", {m_Materials["teapot"],m_Materials["white"]}, {0,1,0,0,0,1,1,0,0,0,0});
 
 		m_Models.push_back(Model("Car_0", model5));
 		m_Models[m_Models.size() - 1].m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
 		m_Models.push_back(Model("Car_1", model5));
 		m_Models[m_Models.size()-1].m_TranslationVec = glm::vec3(-15.f, 0.f, 0.f);
-
+		
 		Model model6("Medkit");
-		ModelLoader::LoadModel(model6, resPath+"/meshes/medkit.fbx", m_Materials["medkit_base"]);
+		ModelLoader::LoadModel(model6, resPath+"/meshes/medkit.fbx", {m_Materials["medkit_base"], m_Materials["medkit_light_base"]}, {1, 0});
 		m_Models.push_back(Model("Medkit", model6));
 		m_Models[m_Models.size() - 1].m_TranslationVec = glm::vec3(0.f, 0.f, 10.f);
 		m_Models[m_Models.size() - 1].m_Scale = 10.f;
 		m_Models[m_Models.size() - 1].m_RotationVec.x = 270.f;
-
+		
 		std::cout << "Finished loading models" << std::endl;
 
 		m_Camera->CreateViewMatrix();
@@ -215,7 +209,7 @@ namespace test
 
 		//ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
 		//ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
-		//ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
+		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
 
 		ImGui::SliderFloat("light_color0R", &light_color[0], 0.f, 20.f);
 		ImGui::SliderFloat("light_color0G", &light_color[1], 0.f, 20.f);

@@ -24,5 +24,4 @@ public:
 private:
 	std::string m_Name;
 	// the translation, rotation and scale vector of the meshes are relative to the model center, they perform the mesh->model transformation
-	//std::vector<std::unique_ptr<Mesh>> m_Meshes;
 };

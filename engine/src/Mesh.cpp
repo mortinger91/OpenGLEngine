@@ -8,12 +8,9 @@
 #include "Renderer.h"
 #include "Shader.h"
 
-Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, 
-		   //std::vector <glm::vec3> verticesColors_, 
-		   std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_, bool threaded) 
+Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_, bool threaded) 
 	: m_Name(name),
 	  m_VerticesPositions(verticesPositions_),
-	  //m_VerticesColors(verticesColors_),
 	  m_VerticesNormals(verticesNormals_),
 	  m_VerticesTexCoords(verticesTexCoords_),
 	  m_VerticesIndices(verticesIndices_),
@@ -48,11 +45,6 @@ Mesh::Mesh(const std::string& name, aiVector3D* vertices, aiVector3D* normals, u
 // move constructor
 Mesh::Mesh(Mesh&& mesh) noexcept
 	: m_Name(mesh.m_Name),
-	  //m_VerticesPositions(mesh.m_VerticesPositions),
-	  ////m_VerticesColors(mesh.m_VerticesColors),
-	  //m_VerticesNormals(mesh.m_VerticesNormals),
-	  //m_VerticesTexCoords(mesh.m_VerticesTexCoords),
-	  //m_VerticesIndices(mesh.m_VerticesIndices),
 	  m_VAO(std::move(mesh.m_VAO)),
 	  m_VertexBuffer(std::move(mesh.m_VertexBuffer)),
 	  m_IndexBuffer(std::move(mesh.m_IndexBuffer)),
@@ -115,8 +107,6 @@ void Mesh::parse(const char * filepath)
 		{
 			fscanf(fp, "%f %f %f", &x, &y, &z);
 			m_VerticesPositions.push_back(glm::vec3(x, y, z));
-
-			//m_VerticesColors.push_back(glm::vec3(0.8f,0.3f,0.3f));
 			m_VerticesTexCoords.push_back(glm::vec2(0.f,0.f));
 
 			if (y < minY) minY = y;
@@ -162,10 +152,6 @@ void Mesh::ConvertVectorsToArray(unsigned int& sizeV, unsigned int& sizeI)
 		arrayV[index++] = m_VerticesPositions[i].x;
 		arrayV[index++] = m_VerticesPositions[i].y;
 		arrayV[index++] = m_VerticesPositions[i].z;
-
-		//arrayV[index++] = m_VerticesColors[i].x;
-		//arrayV[index++] = m_VerticesColors[i].y;
-		//arrayV[index++] = m_VerticesColors[i].z;
 
 		arrayV[index++] = m_VerticesNormals[i].x;
 		arrayV[index++] = m_VerticesNormals[i].y;
@@ -216,12 +202,10 @@ void Mesh::MakeVertexArray()
 	layout.Push<float>(3);
 	// normals
 	layout.Push<float>(3);
-	// removed color data from vertex
-	//layout.Push<float>(3);
 	// texture UV coordinates
 	layout.Push<float>(2);
 
-	// these operations must be done on main thread, context cannot be shared between threads
+	// these operations must be done on main thread, context cannot be accessed in other threads
 	// initializing vertex array
 	m_VAO = std::make_unique<VertexArray>();
 

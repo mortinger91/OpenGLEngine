@@ -18,7 +18,6 @@ std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int m
 	#endif
 
 	std::vector<glm::vec3> vertices;
-	//std::vector<glm::vec3> colors;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> texcoords;
 	std::vector<unsigned int> indices;
@@ -26,7 +25,10 @@ std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int m
 	ASSERT(scene->HasMeshes())
 	bool getUVs = false;
 	if (scene->mMeshes[meshIndex]->GetNumUVChannels() == 1 && scene->mMeshes[meshIndex]->mNumUVComponents[0] == 2)
+	{
 		getUVs = true;
+	}
+
 	for (unsigned int i = 0; i < scene->mMeshes[meshIndex]->mNumVertices; ++i)
 	{
 		ASSERT(scene->mMeshes[meshIndex]->HasNormals())
@@ -39,14 +41,6 @@ std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int m
 			glm::vec3(scene->mMeshes[meshIndex]->mVertices[i].x, 
 				scene->mMeshes[meshIndex]->mVertices[i].y, 
 				scene->mMeshes[meshIndex]->mVertices[i].z));
-		//colors.push_back(
-		//	glm::vec3(scene->mMeshes[meshIndex]->mVertices[i].x, 
-		//		scene->mMeshes[meshIndex]->mVertices[i].y, 
-		//		scene->mMeshes[meshIndex]->mVertices[i].z));
-
-		auto x = scene->mMaterials[scene->mMeshes[meshIndex]->mMaterialIndex]->GetName();
-		//auto x2 = scene->mMeshes[meshIndex]->HasTextureCoords();
-		auto x7 = scene->mMeshes[meshIndex]->mTextureCoordsNames;
 		if (getUVs)
 		{
 			texcoords.push_back(glm::vec2(scene->mMeshes[meshIndex]->mTextureCoords[0][i].x, scene->mMeshes[meshIndex]->mTextureCoords[0][i].y));
@@ -65,23 +59,18 @@ std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int m
 		indices.push_back(scene->mMeshes[meshIndex]->mFaces[i].mIndices[1]);
 		indices.push_back(scene->mMeshes[meshIndex]->mFaces[i].mIndices[2]);
 	}
-	
-	// auto x = scene->mMeshes[0]->HasTextureCoords(0);
-	// auto x2 = scene->mMeshes[0]->GetNumUVChannels();
-	// auto x3 = scene->HasTextures();
-	// auto x4 = scene->HasMaterials();
-	// auto x5 = scene->mMaterials[0]->GetTextureCount(aiTextureType::aiTextureType_DIFFUSE);
 
 	#ifdef DEBUG
 	passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000;
 	std::cout << "LoadMesh of meshIndex: " + std::to_string(meshIndex) + ": " + std::to_string(passed) + " ms\n";
 	#endif
 
+	// TODO: create a mesh constructor(adapter class?) that takes assimp vectors as input and convert them to buffer data without calling "ConvertVectorsToArray"
 	//return std::make_unique<Mesh>("mesh_"+std::to_string(meshIndex), scene->mMeshes[meshIndex]->mVertices, scene->mMeshes[meshIndex]->mNormals, scene->mMeshes[meshIndex]->mNumVertices, scene->mMeshes[meshIndex]->mFaces, scene->mMeshes[meshIndex]->mNumFaces, true);
 	return std::make_unique<Mesh>("mesh_" + std::to_string(meshIndex), vertices, normals, texcoords, indices, true);
 }
 
-bool ModelLoader::LoadModel(Model& model, const std::string& pFile, std::shared_ptr<Material> mat)
+bool ModelLoader::LoadModel(Model& model, const std::string& pFile, std::vector<std::shared_ptr<Material>> mats, std::vector<unsigned int> matIndexes)
 {
 	// Create an instance of the Importer class
 	Assimp::Importer importer;
@@ -110,11 +99,14 @@ bool ModelLoader::LoadModel(Model& model, const std::string& pFile, std::shared_
 	#endif
 
 	// If the import failed, report it
-	if( !scene) 
+ 	if( !scene) 
 	{
-		// LOG importer.GetErrorString();
+		std::cout << REDTEXT(importer.GetErrorString());
+		std::cout << std::endl;
 		return false;
 	}
+
+	ASSERT(matIndexes.size() == scene->mNumMeshes);
 
 	std::vector<std::future<std::unique_ptr<Mesh>>> loadingMeshes;
 	
@@ -125,7 +117,7 @@ bool ModelLoader::LoadModel(Model& model, const std::string& pFile, std::shared_
 		#ifdef SINGLECORE
 			std::unique_ptr<Mesh> ptr = loadingMeshes[m].get();
 			ptr->MakeVertexArray();
-			ptr->SetMaterial(mat);
+			ptr->SetMaterial(mats[matIndexes[m]]);
 			model.MoveMesh(std::move(ptr));
 		#endif
 	}
@@ -135,7 +127,7 @@ bool ModelLoader::LoadModel(Model& model, const std::string& pFile, std::shared_
 		{
 			std::unique_ptr<Mesh> ptr = loadingMeshes[m].get();
 			ptr->MakeVertexArray();
-			ptr->SetMaterial(mat);
+			ptr->SetMaterial(mats[matIndexes[m]]);
 			model.MoveMesh(std::move(ptr));
 		}
 	#endif
