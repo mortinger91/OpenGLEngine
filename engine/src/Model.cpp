@@ -11,9 +11,14 @@ Model::Model(const std::string& name)
 }
 
 Model::Model(const std::string& name, const Model& model)
-	: Model(name)
+	: m_Name(name),
+	  m_TranslationVec(model.m_TranslationVec),
+	  m_RotationVec(model.m_RotationVec),
+	  m_Scale(model.m_Scale),
+	  m_UseTextures(model.m_UseTextures),
+	  m_Meshes(model.m_Meshes)
 {
-	m_Meshes = model.m_Meshes;
+	
 }
 
 // moves the mesh inside the mesh vector

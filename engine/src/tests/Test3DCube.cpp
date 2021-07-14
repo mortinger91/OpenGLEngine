@@ -52,18 +52,10 @@ namespace test
 		mesh1->SetMaterial(m_Materials["cubeuv"]);
 		mesh1->m_Scale = 6.f;
 		model1.MoveMesh(std::move(mesh1));
-		model1.m_TranslationVec = glm::vec3(-12.f, 0.f, 0.f);
+		model1.m_TranslationVec = glm::vec3(0.f, 0.f, -20.f);
 		m_Models.push_back(std::move(model1));
 
-		Model model2("Teapot_0");
-		auto mesh2 = std::make_unique<Mesh>("Teapot", resPath+"/meshes/teapot.obj");
-		mesh2->SetMaterial(m_Materials["teapot"]);
-		mesh2->m_Scale = 12.f;
-		model2.MoveMesh(std::move(mesh2));
-		model2.m_TranslationVec = glm::vec3(7.f, 0.f, 0.f);
-		m_Models.push_back(std::move(model2));
-
-		Model model2b("Teapot_1");
+		Model model2b("Teapot");
 		ModelLoader::LoadModel(model2b, resPath + "/meshes/teapot.obj", {m_Materials["teapot"]}, {0});
 		model2b.m_Scale = 6.f;
 		model2b.m_TranslationVec = glm::vec3(0.f, 0.f, 0.f);
@@ -86,11 +78,12 @@ namespace test
 
 		Model model5("Car");
 		ModelLoader::LoadModel(model5, resPath+"/meshes/car.obj", {m_Materials["teapot"],m_Materials["white"]}, {0,1,0,0,0,1,1,0,0,0,0});
+		model5.m_UseTextures = false;
 
 		m_Models.push_back(Model("Car_0", model5));
-		m_Models[m_Models.size() - 1].m_TranslationVec = glm::vec3(15.f, 0.f, 0.f);
+		m_Models[m_Models.size() - 1].m_TranslationVec = glm::vec3(20.f, 0.f, 0.f);
 		m_Models.push_back(Model("Car_1", model5));
-		m_Models[m_Models.size()-1].m_TranslationVec = glm::vec3(-15.f, 0.f, 0.f);
+		m_Models[m_Models.size()-1].m_TranslationVec = glm::vec3(-20.f, 0.f, 0.f);
 		
 		Model model6("Medkit");
 		ModelLoader::LoadModel(model6, resPath+"/meshes/medkit.fbx", {m_Materials["medkit_base"], m_Materials["medkit_light_base"]}, {1, 0});
@@ -112,6 +105,7 @@ namespace test
 
 		bool cameraMoved = false;
 		// TODO: Move inputs to a input class
+		// TODO: Change camera rotation
 		if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		{
 			m_Camera->RotateViewHorizontal(1.f);
