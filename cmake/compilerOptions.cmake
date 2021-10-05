@@ -6,16 +6,11 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(X64 ON)
 endif()
 
-# MSVC compiler options
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-	set(DEFAULT_COMPILE_DEFINITIONS ${DEFAULT_COMPILE_DEFINITIONS}
-			_SCL_SECURE_NO_WARNINGS  # Calling any one of the potentially unsafe methods in the Standard C++ Library
-			_CRT_SECURE_NO_WARNINGS  # Calling any one of the potentially unsafe methods in the CRT Library
-			)
-endif ()
-
-### Compile options
-set(DEFAULT_COMPILE_OPTIONS)
+# Add custom preprocessor directives here
+target_compile_definitions(
+	${LIBRARY_TARGET_NAME}
+	PRIVATE
+)
 
 target_compile_options(
 	${LIBRARY_TARGET_NAME}
