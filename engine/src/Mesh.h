@@ -32,14 +32,14 @@ private:
 
 	void ConvertVectorsToArray(unsigned int& sizeV, unsigned int& sizeI);
 	void parse(const char * filepath);
-	void init(bool threaded);
+	void init();
 	void CreateScalingMatrix(glm::mat4 &mat, float scale);
 
 public:
-	Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_, bool threaded = false);
+	Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_);
 	Mesh(const std::string& name, const std::string& filepath);
 	// assimp constructor
-	Mesh(const std::string& name, aiVector3D* vertices, aiVector3D* normals, unsigned int sizeVertices, aiFace* indices, unsigned int sizeIndices, bool threaded = false);
+	Mesh(const std::string& name, aiVector3D* vertices, aiVector3D* normals, unsigned int sizeVertices, aiFace* indices, unsigned int sizeIndices);
 	// deleted copy constructor
 	Mesh(const Mesh& mesh) = delete;
 	Mesh(Mesh&& mesh) noexcept;
@@ -54,6 +54,7 @@ public:
 	glm::vec3 m_RotationVec;
 	float m_Scale;
 	glm::mat4 m_CustomTransform;
+	bool isLoaded;
 
 	void MakeVertexArray();
 

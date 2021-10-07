@@ -1,5 +1,6 @@
 #include "ModelLoader.h"
 #include "Utility.h"
+#include "Channel.h"
 
 #include <future>
 #include <chrono>
@@ -9,7 +10,7 @@
 // testing parameter
 //#define SINGLECORE
 
-std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int meshIndex)
+std::shared_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int meshIndex)
 {
 	#ifdef DEBUG
 		long double start;
@@ -62,12 +63,12 @@ std::unique_ptr<Mesh> ModelLoader::LoadMesh(const aiScene* scene, unsigned int m
 
 	#ifdef DEBUG
 	passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000;
-	std::cout << "LoadMesh of meshIndex: " + std::to_string(meshIndex) + ": " + std::to_string(passed) + " ms\n";
+	std::cout << "   LoadMesh of meshIndex: " + std::to_string(meshIndex) + ": " + std::to_string(passed) + " ms\n";
 	#endif
 
 	// TODO: create a mesh constructor(adapter class?) that takes assimp vectors as input and convert them to buffer data without calling "ConvertVectorsToArray"
 	//return std::make_unique<Mesh>("mesh_"+std::to_string(meshIndex), scene->mMeshes[meshIndex]->mVertices, scene->mMeshes[meshIndex]->mNormals, scene->mMeshes[meshIndex]->mNumVertices, scene->mMeshes[meshIndex]->mFaces, scene->mMeshes[meshIndex]->mNumFaces, true);
-	return std::make_unique<Mesh>("mesh_" + std::to_string(meshIndex), vertices, normals, texcoords, indices, true);
+	return std::make_shared<Mesh>("mesh_" + std::to_string(meshIndex), vertices, normals, texcoords, indices);
 }
 
 bool ModelLoader::LoadModel(Model& model, const std::string& pFile, std::vector<std::shared_ptr<Material>> mats, std::vector<unsigned int> matIndexes)
@@ -108,32 +109,17 @@ bool ModelLoader::LoadModel(Model& model, const std::string& pFile, std::vector<
 
 	ASSERT(matIndexes.size() == scene->mNumMeshes);
 
-	std::vector<std::future<std::unique_ptr<Mesh>>> loadingMeshes;
-	
 	for (int m = 0; m < scene->mNumMeshes; m++)
 	{
-		std::future<std::unique_ptr<Mesh>> loadingMesh = std::async(std::launch::async, &ModelLoader::LoadMesh, scene, m);
-		loadingMeshes.push_back(std::move(loadingMesh));
-		#ifdef SINGLECORE
-			std::unique_ptr<Mesh> ptr = loadingMeshes[m].get();
-			ptr->MakeVertexArray();
-			ptr->SetMaterial(mats[matIndexes[m]]);
-			model.MoveMesh(std::move(ptr));
-		#endif
+		std::shared_ptr<Mesh> ptr = LoadMesh(scene, m);
+		ptr->SetMaterial(mats[matIndexes[m]]);
+		model.MoveMesh(ptr);
+		// signal to the main thread that this mesh vertex array can be constructed
+		// notify via channel that the vertex array of this mesh can be constructed
+		Channels::meshChan.put(ptr);
+		Channels::toRead++;
+		
 	}
-
-	#ifndef SINGLECORE
-		for (int m = 0; m < scene->mNumMeshes; m++)
-		{
-			std::unique_ptr<Mesh> ptr = loadingMeshes[m].get();
-			ptr->MakeVertexArray();
-			ptr->SetMaterial(mats[matIndexes[m]]);
-			model.MoveMesh(std::move(ptr));
-		}
-	#endif
-	
-	// Now we can access the file's contents.
-	//DoTheSceneProcessing( scene);
 
 	#ifdef DEBUG
 		passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000;

@@ -43,5 +43,9 @@ namespace test
 
 		float m_PointLightAngle;
 		unsigned int m_SelectedModel;
+
+		std::string m_ResPath;
+		std::thread* m_LoadingMeshesThread;
+		bool LoadModels();
 	};
 }

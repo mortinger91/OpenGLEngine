@@ -27,6 +27,12 @@ void Model::MoveMesh(std::unique_ptr<Mesh> mesh) noexcept
 	m_Meshes.push_back(std::move(mesh));
 }
 
+// copies the mesh shared pointer inside the mesh vector
+void Model::MoveMesh(std::shared_ptr<Mesh> mesh)
+{
+	m_Meshes.push_back(mesh);
+}
+
 void Model::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
 {
 	for (auto& mesh : m_Meshes)

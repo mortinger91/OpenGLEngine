@@ -7,7 +7,7 @@
 class ModelLoader
 {
 private:
-	static std::unique_ptr<Mesh> LoadMesh(const aiScene* scene, unsigned int meshIndex);
+	static std::shared_ptr<Mesh> LoadMesh(const aiScene* scene, unsigned int meshIndex);
 public:
 	static bool LoadModel(Model& model, const std::string& pFile, std::vector<std::shared_ptr<Material>> mats, std::vector<unsigned int> matIndexes);
 };
