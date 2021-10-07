@@ -5,6 +5,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <thread>
 #include "Shader.h"
 #include "Material.h"
 #include "Camera.h"
