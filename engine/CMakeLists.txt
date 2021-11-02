@@ -36,6 +36,7 @@ add_library(
 		src/Renderer.cpp 
 		src/Shader.cpp
 		src/Texture.cpp
+		src/Utility.cpp
 		src/VertexArray.cpp
 		src/VertexBuffer.cpp
 		src/Model.cpp

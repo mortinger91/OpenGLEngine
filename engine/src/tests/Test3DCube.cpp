@@ -95,7 +95,20 @@ namespace test
 		std::cout << "Finished loading models" << std::endl;
 
 		m_Camera->CreateViewMatrix();
+
+		// imgui strings initialization
+		usingTex = m_Models[m_SelectedModel].m_UseTextures ? std::string("Yes") : std::string("No");
+		usingProj = m_UseOrtho ? "Ortho" : "Perspective";
+		usingLight = m_IsLight ? "True" : "False";
+		rotEnabled = m_StopRotation ? "Stopped" : "Going";
+		rotPointEnabled = m_StopRotation ? "Going" : "Stopped";
 	}
+
+	// TODO: Add zoom in and out using mouse wheel
+	//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+	//{
+	//	
+	//}
 
 	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)
 	{
@@ -128,11 +141,16 @@ namespace test
 			cameraMoved = true;
 		}
 
+		//glfwSetScrollCallback(window, scroll_callback);
+
 		{
 			// TODO: cache these matrix and modify them only if the values are changed
 			// View matrix, common for all models and meshes
 			if (cameraMoved)
+			{
 				m_Camera->CreateViewMatrix();
+				cameraMoved = false;
+			}
 			
 			glm::vec4 light0direction;
 			light0direction = m_Camera->m_ViewMatrix * light_direction;
@@ -201,8 +219,8 @@ namespace test
 		ImGui::SliderFloat("diffuse1", &m_Models[m_SelectedModel].m_Meshes[0]->m_Material->m_Diffuse, 1.f, 100.f); 
 		ImGui::SliderFloat("ambient1", &m_Models[m_SelectedModel].m_Meshes[0]->m_Material->m_Ambient, 1.f, 100.f);
 
-		//ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
-		//ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
+		ImGui::SliderFloat("nearPlane", &m_NearPlane, -50.f, 50.f);
+		ImGui::SliderFloat("farPlane", &m_FarPlane, 0.f, 1000.f);
 		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
 
 		ImGui::SliderFloat("light_color0R", &light_color[0], 0.f, 20.f);
@@ -217,48 +235,36 @@ namespace test
 		{
 			m_SelectedModel = m_SelectedModel>=m_Models.size()-1 ? 0 : m_SelectedModel+1;
 		}
-		std::string usingTex = m_Models[m_SelectedModel].m_UseTextures ? std::string("Yes") : std::string("No");
+
 		if(ImGui::Button( ("Use Textures: "+usingTex).c_str() ))
 		{
 			m_Models[m_SelectedModel].m_UseTextures = !m_Models[m_SelectedModel].m_UseTextures;
+			m_Models[m_SelectedModel].m_UseTextures ? std::string("Yes") : std::string("No");
 		}
-		if (m_UseOrtho)
-			ImGui::Text("Using Ortho");
-		else
-			ImGui::Text("Using Perspective");
 
-		if(ImGui::Button("change proj matrix"))
+		if(ImGui::Button( ("Using: " + usingProj +" projection matrix").c_str() ))
 		{
 			m_UseOrtho = !m_UseOrtho;
+			m_UseOrtho ? "Ortho" : "Perspective";
 		}
-		if (m_UseOrtho)
-			ImGui::Text("Using Ortho");
-		else
-			ImGui::Text("Using Perspective");
-		if(ImGui::Button("enable/disable light"))
+		
+		if(ImGui::Button( ("Using Light: " + usingLight).c_str() ))
 		{
 			m_IsLight = (m_IsLight == 0) ? 1 : 0;
+			usingLight = m_IsLight ? "True" : "False";
 		}
-		if (m_IsLight == 1)
-			ImGui::Text("Using Light");
-		else
-			ImGui::Text("Not Using Light");
-		if(ImGui::Button("stop rotation"))
+
+		if(ImGui::Button( ("Cube and Teapot rotation: " + rotEnabled).c_str() ))
 		{
 			m_StopRotation = !m_StopRotation;
+			m_StopRotation ? "Stopped" : "Going";
 		}
-		if (m_StopRotation)
-			ImGui::Text("Rotation Stopped");
-		else
-			ImGui::Text("Rotation Going");
-		if(ImGui::Button("rotating point light"))
+		
+		if(ImGui::Button( ("Rotation point light: " + rotPointEnabled).c_str() ))
 		{
 			m_RotatingPointLight = !m_RotatingPointLight;
+			m_StopRotation ? "Going" : "Stopped";
 		}
-		if (m_RotatingPointLight)
-			ImGui::Text("Rotation Point light Going");
-		else
-			ImGui::Text("Rotation Point light Stopped");
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}

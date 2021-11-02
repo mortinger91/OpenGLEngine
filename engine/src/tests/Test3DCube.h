@@ -43,5 +43,13 @@ namespace test
 
 		float m_PointLightAngle;
 		unsigned int m_SelectedModel;
+
+		std::string usingTex;
+		std::string usingProj; 
+		std::string usingLight;
+		std::string rotEnabled;
+		std::string rotPointEnabled;
+
+		//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 	};
 }

@@ -30,6 +30,17 @@ void Camera::RotateViewVertical(float amount)
 	m_UpVec = glm::mat3(matRotation) * m_UpVec;
 }
 
+// to be tested
+void Camera::MoveCameraBackwards(float amount)
+{
+	glm::mat4 matTranslate;
+	Utility::CreateTranslationMatrix(matTranslate, glm::vec3(0,0,amount));
+
+	CreateViewMatrix();
+
+	m_ViewMatrix = matTranslate * m_ViewMatrix;
+}
+
 const glm::vec3& Camera::GetEyePos() const
 {
 	return m_EyeVec;

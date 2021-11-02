@@ -15,5 +15,6 @@ public:
 	void CreateViewMatrix();
 	void RotateViewHorizontal(float amount);
 	void RotateViewVertical(float amount);
+	void MoveCameraBackwards(float amount);
 	const glm::vec3& GetEyePos() const;
 };
