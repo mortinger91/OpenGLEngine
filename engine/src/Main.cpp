@@ -102,6 +102,7 @@ int main(void)
 
 		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
 		testMenu->RegisterTest<test::Test3DCube>("3D Cube");
+		std::cout << std::endl;
 
 		Renderer renderer;
 
@@ -130,6 +131,8 @@ int main(void)
 				ImGui::Begin("Test");
 				if (currentTest != testMenu && ImGui::Button("<-"))
 				{
+					// calling the selected test destructor
+					std::cout << "Returning to selection menu\n\n";
 					delete currentTest;
 					currentTest = testMenu;
 				}

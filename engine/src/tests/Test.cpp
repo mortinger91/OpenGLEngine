@@ -1,4 +1,5 @@
 #include "Test.h"
+#include <string>
 
 namespace test
 {
@@ -14,6 +15,8 @@ namespace test
 		{
 			if(ImGui::Button(test.first.c_str()))
 			{
+				std::cout << "Started Test: " + test.first + "\n\n";
+				// calling the selected test constructor
 				m_CurrentTest = test.second();
 			}
 		}

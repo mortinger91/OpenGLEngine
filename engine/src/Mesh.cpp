@@ -7,35 +7,39 @@
 #include "Utility.h"
 #include "Renderer.h"
 #include "Shader.h"
+#include "Channel.h"
 
-Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_, bool threaded) 
+Mesh::Mesh(const std::string& name, std::vector <glm::vec3> verticesPositions_, std::vector <glm::vec3> verticesNormals_, std::vector <glm::vec2> verticesTexCoords_, std::vector <unsigned int> verticesIndices_)
 	: m_Name(name),
 	  m_VerticesPositions(verticesPositions_),
 	  m_VerticesNormals(verticesNormals_),
 	  m_VerticesTexCoords(verticesTexCoords_),
 	  m_VerticesIndices(verticesIndices_),
 	  sizeV(0),
-	  sizeI(0)
+	  sizeI(0),
+	  isLoaded(false)
 {
 	#ifdef DEBUG
-		std::cout << "Called default mesh constructor of: " + name + "\n";
+		//std::cout << "Called default mesh constructor of: " + name + "\n";
 	#endif
-	init(threaded);
+	init();
 }
 
 // only used for teapot object, deprecated
 Mesh::Mesh(const std::string& name, const std::string& filepath)
-	: m_Name(name)
+	: m_Name(name),
+	  isLoaded(false)
 {
 	#ifdef DEBUG
-		std::cout << "Called mesh constructor from file of: " << m_Name << std::endl;
+		//std::cout << "Called mesh constructor from file of: " << m_Name << std::endl;
 	#endif
 	parse(filepath.c_str());
-	init(false);
+	init();
 }
 
-Mesh::Mesh(const std::string& name, aiVector3D* vertices, aiVector3D* normals, unsigned int sizeVertices, aiFace* indices, unsigned int sizeIndices, bool threaded)
-	: m_Name(name)
+Mesh::Mesh(const std::string& name, aiVector3D* vertices, aiVector3D* normals, unsigned int sizeVertices, aiFace* indices, unsigned int sizeIndices)
+	: m_Name(name),
+	  isLoaded(false)
 {
 
 
@@ -54,12 +58,13 @@ Mesh::Mesh(Mesh&& mesh) noexcept
 	  m_Scale(mesh.m_Scale),
 	  m_CustomTransform(mesh.m_CustomTransform),
 	  arrayV(mesh.arrayV),
-	  arrayI(mesh.arrayI)
+	  arrayI(mesh.arrayI),
+	  isLoaded(mesh.isLoaded)
 {
 	mesh.arrayV = nullptr;
 	mesh.arrayI = nullptr;
 	#ifdef DEBUG
-		std::cout << "Called mesh move constructor of:" << m_Name << std::endl;
+		//std::cout << "Called mesh move constructor of:" << m_Name << std::endl;
 	#endif
 }
 
@@ -68,7 +73,7 @@ Mesh::~Mesh()
 	free(arrayV);
 	free(arrayI);
 	#ifdef DEBUG
-		std::cout << "Called mesh destructor of:" << m_Name << std::endl;
+		//std::cout << "Called mesh destructor of:" << m_Name << std::endl;
 	#endif
 }
 
@@ -168,7 +173,7 @@ void Mesh::ConvertVectorsToArray(unsigned int& sizeV, unsigned int& sizeI)
 	}
 }
 
-void Mesh::init(bool threaded)
+void Mesh::init()
 {
 	#ifdef DEBUG
 		long double start;
@@ -185,11 +190,8 @@ void Mesh::init(bool threaded)
 
 	#ifdef DEBUG
 	passed = (std::chrono::high_resolution_clock::now().time_since_epoch().count() - start) / 1000000;
-		std::cout << "init of mesh: " + m_Name + ": " + std::to_string(passed) + " ms\n";
+		std::cout << "      init of mesh: " + m_Name + ": " + std::to_string(passed) + " ms\n";
 	#endif
-
-	if (!threaded)
-		MakeVertexArray();
 }
 
 void Mesh::MakeVertexArray()
@@ -217,6 +219,8 @@ void Mesh::MakeVertexArray()
 
 	// creating an index buffer
 	m_IndexBuffer = std::make_unique<IndexBuffer>(arrayI, sizeI);
+
+	isLoaded = true;
 }
 
 void Mesh::CreateScalingMatrix(glm::mat4 &mat, float scale)
@@ -262,25 +266,28 @@ void Mesh::Bind() const
 
 void Mesh::Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& ModelTranslationVec, const glm::vec3& ModelRotationVec, float ModelScale, bool UseTextures)
 {
-	Renderer renderer;
-	Bind();
+	if (isLoaded)
+	{ 
+		Renderer renderer;
+		Bind();
 
-	glm::mat4 mv;
-	glm::mat4 mvp;
+		glm::mat4 mv;
+		glm::mat4 mvp;
 
-	CreateModelMatrix(ModelTranslationVec, ModelRotationVec, ModelScale);
-	m_ModelMatrix = m_CustomTransform * m_ModelMatrix;
+		CreateModelMatrix(ModelTranslationVec, ModelRotationVec, ModelScale);
+		m_ModelMatrix = m_CustomTransform * m_ModelMatrix;
 
-	mv = viewMatrix * m_ModelMatrix;
-	mvp = projMatrix * mv;
+		mv = viewMatrix * m_ModelMatrix;
+		mvp = projMatrix * mv;
 
-	m_Material->m_Shader->SetUniformMat4f("u_MV", mv);
-	m_Material->m_Shader->SetUniformMat4f("u_MVP", mvp);
-	m_Material->m_Shader->SetUniform1i("useTexture",UseTextures);
-	// TODO: create a batch renderer:
-		// calling draw does not draw the object but add it in a queue
-		// another command is implemented to render the whole frame
-		// all the meshes that shares the same materials, shaders, uniforms are added together
-		// in one big vertex array, that is rendered using one draw call
-	renderer.Draw(*this, *m_Material->m_Shader);
+		m_Material->m_Shader->SetUniformMat4f("u_MV", mv);
+		m_Material->m_Shader->SetUniformMat4f("u_MVP", mvp);
+		m_Material->m_Shader->SetUniform1i("useTexture",UseTextures);
+		// TODO: create a batch renderer:
+			// calling draw does not draw the object but add it in a queue
+			// another command is implemented to render the whole frame
+			// all the meshes that shares the same materials, shaders, uniforms are added together
+			// in one big vertex array, that is rendered using one draw call
+		renderer.Draw(*this, *m_Material->m_Shader);
+	}
 }

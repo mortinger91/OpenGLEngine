@@ -22,6 +22,7 @@ add_library(
 		src/Model.h
 		src/vendorLibs.h
 		src/ModelLoader.h
+		src/Channel.h
 
 		src/libs/stb_image/stb_image.h
 		src/tests/Test.h
@@ -41,6 +42,7 @@ add_library(
 		src/VertexBuffer.cpp
 		src/Model.cpp
 		src/ModelLoader.cpp
+		src/Channel.cpp
 
 		src/libs/stb_image/stb_image.cpp
 		src/tests/Test.cpp

@@ -11,6 +11,7 @@ public:
 	Model(const std::string& name);
 	Model(const std::string& name, const Model& model);
 	void MoveMesh(std::unique_ptr<Mesh> mesh) noexcept;
+	void MoveMesh(std::shared_ptr<Mesh> mesh);
 	void Draw(const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
 	std::string GetName() const;
 

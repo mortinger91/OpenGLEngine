@@ -3,7 +3,7 @@
 Work in progress 3D engine.
 
 
-# Building instructions:
+### Building instructions:
 Build using CMAKE:<br/>
 1 - git clone https://github.com/mortinger91/OpenGLEngine.git --recursive<br/>
 2 - cd OpenGLEngine<br/>

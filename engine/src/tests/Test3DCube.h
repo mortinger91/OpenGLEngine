@@ -5,6 +5,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <thread>
 #include "Shader.h"
 #include "Material.h"
 #include "Camera.h"
@@ -44,11 +45,9 @@ namespace test
 		float m_PointLightAngle;
 		unsigned int m_SelectedModel;
 
-		std::string usingTex;
-		std::string usingProj; 
-		std::string usingLight;
-		std::string rotEnabled;
-		std::string rotPointEnabled;
+		std::string m_ResPath;
+		std::thread* m_LoadingMeshesThread;
+		bool LoadModels();
 
 		//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 	};
