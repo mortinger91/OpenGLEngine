@@ -4,9 +4,10 @@
 Camera::Camera(const glm::vec3& _EyeVec, const glm::vec3& _CenterVec, const glm::vec3& _UpVec)
 	: m_EyeVec(_EyeVec),
 	  m_CenterVec(_CenterVec),
-	  m_UpVec(_UpVec)
+	  m_UpVec(_UpVec),
+	  m_CameraMoved(false)
 {
-
+	CreateViewMatrix();
 }
 
 Camera::~Camera()
@@ -14,11 +15,19 @@ Camera::~Camera()
 
 }
 
+const glm::mat4& Camera::GetViewMatrix()
+{
+	if (m_CameraMoved)
+		CreateViewMatrix();
+	return m_ViewMatrix;
+}
+
 void Camera::RotateViewHorizontal(float amount)
 {
 	glm::mat4 matRotation;
 	Utility::CreateRotationGenericMatrix(matRotation, amount, m_UpVec);
 	m_EyeVec = glm::mat3(matRotation) * m_EyeVec;
+	m_CameraMoved = true;
 }
 
 void Camera::RotateViewVertical(float amount)
@@ -28,17 +37,13 @@ void Camera::RotateViewVertical(float amount)
 	);
 	m_EyeVec = glm::mat3(matRotation) * m_EyeVec;
 	m_UpVec = glm::mat3(matRotation) * m_UpVec;
+	m_CameraMoved = true;
 }
 
-// to be tested
-void Camera::MoveCameraBackwards(float amount)
+void Camera::MoveEyePosition(glm::vec3 amount)
 {
-	glm::mat4 matTranslate;
-	Utility::CreateTranslationMatrix(matTranslate, glm::vec3(0,0,amount));
-
-	CreateViewMatrix();
-
-	m_ViewMatrix = matTranslate * m_ViewMatrix;
+	m_EyeVec = amount + m_EyeVec;
+	m_CameraMoved = true;
 }
 
 const glm::vec3& Camera::GetEyePos() const

@@ -10,6 +10,7 @@
 #include "Material.h"
 #include "Camera.h"
 #include "Model.h"
+#include "vendorLibs.h"
 
 namespace test
 {
@@ -19,14 +20,18 @@ namespace test
 		Test3DCube();
 		~Test3DCube();
 
+		// marked as static public member so that ScrollCallback can access it
+		// only solution found as now since ScrollCallback can't be a member function and no other arguments can be passed to it
+		static std::unique_ptr<Camera> m_Camera;
+
 		void OnUpdate(float deltaTime) override;
-		void OnRender(GLFWwindow *window, int width, int height);
+		void ProcessInput(GLFWwindow *window, int width, int height) override;
+		void OnRender() override;
 		void OnImGuiRender() override;
 
 	private:
 		std::unordered_map< std::string, std::shared_ptr<Shader> > m_Shaders;
 		std::unordered_map< std::string, std::shared_ptr<Material> > m_Materials;
-		std::unique_ptr<Camera> m_Camera;
 		std::vector<Model> m_Models;
 		Renderer m_Renderer;
 		
@@ -47,8 +52,11 @@ namespace test
 
 		std::string m_ResPath;
 		std::thread* m_LoadingMeshesThread;
-		bool LoadModels();
 
-		//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+		int m_Width;
+		int m_Height;
+		bool m_ScrollCallbackRegistered;
+
+		bool LoadModels();
 	};
 }

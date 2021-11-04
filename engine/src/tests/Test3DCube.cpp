@@ -21,7 +21,8 @@ namespace test
 		  m_StopRotation(true),
 		  m_RotatingPointLight(true),
 		  m_PointLightAngle(0),
-		  m_SelectedModel(0)
+		  m_SelectedModel(0),
+		  m_ScrollCallbackRegistered(false)
 	{
 		GLCall(glEnable(GL_BLEND));
 		// setting up a blend function, default would be src=0 dest=1 which means override old pixels with new ones
@@ -36,7 +37,7 @@ namespace test
 		// defining a shader
 		m_Shaders["default"] = std::make_shared<Shader>(m_ResPath + "/shaders/Basic.vert", m_ResPath + "/shaders/Basic.frag");
 		
-		// TODO: move the loading of the materials to the loading mesh thread, so that the window and the interface is responsive as soon as possible
+		// TODO: move the loading of the materials to the loading mesh thread, so that the window and the ui is responsive as soon as possible
 		// creating the materials
 		#ifdef DEBUG
 			long double start;
@@ -59,9 +60,10 @@ namespace test
 		m_LoadingMeshesThread = new std::thread(&Test3DCube::LoadModels, this);
 
 		// creating the camera
-		m_Camera = std::make_unique<Camera>(glm::vec3(0.f, 0.f, 60.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-		m_Camera->CreateViewMatrix();
+		m_Camera->RotateViewVertical(-15.f);
 	}
+
+	std::unique_ptr<Camera> Test3DCube::m_Camera = std::make_unique<Camera>(glm::vec3(0.f, 0.f, 100.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 
 	bool Test3DCube::LoadModels()
 	{
@@ -131,57 +133,50 @@ namespace test
 		return true;
 	}
 
-	// TODO: Add zoom in and out using mouse wheel
-	//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-	//{
-	//	
-	//}
+	void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+	{
+		glm::vec3 amount(0.f,0.f,(float)-yoffset);
+		Test3DCube::m_Camera->MoveEyePosition(amount);
+	}
 
-	void Test3DCube::OnRender(GLFWwindow *window, int width, int height)
+	void Test3DCube::ProcessInput(GLFWwindow *window, int width, int height)
+	{
+		m_Width = width;
+		m_Height = height;
+		// TODO: Fix camera movements, adjust scrolling zoom in/out if visual is tilted, change visual rotation keeping plane 
+		if (!m_ScrollCallbackRegistered)
+		{
+			glfwSetScrollCallback(window, ScrollCallback);
+			m_ScrollCallbackRegistered = true;
+		}
+		if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			m_Camera->RotateViewHorizontal(1.f);
+		}
+		if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			m_Camera->RotateViewHorizontal(-1.f);
+		}
+		if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			m_Camera->RotateViewVertical(1.f);
+		}
+		if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			m_Camera->RotateViewVertical(-1.f);
+		}
+	}
+
+	void Test3DCube::OnRender()
 	{
 		GLCall(glClearColor(0.2f, 0.3f, 0.8f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 		GLCall(glClear(GL_DEPTH_BUFFER_BIT));
 
-		bool cameraMoved = false;
-		// TODO: Move inputs to a input class
-		// TODO: Change camera rotation
-		// TODO: Add zoom in, zoom out using scrolling wheel
-		if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			m_Camera->RotateViewHorizontal(1.f);
-			cameraMoved = true;
-		}
-		if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			m_Camera->RotateViewHorizontal(-1.f);
-			cameraMoved = true;
-		}
-			
-		if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			m_Camera->RotateViewVertical(1.f);
-			cameraMoved = true;
-		}
-		if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			m_Camera->RotateViewVertical(-1.f);
-			cameraMoved = true;
-		}
-
-		//glfwSetScrollCallback(window, scroll_callback);
-
 		{
 			// TODO: cache these matrix and modify them only if the values are changed
-			// View matrix, common for all models and meshes
-			if (cameraMoved)
-			{
-				m_Camera->CreateViewMatrix();
-				cameraMoved = false;
-			}
-			
 			glm::vec4 light0direction;
-			light0direction = m_Camera->m_ViewMatrix * light_direction;
+			light0direction = m_Camera->GetViewMatrix() * light_direction;
 			glm::vec4 light1position;
 			if (m_RotatingPointLight)
 			{
@@ -190,16 +185,16 @@ namespace test
 			}
 			glm::mat4 matRotateLight;
 			Utility::CreateRotationGenericMatrix(matRotateLight, m_PointLightAngle, glm::vec3(0.f, 1.f, 0.f));
-			light1position = m_Camera->m_ViewMatrix * matRotateLight * light_position1;
+			light1position = m_Camera->GetViewMatrix() * matRotateLight * light_position1;
 
 			// Perspective matrix, common for all models and meshes
 			if (m_UseOrtho)
 			{
-				m_ProjMatrix = Utility::CreateOrthoMatrix((float)width, (float)height, m_NearPlane, m_FarPlane);
+				m_ProjMatrix = Utility::CreateOrthoMatrix((float)m_Width, (float)m_Height, m_NearPlane, m_FarPlane);
 			}
 			else
 			{
-				m_ProjMatrix = Utility::CreatePerspectiveMatrix(m_Fov, (float)width / (float)height, m_NearPlane, m_FarPlane);
+				m_ProjMatrix = Utility::CreatePerspectiveMatrix(m_Fov, (float)m_Width / (float)m_Height, m_NearPlane, m_FarPlane);
 			}
 
 			m_Shaders["default"]->Bind();
@@ -239,7 +234,7 @@ namespace test
 					m_Models[i].m_Meshes[0]->m_CustomTransform = matRotateLight;
 				}
 
-				m_Models[i].Draw(m_Camera->m_ViewMatrix, m_ProjMatrix);
+				m_Models[i].Draw(m_Camera->GetViewMatrix(), m_ProjMatrix);
 			}
 		}
 	}

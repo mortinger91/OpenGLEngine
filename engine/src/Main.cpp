@@ -127,7 +127,8 @@ int main(void)
 			if(currentTest)
 			{
 				currentTest->OnUpdate(0.f);
-				currentTest->OnRender(window, width, height);
+				currentTest->ProcessInput(window, width, height);
+				currentTest->OnRender();
 				ImGui::Begin("Test");
 				if (currentTest != testMenu && ImGui::Button("<-"))
 				{

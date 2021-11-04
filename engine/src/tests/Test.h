@@ -14,7 +14,8 @@ namespace test
 		virtual ~Test() {}
 
 		virtual void OnUpdate(float deltaTime) {}
-		virtual void OnRender(GLFWwindow *window, int width, int height) {}
+		virtual void ProcessInput(GLFWwindow *window, int width, int height) {}
+		virtual void OnRender() {}
 		virtual void OnImGuiRender() {}
 
 	};
@@ -31,7 +32,6 @@ namespace test
 		{
 			std::cout << "Registering test: " << name << std::endl;
 
-			// lamba function
 			m_Tests.push_back(std::make_pair(name, []() { return new T(); } ));
 		}
 		
