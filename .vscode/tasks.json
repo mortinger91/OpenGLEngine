@@ -6,7 +6,10 @@
             "type": "shell",
             "command": "make -C build/",
             "problemMatcher": [],
-            "group": "build"
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
