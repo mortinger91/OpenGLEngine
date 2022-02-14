@@ -241,6 +241,28 @@ namespace test
 
 	void Test3DCube::OnImGuiRender()
 	{
+		// if (ImGui::BeginMenuBar())
+		// {
+		// 	if (ImGui::BeginMenu("Options"))
+		// 	{
+		// 		// Disabling fullscreen would allow the window to be moved to the front of other windows,
+		// 		// which we can't undo at the moment without finer window depth/z control.
+		// 		ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen);
+		// 		ImGui::MenuItem("Padding", NULL, &opt_padding);
+		// 		ImGui::Separator();
+
+		// 		if (ImGui::MenuItem("Flag: NoSplit",                "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))                 { dockspace_flags ^= ImGuiDockNodeFlags_NoSplit; }
+		// 		if (ImGui::MenuItem("Flag: NoResize",               "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0))                { dockspace_flags ^= ImGuiDockNodeFlags_NoResize; }
+		// 		if (ImGui::MenuItem("Flag: NoDockingInCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingInCentralNode) != 0))  { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode; }
+		// 		if (ImGui::MenuItem("Flag: AutoHideTabBar",         "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0))          { dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
+		// 		if (ImGui::MenuItem("Flag: PassthruCentralNode",    "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen)) { dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; }
+		// 		ImGui::Separator();
+		// 		ImGui::EndMenu();
+		// 	}
+		// 	ImGui::EndMenuBar();
+		// }
+
+		// my imgui ui for test3dcube
 		if (m_Models.size() > 0)
 		{
 			ImGui::SliderFloat("Translate X", &m_Models[m_SelectedModel].m_TranslationVec.x, -100.f, 100.f);
@@ -253,7 +275,23 @@ namespace test
 			ImGui::SliderFloat("specular1", &m_Models[m_SelectedModel].m_Meshes[0]->m_Material->m_Specular, 1.f, 100.f);
 			ImGui::SliderFloat("diffuse1", &m_Models[m_SelectedModel].m_Meshes[0]->m_Material->m_Diffuse, 1.f, 100.f);
 			ImGui::SliderFloat("ambient1", &m_Models[m_SelectedModel].m_Meshes[0]->m_Material->m_Ambient, 1.f, 100.f);
+		}
 
+		ImGui::SliderFloat("light_color0R", &light_color[0], 0.f, 20.f);
+		ImGui::SliderFloat("light_color0G", &light_color[1], 0.f, 20.f);
+		ImGui::SliderFloat("light_color0B", &light_color[2], 0.f, 20.f);
+
+		ImGui::SliderFloat("light_color1R", &light_color1[0], 0.f, 20.f);
+		ImGui::SliderFloat("light_color1G", &light_color1[1], 0.f, 20.f);
+		ImGui::SliderFloat("light_color1B", &light_color1[2], 0.f, 20.f);
+
+		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
+
+		ImGui::End();
+		ImGui::Begin("ImGui Panel 2");
+
+		if (m_Models.size() > 0)
+		{
 			if (ImGui::Button(("Selected Model: " + m_Models[m_SelectedModel].GetName()).c_str()))
 			{
 				m_SelectedModel = m_SelectedModel >= m_Models.size() - 1 ? 0 : m_SelectedModel + 1;
@@ -288,18 +326,11 @@ namespace test
 		{
 			m_RotatingPointLight = !m_RotatingPointLight;
 		}
-
-		ImGui::SliderFloat("light_color0R", &light_color[0], 0.f, 20.f);
-		ImGui::SliderFloat("light_color0G", &light_color[1], 0.f, 20.f);
-		ImGui::SliderFloat("light_color0B", &light_color[2], 0.f, 20.f);
-
-		ImGui::SliderFloat("light_color1R", &light_color1[0], 0.f, 20.f);
-		ImGui::SliderFloat("light_color1G", &light_color1[1], 0.f, 20.f);
-		ImGui::SliderFloat("light_color1B", &light_color1[2], 0.f, 20.f);
-
-		ImGui::SliderFloat("fovy", &m_Fov, 0.f, 90.f);
-
+		
+		ImGui::End();
+		ImGui::Begin("ImGui Panel 3");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		// */
 	}
 
 	Test3DCube::~Test3DCube()

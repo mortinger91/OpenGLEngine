@@ -10,7 +10,6 @@
 #include "Material.h"
 #include "Camera.h"
 #include "Model.h"
-#include "vendorLibs.h"
 
 namespace test
 {

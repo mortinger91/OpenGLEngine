@@ -32,6 +32,7 @@ add_library(
 		# cpp files
 		src/Camera.cpp
 		src/IndexBuffer.cpp
+		src/Main.cpp
 		src/Material.cpp
 		src/Mesh.cpp
 		src/Renderer.cpp 

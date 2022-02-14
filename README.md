@@ -7,11 +7,11 @@ Work in progress 3D engine.
 Build using CMAKE:<br/>
 1 - git clone https://github.com/mortinger91/OpenGLEngine.git --recursive<br/>
 2 - cd OpenGLEngine<br/>
+Linux: 
+3 - ./scripts/build_linux.sh
+4 - Open OpenGLEngine folder with VS Code.<br/>
+Windows:
 3 - mkdir build<br/>
 4 - cd build<br/>
 5 - cmake ..<br/>
-6 - (optional)cmake --build . -v<br/>
-
-
-Windows: Open OpenGLEngine/build/OpenGLEngine.sln, set "exec" as startup project.<br/>
-Linux: Open OpenGLEngine folder with VS Code.<br/>
+6 - Open OpenGLEngine/build/OpenGLEngine.sln with Visual Studio, set "exec" as startup project.<br/>

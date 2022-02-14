@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 cmake_policy(SET CMP0077 NEW) # option honors normal variables
 cmake_policy(SET CMP0072 NEW)
 
+# Unix console colors
 #if(WIN32)
 #  set(ColourReset "\033[0m")
 #  set(Red         "\033[31m")
@@ -98,7 +99,7 @@ target_link_libraries(
 include(build)
 
 add_executable(
-			exec engine/src/Main.cpp
+			exec engine/src/EntryPoint.cpp
 )
 
 	target_link_libraries(
