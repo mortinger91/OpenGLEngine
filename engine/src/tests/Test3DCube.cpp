@@ -12,6 +12,8 @@
 
 namespace test
 {
+	std::unique_ptr<Camera> Test3DCube::m_Camera = std::make_unique<Camera>(glm::vec3(0.f, 0.f, 100.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+
 	Test3DCube::Test3DCube()
 		: m_NearPlane(1.f),
 		  m_FarPlane(1000.f),
@@ -62,8 +64,6 @@ namespace test
 		// creating the camera
 		m_Camera->RotateViewVertical(-15.f);
 	}
-
-	std::unique_ptr<Camera> Test3DCube::m_Camera = std::make_unique<Camera>(glm::vec3(0.f, 0.f, 100.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 
 	bool Test3DCube::LoadModels()
 	{
@@ -167,6 +167,7 @@ namespace test
 		}
 	}
 
+	// this needs to be the done on the main thread due to the opengl context
 	void Test3DCube::OnRender()
 	{
 		GLCall(glClearColor(0.2f, 0.3f, 0.8f, 1.0f));
@@ -217,7 +218,6 @@ namespace test
 			}
 
 			//check if a new model is loaded so its vertex array can be constructed
-			
 			while (Channels::toRead > 0)
 			{
 				std::shared_ptr<Mesh> m = Channels::meshChan.get();
@@ -241,28 +241,7 @@ namespace test
 
 	void Test3DCube::OnImGuiRender()
 	{
-		// if (ImGui::BeginMenuBar())
-		// {
-		// 	if (ImGui::BeginMenu("Options"))
-		// 	{
-		// 		// Disabling fullscreen would allow the window to be moved to the front of other windows,
-		// 		// which we can't undo at the moment without finer window depth/z control.
-		// 		ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen);
-		// 		ImGui::MenuItem("Padding", NULL, &opt_padding);
-		// 		ImGui::Separator();
-
-		// 		if (ImGui::MenuItem("Flag: NoSplit",                "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))                 { dockspace_flags ^= ImGuiDockNodeFlags_NoSplit; }
-		// 		if (ImGui::MenuItem("Flag: NoResize",               "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0))                { dockspace_flags ^= ImGuiDockNodeFlags_NoResize; }
-		// 		if (ImGui::MenuItem("Flag: NoDockingInCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingInCentralNode) != 0))  { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode; }
-		// 		if (ImGui::MenuItem("Flag: AutoHideTabBar",         "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0))          { dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
-		// 		if (ImGui::MenuItem("Flag: PassthruCentralNode",    "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen)) { dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; }
-		// 		ImGui::Separator();
-		// 		ImGui::EndMenu();
-		// 	}
-		// 	ImGui::EndMenuBar();
-		// }
-
-		// my imgui ui for test3dcube
+		// imgui ui for test3dcube
 		if (m_Models.size() > 0)
 		{
 			ImGui::SliderFloat("Translate X", &m_Models[m_SelectedModel].m_TranslationVec.x, -100.f, 100.f);
@@ -330,7 +309,6 @@ namespace test
 		ImGui::End();
 		ImGui::Begin("ImGui Panel 3");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		// */
 	}
 
 	Test3DCube::~Test3DCube()
@@ -340,6 +318,6 @@ namespace test
 
 	void Test3DCube::OnUpdate(float deltaTime)
 	{
-	}
 
+	}
 }

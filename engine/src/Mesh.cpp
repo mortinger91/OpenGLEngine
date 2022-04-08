@@ -42,8 +42,6 @@ Mesh::Mesh(const std::string& name, aiVector3D* vertices, aiVector3D* normals, u
 	  isLoaded(false)
 {
 
-
-
 }
 
 // move constructor

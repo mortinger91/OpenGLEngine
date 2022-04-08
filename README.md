@@ -12,7 +12,8 @@
 >3 - mkdir build<br/>
 >4 - cd build<br/>
 >5 - cmake ..<br/>
->6 - Open OpenGLEngine/build/OpenGLEngine.sln with Visual Studio, set "exec" as startup project.<br/>
+>6 - copy "imgui.ini" from root to build folder<br/>
+>7 - Open OpenGLEngine/build/OpenGLEngine.sln with Visual Studio, set "exec" as startup project.<br/>
 
 ### Update instructions:
 1 - git pull origin master<br/>

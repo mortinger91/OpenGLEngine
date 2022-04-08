@@ -8,6 +8,4 @@ class MeshBuilder
 	void SetScale() {}
 	void SetTraslation() {}
 	void SetRotation() {}
-
-	MeshBuilder
 };
