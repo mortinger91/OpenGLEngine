@@ -40,7 +40,7 @@ jobs:
     
     - name: Install mesa-dev
       if: startsWith(matrix.name, 'ubuntu')
-      run: sudo apt-get update; sudo apt-get install xorg-dev libglu1-mesa-dev
+      run: sudo apt-get update; sudo apt-get install libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev libxss-dev libgl1-mesa-dev
       
     - name: configure and build
       uses: lukka/run-cmake@v3
