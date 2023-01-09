@@ -8,7 +8,6 @@
 #include "Mesh.h"
 
 // TODO: change channel implementation so that the get() function is not blocking, but returns null if the list is empty
-//template<class item>
 class channel
 {
 private:
