@@ -7,7 +7,7 @@ mkdir release
 cp ../imgui.ini debug/
 cp ../imgui.ini release/
 cd debug
-cmake --DCMAKE_BUILD_TYPE=DEBUG ../..
+cmake -D CMAKE_BUILD_TYPE=DEBUG ../..
 cd ..
 cd release
-cmake --DCMAKE_BUILD_TYPE=RELEASE ../..
+cmake -D CMAKE_BUILD_TYPE=RELEASE ../..
