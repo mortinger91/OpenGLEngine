@@ -1,6 +1,6 @@
 # OpenGLEngine
 ![Compile using MSVC and g++](https://github.com/mortinger91/OpenGLEngine/actions/workflows/cmake.yml/badge.svg)<br/>
-An OpenGL 3D Engine, make with C++, that includes external libraries such as:
+An OpenGL 3D Engine, made with C++, that includes external libraries such as:
 
 - imgui: UI
 - assimp: 3D model loading
